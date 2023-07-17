@@ -6,7 +6,8 @@ export class AppService {
   constructor(private ocppService: OcppService) {}
 
   async getHello(): Promise<string> {
-    await this.ocppService.connect();
+    await this.ocppService.startServer();
+    await this.ocppService.startClient();
     return 'Hello World2!';
   }
 }

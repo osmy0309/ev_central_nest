@@ -1,11 +1,11 @@
-const { RPCServer, createRPCError } = require('ocpp-rpc');
+const { RPCServer, createRPCError, RPCClient } = require('ocpp-rpc');
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class OcppService {
   constructor() {}
 
-  async connect() {
-    console.log('Connected...');
+  async startServer() {
+    console.log('Create Server...');
     const server = new RPCServer({
       protocols: ['ocpp1.6'], // server accepts ocpp1.6 subprotocol
       strictMode: true, // enable strict validation of requests & responses
@@ -67,10 +67,44 @@ export class OcppService {
     });
 
     async function startServer() {
-      await server.listen(3000);
+      console.log('Connected to Server...');
+      await server.listen(3100);
       console.log('Server listening on port 3000');
     }
 
     startServer();
+  }
+
+  async startClient() {
+    const cli = new RPCClient({
+      endpoint: 'ws://localhost:3100', // the OCPP endpoint URL
+      identity: 'EXAMPLE', // the OCPP identity
+      protocols: ['ocpp1.6'], // client understands ocpp1.6 subprotocol
+      strictMode: true, // enable strict validation of requests & responses
+    });
+
+    // connect to the OCPP server
+    await cli.connect();
+
+    // send a BootNotification request and await the response
+    const bootResponse = await cli.call('BootNotification', {
+      chargePointVendor: 'ocpp-rpc',
+      chargePointModel: 'ocpp-rpc',
+    });
+
+    // check that the server accepted the client
+    if (bootResponse.status === 'Accepted') {
+      // send a Heartbeat request and await the response
+      const heartbeatResponse = await cli.call('Heartbeat', {});
+      // read the current server time from the response
+      console.log('Server time is:', heartbeatResponse.currentTime);
+
+      // send a StatusNotification request for the controller
+      await cli.call('StatusNotification', {
+        connectorId: 0,
+        errorCode: 'NoError',
+        status: 'Available',
+      });
+    }
   }
 }
