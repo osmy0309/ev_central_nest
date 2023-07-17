@@ -5,7 +5,7 @@ export class OcppService {
   constructor() {}
 
   async startServer() {
-    console.log('Create Server...');
+    console.log('Create Server OCPP...');
     const server = new RPCServer({
       protocols: ['ocpp1.6'], // server accepts ocpp1.6 subprotocol
       strictMode: true, // enable strict validation of requests & responses
@@ -67,9 +67,9 @@ export class OcppService {
     });
 
     async function startServer() {
-      console.log('Connected to Server...');
+      console.log('Connected to Server OCPP...');
       await server.listen(3100);
-      console.log('Server listening on port 3000');
+      console.log('Server OCPP listening on port 3100');
     }
 
     startServer();
