@@ -15,7 +15,7 @@ export class OcppService {
       // accept the incoming client
       accept({
         // anything passed to accept() will be attached as a 'session' property of the client.
-        sessionId: 'XYZ123',
+        sessionId: handshake.identity,
       });
     });
 
@@ -36,6 +36,65 @@ export class OcppService {
           currentTime: new Date().toISOString(),
         };
       });
+
+      client.handle('Authorize', (params) => {
+        console.log('Parametro idTag: ', params.params.idTag);
+
+        // Verify the idTag and respond with an appropriate response
+        if (params.params.idTag === '12345678') {
+          return {
+            idTagInfo: {
+              status: 'Accepted',
+              expiryDate: '2023-07-31T12:00:00.000Z',
+              parentIdTag: null,
+            },
+          };
+        } else {
+          return {
+            idTagInfo: {
+              status: 'Invalid',
+              expiryDate: null,
+              parentIdTag: null,
+            },
+          };
+        }
+      });
+
+      client.handle(
+        'StartTransaction',
+        ({
+          connectorId,
+          idTag,
+          meterStart,
+          timestamp,
+          reservationId,
+          purpose,
+        }) => {
+          console.log(
+            `Server got StartTransaction from ${client.identity}:`,
+            connectorId,
+            idTag,
+            meterStart,
+            timestamp,
+            reservationId,
+            purpose,
+          );
+
+          // Verify the idTag and respond with an appropriate response
+          if (idTag === '12345678') {
+            return {
+              transactionId: 1234,
+              idTagInfo: {
+                status: 'Accepted',
+                expiryDate: '2023-07-31T12:00:00.000Z',
+                parentIdTag: null,
+              },
+            };
+          } else {
+            throw createRPCError('AuthorizationFailed', 'Invalid idTag');
+          }
+        },
+      );
 
       // create a specific handler for handling Heartbeat requests
       client.handle('Heartbeat', ({ params }) => {
@@ -100,11 +159,60 @@ export class OcppService {
       console.log('Server time is:', heartbeatResponse.currentTime);
 
       // send a StatusNotification request for the controller
-      await cli.call('StatusNotification', {
-        connectorId: 0,
-        errorCode: 'NoError',
-        status: 'Available',
-      });
+
+      await cli
+        .call('StatusNotification', {
+          connectorId: 1,
+          errorCode: 'NoError',
+          status: 'Available',
+        })
+        .then((result) => {
+          console.log('StatusNotification response:', result);
+        })
+        .catch((err) => {
+          console.error('Error sending StatusNotification:', err);
+        });
+
+      await cli
+        .call('Heartbeat', {})
+        .then((result) => {
+          console.log('Heartbeat response:', result);
+        })
+        .catch((err) => {
+          console.error('Error sending Heartbeat:', err);
+        });
+
+      await cli
+        .call('Authorize', {
+          idTag: '12345678',
+        })
+        .then((authorizeResponse) => {
+          console.log('Authorize response:', authorizeResponse);
+          // Si la autorización es exitosa, enviar solicitud de inicio de transacción
+          if (authorizeResponse.idTagInfo.status === 'Accepted') {
+            cli
+              .call('StartTransaction', {
+                connectorId: 1,
+                idTag: '12345678',
+                meterStart: 0,
+                timestamp: new Date().toISOString(),
+                reservationId: 0,
+                purpose: 'ChargePoint',
+              })
+              .then((startTransactionResponse) => {
+                console.log(
+                  'StartTransaction response:',
+                  startTransactionResponse,
+                );
+              })
+              .catch((err) => {
+                console.error('Error en StartTransaction:', err);
+              });
+          }
+        })
+        .catch((err) => {
+          console.error('Error en Authorize:', err);
+        });
     }
   }
 }
