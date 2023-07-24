@@ -23,4 +23,9 @@ export class ClientOcppController {
   async authorizeTransaction(@Body() newConnection: connectDto) {
     return await this.clientOcppService.authorizeTransaction(newConnection);
   }
+
+  @Post('stopTransaction')
+  async stopTransaction(@Body() newConnection: connectDto) {
+    return await this.clientOcppService.stopTransaction(newConnection);
+  }
 }

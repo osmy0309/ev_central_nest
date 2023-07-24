@@ -5,5 +5,6 @@ import { ClientOcppService } from './client_ocpp.service';
 @Module({
   providers: [ClientOcppService],
   controllers: [ClientOcppController],
+  exports: [ClientOcppService],
 })
 export class ClientOcppModule {}

@@ -1,14 +1,16 @@
 const { RPCServer, createRPCError, RPCClient } = require('ocpp-rpc');
 import { Injectable } from '@nestjs/common';
+import { async } from 'rxjs';
+import { ClientOcppService } from '../client_ocpp/client_ocpp.service';
 @Injectable()
 export class OcppService {
-  constructor() {}
+  constructor(private readonly clientOcppService: ClientOcppService) {}
 
   async startServer() {
     console.log('Create Server OCPP...');
     const server = new RPCServer({
       protocols: ['ocpp1.6'], // server accepts ocpp1.6 subprotocol
-      strictMode: true, // enable strict validation of requests & responses
+      strictMode: false, // enable strict validation of requests & responses
     });
 
     server.auth((accept, reject, handshake) => {
@@ -38,7 +40,7 @@ export class OcppService {
       });
 
       client.handle('Authorize', (params) => {
-        console.log('Parametro idTag: ', params.params.idTag);
+        // console.log('Parametro AUTORIZACION: ', params);
 
         // Verify the idTag and respond with an appropriate response
         if (params.params.idTag === '12345678') {
@@ -46,7 +48,7 @@ export class OcppService {
             idTagInfo: {
               status: 'Accepted',
               expiryDate: '2023-07-31T12:00:00.000Z',
-              parentIdTag: null,
+              parentIdTag: '',
             },
           };
         } else {
@@ -54,47 +56,49 @@ export class OcppService {
             idTagInfo: {
               status: 'Invalid',
               expiryDate: null,
-              parentIdTag: null,
+              parentIdTag: '',
             },
           };
         }
       });
 
-      client.handle(
-        'StartTransaction',
-        ({
-          connectorId,
-          idTag,
-          meterStart,
-          timestamp,
-          reservationId,
-          purpose,
-        }) => {
-          console.log(
-            `Server got StartTransaction from ${client.identity}:`,
-            connectorId,
-            idTag,
-            meterStart,
-            timestamp,
-            reservationId,
-            purpose,
-          );
+      client.handle('StartTransaction', (objet) => {
+        console.log(
+          `Server got StartTransaction from ${client.identity}:`,
+          objet.params,
+        );
 
-          // Verify the idTag and respond with an appropriate response
-          if (idTag === '12345678') {
-            return {
-              transactionId: 1234,
-              idTagInfo: {
-                status: 'Accepted',
-                expiryDate: '2023-07-31T12:00:00.000Z',
-                parentIdTag: null,
-              },
-            };
-          } else {
-            throw createRPCError('AuthorizationFailed', 'Invalid idTag');
-          }
-        },
-      );
+        // Verify the idTag and respond with an appropriate response
+        if (objet.params.idTag === '12345678') {
+          return {
+            transactionId: 1234,
+            idTagInfo: {
+              status: 'Accepted',
+              expiryDate: '2023-07-31T12:00:00.000Z',
+              parentIdTag: '',
+            },
+          };
+        } else {
+          throw createRPCError('AuthorizationFailed', 'Invalid idTag');
+        }
+      });
+
+      client.handle('StopTransaction', ({ params }) => {
+        console.log(
+          `Server got StopTransaction from ${client.identity}:`,
+          params,
+        );
+
+        // Aquí puedes agregar la lógica para manejar la solicitud StopTransaction
+        // y realizar cualquier acción necesaria en función de los parámetros recibidos.
+        return {
+          transactionId: params.transactionId,
+          idTagInfo: {
+            status: 'Accepted',
+            expiryDate: '2023-07-31T12:00:00.000Z',
+          },
+        };
+      });
 
       // create a specific handler for handling Heartbeat requests
       client.handle('Heartbeat', ({ params }) => {
@@ -112,7 +116,25 @@ export class OcppService {
           `Server got StatusNotification from ${client.identity}:`,
           params,
         );
-        return {};
+
+        let response = {};
+
+        if (params.status == 'Available') {
+          const ocppClient = new RPCClient({
+            endpoint: 'ws://127.0.0.1:3100',
+            identity: client.session.sessionId,
+            protocols: ['ocpp1.6'],
+            strictMode: false,
+          });
+          ocppClient.connect().then(async () => {
+            response = await this.clientOcppService.authorizeTransaction(
+              ocppClient,
+            );
+            console.log('RESPONSE', response);
+          });
+        }
+        const { connectorId, status } = params;
+        return response;
       });
 
       // create a wildcard handler to handle any RPC method
