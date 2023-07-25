@@ -4,11 +4,13 @@ import { User } from './entities/user.entity';
 import { createUserDto, updateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from 'bcrypt';
+import { Rol } from 'src/rol/entities/rol.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Rol) private rolRepository: Repository<Rol>,
   ) {}
 
   async create(user: createUserDto): Promise<User> {

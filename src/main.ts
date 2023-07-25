@@ -3,13 +3,16 @@ import { DocumentBuilder } from '@nestjs/swagger';
 import { SwaggerModule } from '@nestjs/swagger/dist';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import * as dotenv from 'dotenv';
 
 async function bootstrap() {
+  dotenv.config();
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
 
     .setTitle('API EV CENTRAL NEST')
+    .addBearerAuth()
     .setDescription('')
     .setVersion('1.0')
     .addTag('connect OCPP')

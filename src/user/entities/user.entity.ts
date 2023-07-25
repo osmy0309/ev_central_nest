@@ -1,9 +1,12 @@
 import { Card } from 'src/card/entities/card.entity';
+import { Rol } from 'src/rol/entities/rol.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   /*BeforeInsert, BeforeUpdate,*/ OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 // import { hash } from 'bcrypt';
 //import { Enterprise } from '../../enterprises/entities/enterprice.entity';
@@ -40,6 +43,17 @@ export class User {
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
+  @Column({ type: 'simple-array' })
+  roles: string[];
+
   @OneToMany(() => Card, (card) => card.user)
   cards: Card[];
+
+  @ManyToMany((type) => User, (user) => user.rol)
+  @JoinTable({
+    name: 'user_rol',
+    joinColumn: { name: 'userId' },
+    inverseJoinColumn: { name: 'rolId' },
+  })
+  rol: Rol[];
 }

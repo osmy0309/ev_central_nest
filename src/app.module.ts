@@ -12,6 +12,10 @@ import { AuthModule } from './auth/auth.module';
 import { CardController } from './card/card.controller';
 import { CardService } from './card/card.service';
 import { CardModule } from './card/card.module';
+import { RolService } from './rol/rol.service';
+import { RolModule } from './rol/rol.module';
+import { AccessControlModule } from 'nest-access-control';
+import { roles } from './rol/app.roles';
 
 @Module({
   imports: [
@@ -25,13 +29,21 @@ import { CardModule } from './card/card.module';
       synchronize: true,
       autoLoadEntities: true,
     }),
+    AccessControlModule.forRoles(roles),
     AuthModule,
     OcppModule,
     ClientOcppModule,
     UserModule,
     CardModule,
+    RolModule,
   ],
   controllers: [AppController, ClientOcppController, CardController],
-  providers: [AppService, OcppService, ClientOcppService, CardService],
+  providers: [
+    AppService,
+    OcppService,
+    ClientOcppService,
+    CardService,
+    RolService,
+  ],
 })
 export class AppModule {}

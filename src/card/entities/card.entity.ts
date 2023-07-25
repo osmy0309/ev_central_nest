@@ -1,7 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
-// import { hash } from 'bcrypt';
-//import { Enterprise } from '../../enterprises/entities/enterprice.entity';
 
 @Entity()
 export class Card {
@@ -11,7 +9,7 @@ export class Card {
   @Column()
   no_serie: string;
 
-  @Column()
+  @Column({ default: () => 0 })
   idTarjetaPadre?: number;
 
   @Column({ type: 'float', default: () => 0 })

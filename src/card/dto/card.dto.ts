@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator';
 import { User } from 'src/user/entities/user.entity';
 
 export class createCardDto {
@@ -7,6 +13,7 @@ export class createCardDto {
   no_serie: string;
 
   @IsNumber()
+  @IsOptional()
   idTarjetaPadre?: number;
 
   @IsNotEmpty()
@@ -15,4 +22,22 @@ export class createCardDto {
 
   @IsNotEmpty()
   user: User;
+}
+
+export class updateCardDto {
+  @IsOptional()
+  @IsString()
+  no_serie?: string;
+
+  @IsOptional()
+  @IsNumber()
+  idTarjetaPadre?: number;
+
+  @IsOptional()
+  @IsNumber()
+  balance?: number;
+
+  @IsOptional()
+  @ValidateNested()
+  user?: User;
 }
