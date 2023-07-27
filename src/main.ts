@@ -18,6 +18,8 @@ async function bootstrap() {
     .addTag('connect OCPP')
     .addTag('User')
     .addTag('Autentication')
+    .addTag('Card-Charges')
+    .addTag('Charges')
     .build();
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();

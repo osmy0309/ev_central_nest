@@ -4,12 +4,10 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  /*BeforeInsert, BeforeUpdate,*/ OneToMany,
+  OneToMany,
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-// import { hash } from 'bcrypt';
-//import { Enterprise } from '../../enterprises/entities/enterprice.entity';
 
 @Entity()
 export class User {

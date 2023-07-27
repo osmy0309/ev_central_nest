@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsString,
@@ -10,17 +11,29 @@ import { User } from 'src/user/entities/user.entity';
 export class createCardDto {
   @IsNotEmpty()
   @IsString()
+  @ApiProperty({
+    example: '123',
+    description: 'El usuario que va autenticarse',
+  })
   no_serie: string;
 
   @IsNumber()
   @IsOptional()
+  @ApiProperty({
+    example: '1 Opcional',
+    description: 'El usuario que va autenticarse',
+  })
   idTarjetaPadre?: number;
 
   @IsNotEmpty()
   @IsNumber()
+  @ApiProperty({
+    example: 2,
+    description: 'El usuario que va autenticarse',
+  })
   balance: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   user: User;
 }
 

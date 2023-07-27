@@ -16,6 +16,8 @@ import { RolService } from './rol/rol.service';
 import { RolModule } from './rol/rol.module';
 import { AccessControlModule } from 'nest-access-control';
 import { roles } from './rol/app.roles';
+import { ChargeController } from './charge/charge.controller';
+import { ChargeModule } from './charge/charge.module';
 
 @Module({
   imports: [
@@ -36,8 +38,9 @@ import { roles } from './rol/app.roles';
     UserModule,
     CardModule,
     RolModule,
+    ChargeModule,
   ],
-  controllers: [AppController, ClientOcppController, CardController],
+  controllers: [AppController, ClientOcppController, CardController, ChargeController],
   providers: [
     AppService,
     OcppService,

@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  ParseIntPipe,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { RolService } from './rol.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { createRolDTO } from './dto/rol.dto';
@@ -23,8 +13,7 @@ import { RolesGuard } from 'src/guards/roles.guard';
 export class RolController {
   constructor(private readonly rolService: RolService) {}
 
-  @Roles('AUTOR')
-  @UseGuards(RolesGuard)
+  @Roles('ADMIN', 'AUTOR')
   @Auth()
   @Get()
   async findAll() {
