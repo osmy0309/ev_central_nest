@@ -18,6 +18,11 @@ import { AccessControlModule } from 'nest-access-control';
 import { roles } from './rol/app.roles';
 import { ChargeController } from './charge/charge.controller';
 import { ChargeModule } from './charge/charge.module';
+import { TransactionService } from './transaction/transaction.service';
+import { TransactionModule } from './transaction/transaction.module';
+import { TimeZoneController } from './time_zone/time_zone.controller';
+import { TimeZoneService } from './time_zone/time_zone.service';
+import { TimeZoneModule } from './time_zone/time_zone.module';
 
 @Module({
   imports: [
@@ -39,14 +44,18 @@ import { ChargeModule } from './charge/charge.module';
     CardModule,
     RolModule,
     ChargeModule,
+    TransactionModule,
+    TimeZoneModule,
   ],
-  controllers: [AppController, ClientOcppController, CardController, ChargeController],
+  controllers: [AppController, ClientOcppController, CardController, ChargeController, TimeZoneController],
   providers: [
     AppService,
     OcppService,
     ClientOcppService,
     CardService,
     RolService,
+    TransactionService,
+    TimeZoneService,
   ],
 })
 export class AppModule {}

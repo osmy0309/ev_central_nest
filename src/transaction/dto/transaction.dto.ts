@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
-
-export class createCard_ChargerDto {
+export class createTrasactionDto {
   @IsNotEmpty()
   @IsNumber()
   @ApiProperty({
@@ -27,7 +26,7 @@ export class createCard_ChargerDto {
   estado: number;
 }
 
-export class updateCard_ChargerDto {
+export class updateTrasactionDto {
   @IsOptional()
   @IsNumber()
   @ApiProperty({
@@ -53,7 +52,7 @@ export class updateCard_ChargerDto {
   estado?: number;
 }
 
-export class deleteCard_ChargerDto {
+export class deleteTrasactionDto {
   @IsOptional()
   @IsNumber()
   @ApiProperty({

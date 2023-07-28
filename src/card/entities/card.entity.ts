@@ -1,5 +1,6 @@
 import { Card_Charge } from 'src/charge/entities/card_charge.entity';
 import { Charge } from 'src/charge/entities/charge.entity';
+import { Transaction } from 'src/transaction/entities/transaction.entity';
 import {
   Entity,
   Column,
@@ -18,7 +19,7 @@ export class Card {
   @Column()
   no_serie: string;
 
-  @Column({ default: () => null })
+  @Column({ default: 0 })
   idTarjetaPadre?: number;
 
   @Column({ type: 'float', default: () => 0 })
@@ -34,4 +35,7 @@ export class Card {
 
   @OneToMany(() => Card_Charge, (card_charge) => card_charge.card)
   public card_charge: Card_Charge[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.card)
+  public transaction: Transaction[];
 }

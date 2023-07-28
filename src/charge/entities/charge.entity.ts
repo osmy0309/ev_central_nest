@@ -1,4 +1,5 @@
 import { Card } from 'src/card/entities/card.entity';
+import { Transaction } from 'src/transaction/entities/transaction.entity';
 import {
   Entity,
   Column,
@@ -56,4 +57,7 @@ export class Charge {
   //Relacion
   @OneToMany(() => Card_Charge, (card_charge) => card_charge.charge)
   public card_charge: Card_Charge[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.charge)
+  public transaction: Transaction[];
 }

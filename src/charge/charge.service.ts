@@ -7,7 +7,7 @@ import { User } from '../user/entities/user.entity';
 import { Card_Charge } from './entities/card_charge.entity';
 import {
   createCard_ChargerDto,
-  updateCard_ChargerDto,
+  deleteCard_ChargerDto,
 } from './dto/card_charge.dto';
 import { Card } from 'src/card/entities/card.entity';
 
@@ -125,7 +125,7 @@ export class ChargeService {
     const newRelation = this.card_chargeRepository.create(newCard_Charge);
     return await this.card_chargeRepository.save(newRelation);
   }
-
+  // ENDPOINTS PARA LA TABLA RELACIONAL ENTRE TARJETA Y CARGADOR
   async changeStateCard_Charge(
     newCard_Charge: createCard_ChargerDto,
   ): Promise<Card_Charge> {
@@ -140,5 +140,59 @@ export class ChargeService {
     }
     relactionexist.estado = newCard_Charge.estado;
     return await this.card_chargeRepository.save(relactionexist);
+  }
+
+  async deleteRelationCardCharge(
+    deleteCard_ChargerDto: deleteCard_ChargerDto,
+  ): Promise<any> {
+    if (deleteCard_ChargerDto.cardId && deleteCard_ChargerDto.chargeId) {
+      const searchCardCharge = await this.card_chargeRepository.findOne({
+        where: {
+          cardId: deleteCard_ChargerDto.cardId,
+          chargeId: deleteCard_ChargerDto.chargeId,
+        },
+      });
+      if (!searchCardCharge) throw new HttpException('RELATION_NOT_EXIST', 400);
+      console.log(searchCardCharge.id);
+      const charge = await this.card_chargeRepository.delete({
+        id: searchCardCharge.id,
+      });
+      if (charge.affected === 0) {
+        throw new HttpException('CHARGE_NOT_FOUND', 400);
+      }
+      return { success: true };
+    } else if (deleteCard_ChargerDto.cardId) {
+      const searchCardCharge = await this.card_chargeRepository.find({
+        where: {
+          cardId: deleteCard_ChargerDto.cardId,
+        },
+      });
+      console.log(searchCardCharge);
+      if (searchCardCharge.length == 0)
+        throw new HttpException('CARD_NOT_RELATION', 400);
+      searchCardCharge.forEach(async (item) => {
+        await this.card_chargeRepository.delete({
+          id: item.id,
+        });
+      });
+      return { success: true };
+    } else if (deleteCard_ChargerDto.chargeId) {
+      const cardCharges = await this.card_chargeRepository.find({
+        where: {
+          chargeId: deleteCard_ChargerDto.chargeId,
+        },
+      });
+      if (cardCharges.length == 0)
+        throw new HttpException('CHARGE_NOT_RELATION', 400);
+      console.log(cardCharges);
+
+      cardCharges.forEach(async (item) => {
+        await this.card_chargeRepository.delete({
+          id: item.id,
+        });
+      });
+
+      return { success: true };
+    } else throw new HttpException('CHARGEID_OR_CARDID_IS_NECESARY', 400);
   }
 }
