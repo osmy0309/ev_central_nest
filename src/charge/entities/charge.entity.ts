@@ -45,16 +45,6 @@ export class Charge {
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   last_connection: Date;
 
-  /* @ManyToMany((type) => Charge, (charge) => charge.card)
-  @JoinTable({
-    name: 'card_charge',
-    joinColumn: { name: 'cardId' },
-    inverseJoinColumn: { name: 'chargeId' },
-  })
-  card: Card[];
-  @Column()
-  estado: string;*/
-  //Relacion
   @OneToMany(() => Card_Charge, (card_charge) => card_charge.charge)
   public card_charge: Card_Charge[];
 

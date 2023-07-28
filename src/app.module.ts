@@ -23,6 +23,9 @@ import { TransactionModule } from './transaction/transaction.module';
 import { TimeZoneController } from './time_zone/time_zone.controller';
 import { TimeZoneService } from './time_zone/time_zone.service';
 import { TimeZoneModule } from './time_zone/time_zone.module';
+import { ChargeService } from './charge/charge.service';
+import { TransactionController } from './transaction/transaction.controller';
+import { UserController } from './user/user.controller';
 
 @Module({
   imports: [
@@ -47,7 +50,15 @@ import { TimeZoneModule } from './time_zone/time_zone.module';
     TransactionModule,
     TimeZoneModule,
   ],
-  controllers: [AppController, ClientOcppController, CardController, ChargeController, TimeZoneController],
+  controllers: [
+    AppController,
+    ClientOcppController,
+    CardController,
+    ChargeController,
+    TimeZoneController,
+    TransactionController,
+    UserController,
+  ],
   providers: [
     AppService,
     OcppService,
@@ -56,6 +67,7 @@ import { TimeZoneModule } from './time_zone/time_zone.module';
     RolService,
     TransactionService,
     TimeZoneService,
+    ChargeService,
   ],
 })
 export class AppModule {}

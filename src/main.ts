@@ -19,6 +19,7 @@ async function bootstrap() {
     .addTag('User')
     .addTag('Autentication')
     .addTag('Card-Charges')
+    .addTag('Time-Zone')
     .addTag('Charges')
     .build();
   app.useGlobalPipes(new ValidationPipe());

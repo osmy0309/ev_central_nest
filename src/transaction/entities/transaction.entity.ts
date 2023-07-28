@@ -1,5 +1,12 @@
 import { Card } from 'src/card/entities/card.entity';
-import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Timezone } from 'src/time_zone/entities/time_zone.entity';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  OneToMany,
+} from 'typeorm';
 import { Charge } from '../../charge/entities/charge.entity';
 
 @Entity()
@@ -21,4 +28,7 @@ export class Transaction {
 
   @ManyToOne(() => Card, (card) => card.transaction)
   public card: Card;
+
+  @OneToMany(() => Timezone, (timezone) => timezone.transaction)
+  timezones: Timezone[];
 }

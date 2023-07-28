@@ -3,7 +3,6 @@ import { Repository, DataSource } from 'typeorm';
 import { Charge } from './entities/charge.entity';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { createChargerDto, updateUserDto } from './dto/charge.dto';
-import { User } from '../user/entities/user.entity';
 import { Card_Charge } from './entities/card_charge.entity';
 import {
   createCard_ChargerDto,
