@@ -94,11 +94,11 @@ export class CardService {
     return await this.cardRepository.save(cardToUpdate);
   }
 
-  async deleteCard(id: number): Promise<any> {
+  async deleteCard(id: number): Promise<{ success: boolean }> {
     const card = await this.cardRepository.delete({ id });
     if (card.affected === 0) {
-      return new HttpException('CARD_NOT_FOUND', 400);
+      throw new HttpException('CARD_NOT_FOUND', 400);
     }
-    return card;
+    return { success: true };
   }
 }

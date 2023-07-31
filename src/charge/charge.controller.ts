@@ -26,9 +26,12 @@ export class ChargeController {
   constructor(private readonly chargeService: ChargeService) {}
   //@ApiBearerAuth()
   // @UseGuards(AuthGuard)
-  @Post('create')
-  async createCharge(@Body() newCharge: createChargerDto) {
-    return await this.chargeService.create(newCharge);
+  @Post(':id_client/create')
+  async createCharge(
+    @Param('id_client', ParseIntPipe) id_client: number,
+    @Body() newCharge: createChargerDto,
+  ) {
+    return await this.chargeService.create(newCharge, id_client);
   }
 
   @Get(':id')

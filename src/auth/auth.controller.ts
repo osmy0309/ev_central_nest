@@ -11,10 +11,10 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   //@UseGuards(AuthGuard)
-  @Post('register')
+  /*@Post('register')
   registerUser(@Body() userObjet: registerUserDto) {
     return this.authService.register(userObjet);
-  }
+  }*/
 
   @Post('login')
   loginUser(@Body() userLogin: loginUserDto) {

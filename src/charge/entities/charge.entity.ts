@@ -1,4 +1,5 @@
 import { Card } from 'src/card/entities/card.entity';
+import { Client } from 'src/client/entities/client.entity';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
 import {
   Entity,
@@ -7,6 +8,7 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { Card_Charge } from './card_charge.entity';
 
@@ -50,4 +52,10 @@ export class Charge {
 
   @OneToMany(() => Transaction, (transaction) => transaction.charge)
   public transaction: Transaction[];
+
+  @ManyToOne(() => Client, (client) => client.users, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
+  client: Client;
 }

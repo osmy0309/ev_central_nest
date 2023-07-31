@@ -26,6 +26,9 @@ import { TimeZoneModule } from './time_zone/time_zone.module';
 import { ChargeService } from './charge/charge.service';
 import { TransactionController } from './transaction/transaction.controller';
 import { UserController } from './user/user.controller';
+import { UserseederModule } from './userseeder/userseeder.module';
+import { UserSeederService } from './userseeder/userseeder.service';
+import { ClientModule } from './client/client.module';
 
 @Module({
   imports: [
@@ -49,6 +52,8 @@ import { UserController } from './user/user.controller';
     ChargeModule,
     TransactionModule,
     TimeZoneModule,
+    UserseederModule,
+    ClientModule,
   ],
   controllers: [
     AppController,
@@ -68,6 +73,7 @@ import { UserController } from './user/user.controller';
     TransactionService,
     TimeZoneService,
     ChargeService,
+    UserSeederService,
   ],
 })
 export class AppModule {}

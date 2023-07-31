@@ -1,4 +1,5 @@
 import { Card } from 'src/card/entities/card.entity';
+import { Client } from 'src/client/entities/client.entity';
 import { Rol } from 'src/rol/entities/rol.entity';
 import {
   Entity,
@@ -7,6 +8,7 @@ import {
   OneToMany,
   ManyToMany,
   JoinTable,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity()
@@ -47,11 +49,17 @@ export class User {
   @OneToMany(() => Card, (card) => card.user)
   cards: Card[];
 
-  @ManyToMany((type) => User, (user) => user.rol)
+  @ManyToOne(() => Client, (client) => client.users, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
+  client: Client;
+
+  /*@ManyToMany((type) => User, (user) => user.rol)
   @JoinTable({
     name: 'user_rol',
     joinColumn: { name: 'userId' },
     inverseJoinColumn: { name: 'rolId' },
   })
-  rol: Rol[];
+  rol: Rol[];*/
 }

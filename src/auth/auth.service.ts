@@ -21,9 +21,9 @@ export class AuthService {
     });
   }
 
-  async register(userObjet: registerUserDto): Promise<any> {
+  /* async register(userObjet: registerUserDto): Promise<any> {
     return this.usersService.create(userObjet);
-  }
+  }*/
   logoutall(): any {
     return { message: 'Success' };
   }

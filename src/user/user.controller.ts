@@ -20,16 +20,12 @@ import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  @ApiBody({
-    type: createUserDto,
-    required: true,
-    description:
-      'Los datos del usuario a crear (username: string, password: string, firstName: string, lastName: string, email: string, direction: string, dni: string)',
-  })
-  @ApiParam({ name: 'newUser', type: createUserDto, required: true })
-  async createUser(@Body() newUser: createUserDto) {
-    return await this.userService.create(newUser);
+  @Post(':id_client')
+  async createUser(
+    @Param('id_client', ParseIntPipe) id_client: number,
+    @Body() newUser: createUserDto,
+  ) {
+    return await this.userService.create(newUser, id_client);
   }
 
   @Get()
@@ -43,13 +39,6 @@ export class UserController {
   }
 
   @Patch(':id')
-  @ApiBody({
-    type: updateUserDto,
-    required: true,
-    description:
-      'Los datos del usuario a modificar (username: string, password: string, firstName: string, lastName: string, email: string, direction: string, dni: string)',
-  })
-  @ApiParam({ name: 'newUser', type: updateUserDto, required: true })
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
     @Body() userModify: any,

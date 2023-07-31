@@ -9,6 +9,7 @@ import {
   deleteCard_ChargerDto,
 } from './dto/card_charge.dto';
 import { Card } from 'src/card/entities/card.entity';
+import { Client } from 'src/client/entities/client.entity';
 
 @Injectable()
 export class ChargeService {
@@ -19,12 +20,22 @@ export class ChargeService {
     private card_chargeRepository: Repository<Card_Charge>,
     @InjectRepository(Card)
     private cardRepository: Repository<Card>,
+    @InjectRepository(Client) private clientRepository: Repository<Client>,
 
     @InjectDataSource()
     private dataSource: DataSource,
   ) {}
 
-  async create(charge: createChargerDto): Promise<Charge> {
+  async create(charge: createChargerDto, id_client: number): Promise<Charge> {
+    const client = await this.clientRepository.findOne({
+      where: {
+        id: id_client,
+      },
+    });
+    if (!client) {
+      throw new HttpException('CLIENT_NOT_EXIST', 400);
+    }
+
     const chargeFind = await this.chargeRepository.findOne({
       where: {
         serial_number: charge.serial_number,
@@ -33,7 +44,8 @@ export class ChargeService {
     if (chargeFind) {
       throw new HttpException('CHARGE_EXIST', 400);
     }
-
+    charge.client = client;
+    await this.clientRepository.save(client);
     const newCHARGE = this.chargeRepository.create(charge);
     return await this.chargeRepository.save(newCHARGE);
   }
