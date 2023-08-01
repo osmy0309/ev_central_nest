@@ -23,12 +23,20 @@ export class Transaction {
   @Column()
   public estado: number;
 
-  @ManyToOne(() => Charge, (charge) => charge.transaction)
+  @ManyToOne(() => Charge, (charge) => charge.transaction, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
   public charge: Charge;
 
-  @ManyToOne(() => Card, (card) => card.transaction)
+  @ManyToOne(() => Card, (card) => card.transaction, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
   public card: Card;
 
-  @OneToMany(() => Timezone, (timezone) => timezone.transaction)
+  @OneToMany(() => Timezone, (timezone) => timezone.transaction, {
+    cascade: true,
+  })
   timezones: Timezone[];
 }

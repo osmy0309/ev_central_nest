@@ -11,9 +11,8 @@ import {
 } from '@nestjs/common';
 import { CardService } from './card.service';
 import { GetPrincipal } from 'src/decorators/get-principal.decorator';
-import { AuthGuard } from '../guards/auth.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { createCardDto, updateCardDto } from './dto/card.dto';
+import { createCardDto, updateCardDto, asingCardDto } from './dto/card.dto';
 import { Roles } from 'src/rol/decorator/rol.decorator';
 import { Auth } from 'src/decorators/auth.decorator';
 
@@ -21,15 +20,20 @@ import { Auth } from 'src/decorators/auth.decorator';
 @Controller('card')
 export class CardController {
   constructor(private readonly cardService: CardService) {}
+  @Roles('ADMIN')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
-  @Post('create')
-  async createCard(
-    @Body() newCard: createCardDto,
-    id_user: number,
-    @GetPrincipal() user: any,
-  ) {
-    return await this.cardService.create(newCard, user.userid);
+  @Auth()
+  @Post()
+  async createCard(@Body() newCard: createCardDto) {
+    return await this.cardService.create(newCard);
+  }
+
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @Post('asing_to_card')
+  async asingCard(@Body() asing: asingCardDto) {
+    return await this.cardService.asingCard(asing);
   }
 
   @Roles('ADMIN')
@@ -40,7 +44,9 @@ export class CardController {
     return await this.cardService.getCards(user.userid);
   }
 
-  @UseGuards(AuthGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
   @Patch(':id')
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
@@ -51,7 +57,7 @@ export class CardController {
     return await this.cardService.patchCards(cardModify, id, user.userid);
   }
 
-  @Roles('ADMIN', 'AUTOR')
+  @Roles('ADMIN')
   @Auth()
   @Delete(':id')
   async deleteUsers(@Param('id', ParseIntPipe) id: number): Promise<any> {

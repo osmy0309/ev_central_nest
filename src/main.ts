@@ -21,6 +21,7 @@ async function bootstrap() {
     .addTag('Card-Charges')
     .addTag('Time-Zone')
     .addTag('Charges')
+    .addTag('Company')
     .build();
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();

@@ -42,12 +42,13 @@ export class AuthService {
         'Unable to log in with provided credentials.',
         400,
       );
-    console.log(findUser.roles);
+    console.log(findUser);
     const payload = {
       userid: findUser.id,
       username: username,
       jti: v4(),
       roles: findUser.roles,
+      company: findUser.client.id,
     };
     const token = await this.generateToken(payload);
     delete findUser['password'];

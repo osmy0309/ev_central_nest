@@ -1,5 +1,5 @@
 import { Card } from 'src/card/entities/card.entity';
-import { Client } from 'src/client/entities/client.entity';
+import { Company } from 'src/client/entities/client.entity';
 import { Rol } from 'src/rol/entities/rol.entity';
 import {
   Entity,
@@ -46,14 +46,16 @@ export class User {
   @Column({ type: 'simple-array' })
   roles: string[];
 
-  @OneToMany(() => Card, (card) => card.user)
+  @OneToMany(() => Card, (card) => card.user, {
+    cascade: true,
+  })
   cards: Card[];
 
-  @ManyToOne(() => Client, (client) => client.users, {
+  @ManyToOne(() => Company, (client) => client.users, {
     onDelete: 'CASCADE',
     nullable: false,
   })
-  client: Client;
+  client: Company;
 
   /*@ManyToMany((type) => User, (user) => user.rol)
   @JoinTable({

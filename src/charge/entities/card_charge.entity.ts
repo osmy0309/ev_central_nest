@@ -16,9 +16,15 @@ export class Card_Charge {
   @Column()
   public estado: number;
 
-  @ManyToOne(() => Charge, (charge) => charge.card_charge)
+  @ManyToOne(() => Charge, (charge) => charge.card_charge, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
   public charge: Charge;
 
-  @ManyToOne(() => Card, (card) => card.card_charge)
+  @ManyToOne(() => Card, (card) => card.card_charge, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
   public card: Card;
 }

@@ -24,12 +24,19 @@ export class Card {
   @Column({ type: 'float', default: () => 0 })
   balance: number;
 
-  @ManyToOne(() => User, (user) => user.cards)
+  @ManyToOne(() => User, (user) => user.cards, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
   user: User;
 
-  @OneToMany(() => Card_Charge, (card_charge) => card_charge.card)
+  @OneToMany(() => Card_Charge, (card_charge) => card_charge.card, {
+    cascade: true,
+  })
   public card_charge: Card_Charge[];
 
-  @OneToMany(() => Transaction, (transaction) => transaction.card)
+  @OneToMany(() => Transaction, (transaction) => transaction.card, {
+    cascade: true,
+  })
   public transaction: Transaction[];
 }

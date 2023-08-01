@@ -1,5 +1,5 @@
 import { Card } from 'src/card/entities/card.entity';
-import { Client } from 'src/client/entities/client.entity';
+import { Company } from 'src/client/entities/client.entity';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
 import {
   Entity,
@@ -47,15 +47,19 @@ export class Charge {
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   last_connection: Date;
 
-  @OneToMany(() => Card_Charge, (card_charge) => card_charge.charge)
+  @OneToMany(() => Card_Charge, (card_charge) => card_charge.charge, {
+    cascade: true,
+  })
   public card_charge: Card_Charge[];
 
-  @OneToMany(() => Transaction, (transaction) => transaction.charge)
+  @OneToMany(() => Transaction, (transaction) => transaction.charge, {
+    cascade: true,
+  })
   public transaction: Transaction[];
 
-  @ManyToOne(() => Client, (client) => client.users, {
+  @ManyToOne(() => Company, (client) => client.users, {
     onDelete: 'CASCADE',
     nullable: false,
   })
-  client: Client;
+  client: Company;
 }

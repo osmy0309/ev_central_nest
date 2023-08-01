@@ -3,7 +3,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity()
-export class Client {
+export class Company {
   @PrimaryGeneratedColumn('increment')
   id: number;
 

@@ -5,13 +5,13 @@ import { createUserDto, updateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from 'bcrypt';
 import { Rol } from 'src/rol/entities/rol.entity';
-import { Client } from 'src/client/entities/client.entity';
+import { Company } from 'src/client/entities/client.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(Client) private clientRepository: Repository<Client>,
+    @InjectRepository(Company) private clientRepository: Repository<Company>,
   ) {}
 
   async create(user: createUserDto, id_client: number): Promise<User> {
@@ -60,14 +60,22 @@ export class UserService {
   }
 
   async getUserByUserName(username: string): Promise<any> {
-    const user = await this.userRepository.findOne({
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.client', 'company')
+      .select(['user', 'company.id'])
+      .where('user.username = :username', { username })
+      .getOne();
+    console.log(user);
+    /*const user = await this.userRepository.findOne({
       where: {
         username,
       },
-    });
+    });*/
     if (!user) {
       return new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
+
     return user;
   }
 

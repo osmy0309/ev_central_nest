@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsNumber, IsOptional } from 'class-validator';
-import { Client } from 'src/client/entities/client.entity';
+import { Company } from 'src/client/entities/client.entity';
 
 export class createChargerDto {
   @IsNotEmpty()
@@ -79,7 +79,7 @@ export class createChargerDto {
   last_connection: Date;
 
   @IsOptional()
-  client: Client;
+  client: Company;
 }
 
 export class updateUserDto {

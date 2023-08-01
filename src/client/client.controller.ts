@@ -9,26 +9,31 @@ import {
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Auth } from 'src/decorators/auth.decorator';
+import { Roles } from 'src/rol/decorator/rol.decorator';
 import { ClientService } from './client.service';
 import { createClientDto, updateClientDto } from './dto/client.dto';
-import { Client } from './entities/client.entity';
-@ApiTags('Client')
-@Controller('client')
+import { Company } from './entities/client.entity';
+@ApiTags('Company')
+@Controller('company')
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
   @Post()
-  async createClient(@Body() newClient: createClientDto) {
+  async createClient(@Body() newClient: createClientDto): Promise<Company> {
     return await this.clientService.create(newClient);
   }
 
   @Get()
-  async findAll() {
+  async findAll(): Promise<Company[]> {
     return await this.clientService.getClients();
   }
 
   @Get(':id')
-  async getUserByID(@Param('id', ParseIntPipe) id: number): Promise<Client> {
+  async getUserByID(@Param('id', ParseIntPipe) id: number): Promise<Company> {
     return await this.clientService.getClientById(id);
   }
 
@@ -36,7 +41,7 @@ export class ClientController {
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
     @Body() clientModify: updateClientDto,
-  ) {
+  ): Promise<Company> {
     return await this.clientService.updateClient(id, clientModify);
   }
 

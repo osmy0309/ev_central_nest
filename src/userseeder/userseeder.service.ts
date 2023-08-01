@@ -4,14 +4,14 @@ import { createUserDto } from 'src/user/dto/create-user.dto';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { hash } from 'bcrypt';
-import { Client } from 'src/client/entities/client.entity';
+import { Company } from 'src/client/entities/client.entity';
 import { createClientDto } from 'src/client/dto/client.dto';
 
 @Injectable()
 export class UserSeederService implements OnModuleInit {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(Client) private clientRepository: Repository<Client>,
+    @InjectRepository(Company) private clientRepository: Repository<Company>,
   ) {}
 
   async onModuleInit() {

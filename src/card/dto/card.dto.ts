@@ -34,7 +34,7 @@ export class createCardDto {
   balance: number;
 
   @IsOptional()
-  user: User;
+  user?: User;
 }
 
 export class updateCardDto {
@@ -53,4 +53,22 @@ export class updateCardDto {
   @IsOptional()
   @ValidateNested()
   user?: User;
+}
+
+export class asingCardDto {
+  @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty({
+    example: 1,
+    description: 'el id de la tarjeta y el usuario a la que se valla a asignar',
+  })
+  id_card: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty({
+    example: 2,
+    description: 'el id de la tarjeta y el usuario a la que se valla a asignar',
+  })
+  id_user: number;
 }

@@ -20,6 +20,7 @@ export class Timezone {
 
   @ManyToOne(() => Transaction, (transaction) => transaction.timezones, {
     onDelete: 'CASCADE',
+    nullable: false,
   })
   transaction: Transaction;
 }

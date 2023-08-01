@@ -10,7 +10,7 @@ import {
   IsOptional,
   IsEmail,
 } from 'class-validator';
-import { Client } from 'src/client/entities/client.entity';
+import { Company } from 'src/client/entities/client.entity';
 import { AppRoles } from 'src/rol/app.roles';
 
 export class createUserDto {
@@ -84,7 +84,7 @@ export class createUserDto {
   roles: string[];
 
   @IsOptional()
-  client?: Client;
+  client?: Company;
 
   /* @IsEnum(RolName, { message: 'Los roles establecidos son user o admin' })
   rolname: RolName;*/
@@ -155,5 +155,5 @@ export class updateUserDto {
   roles: string[];
 
   @IsOptional()
-  client?: Client;
+  client?: Company;
 }

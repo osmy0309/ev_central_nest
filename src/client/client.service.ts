@@ -2,15 +2,15 @@ import { Injectable, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { createClientDto, updateClientDto } from './dto/client.dto';
-import { Client } from './entities/client.entity';
+import { Company } from './entities/client.entity';
 
 @Injectable()
 export class ClientService {
   constructor(
-    @InjectRepository(Client) private clientRepository: Repository<Client>,
+    @InjectRepository(Company) private clientRepository: Repository<Company>,
   ) {}
 
-  async create(client: createClientDto): Promise<Client> {
+  async create(client: createClientDto): Promise<Company> {
     const clientFind = await this.clientRepository.findOne({
       //BUSCAR PARA QUE NO EXISTAN USUARIOS REPETIDOS
       where: {
@@ -25,13 +25,13 @@ export class ClientService {
     return await this.clientRepository.save(newClient);
   }
 
-  async getClients(): Promise<Client[]> {
+  async getClients(): Promise<Company[]> {
     const clients = await this.clientRepository.find();
     if (!clients.length) throw new HttpException('CLIENT_NOT_FOUND', 400);
     return clients;
   }
 
-  async getClientById(id: number): Promise<Client> {
+  async getClientById(id: number): Promise<Company> {
     const client = await this.clientRepository.findOne({
       where: {
         id,
@@ -43,7 +43,7 @@ export class ClientService {
     return client;
   }
 
-  async getClientByEmail(email: string): Promise<Client> {
+  async getClientByEmail(email: string): Promise<Company> {
     const client = await this.clientRepository.findOne({
       where: {
         email,
@@ -64,7 +64,7 @@ export class ClientService {
     return { success: true };
   }
 
-  async updateClient(id: number, client: updateClientDto): Promise<Client> {
+  async updateClient(id: number, client: updateClientDto): Promise<Company> {
     const response = await this.clientRepository.update({ id }, client);
     if (response.affected === 0) {
       throw new HttpException('CLIENT_NOT_FOUND', 400);

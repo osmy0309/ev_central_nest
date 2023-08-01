@@ -9,7 +9,7 @@ import {
   deleteCard_ChargerDto,
 } from './dto/card_charge.dto';
 import { Card } from 'src/card/entities/card.entity';
-import { Client } from 'src/client/entities/client.entity';
+import { Company } from 'src/client/entities/client.entity';
 
 @Injectable()
 export class ChargeService {
@@ -20,7 +20,7 @@ export class ChargeService {
     private card_chargeRepository: Repository<Card_Charge>,
     @InjectRepository(Card)
     private cardRepository: Repository<Card>,
-    @InjectRepository(Client) private clientRepository: Repository<Client>,
+    @InjectRepository(Company) private clientRepository: Repository<Company>,
 
     @InjectDataSource()
     private dataSource: DataSource,
