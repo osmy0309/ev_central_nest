@@ -41,13 +41,29 @@ export class UserService {
     return await this.userRepository.save(newUser);
   }
 
-  async getUser(): Promise<User[]> {
-    const users = await this.userRepository.find();
-    if (!users.length) throw new HttpException('USER_NOT_FOUND', 400);
+  async getUser(user: any): Promise<User[]> {
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.client', 'company')
+      .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.isActive',
+        'user.username',
+        'user.email',
+        'user.direction',
+        'user.dni',
+        'user.roles',
+        'company.id',
+      ])
+      .where('user.clientId = :id', { id: user.company })
+      .getMany();
+    if (users.length == 0) throw new HttpException('USER_NOT_FOUND', 400);
     return users;
   }
 
-  async getUserById(id: number): Promise<any> {
+  async getUserByIdAuth(id: number): Promise<any> {
     const user = await this.userRepository.findOne({
       where: {
         id,
@@ -55,6 +71,31 @@ export class UserService {
     });
     if (!user) {
       return new HttpException('USER_NOT_FOUND', 400);
+    }
+    return user;
+  }
+
+  async getUserById(id: number, usercompany: any): Promise<User> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.client', 'company')
+      .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.isActive',
+        'user.username',
+        'user.email',
+        'user.direction',
+        'user.dni',
+        'user.roles',
+        'company.id',
+      ])
+      .where('user.clientId = :id', { id: usercompany })
+      .andWhere('user.id = :id', { id })
+      .getOne();
+    if (!user) {
+      throw new HttpException('USER_NOT_THIS_COMPANY', 400);
     }
     return user;
   }

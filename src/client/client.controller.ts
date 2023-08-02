@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   ParseIntPipe,
-  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Auth } from 'src/decorators/auth.decorator';
@@ -47,28 +46,46 @@ export class ClientController {
     );
   }
 
-  @Get()
-  async findAll(): Promise<Company[]> {
-    return await this.clientService.getClients();
+  @Roles('ADMIN', 'AUTOR')
+  @ApiBearerAuth()
+  @Auth()
+  @Get('companys_son_tree')
+  async findAllMyClients(@GetPrincipal() user: any): Promise<Company[]> {
+    return await this.clientService.getMyClientsTree(user.company);
   }
 
-  @Get(':id')
-  async getUserByID(@Param('id', ParseIntPipe) id: number): Promise<Company> {
-    return await this.clientService.getClientById(id);
+  @Roles('ADMIN', 'AUTOR')
+  @ApiBearerAuth()
+  @Auth()
+  @Get('company_login')
+  async getClientById(@GetPrincipal() user: any): Promise<Company> {
+    return await this.clientService.getClientById(user.company);
   }
 
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
   @Patch(':id')
-  async updateUser(
+  async updateClient(
     @Param('id', ParseIntPipe) id: number,
     @Body() clientModify: updateClientDto,
+    @GetPrincipal() user: any,
   ): Promise<Company> {
-    return await this.clientService.updateClient(id, clientModify);
+    return await this.clientService.updateClient(
+      id,
+      clientModify,
+      user.company,
+    );
   }
 
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
   @Delete(':id')
-  async deleteUsers(
+  async deleteClient(
     @Param('id', ParseIntPipe) id: number,
+    @GetPrincipal() user: any,
   ): Promise<{ success: boolean }> {
-    return await this.clientService.deleteClient(id);
+    return await this.clientService.deleteClient(id, user.company);
   }
 }

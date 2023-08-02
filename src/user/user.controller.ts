@@ -21,7 +21,7 @@ import { Auth } from 'src/decorators/auth.decorator';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
+  //SERVICIO PARA ADICIONAR USUARIOS A UNA COMPAÑIA DETERMINADA
   @Roles('ADMIN')
   @ApiBearerAuth()
   @Auth()
@@ -33,20 +33,24 @@ export class UserController {
     return await this.userService.create(newUser, id_client);
   }
 
-  @Roles('ADMIN')
+  //SERVICIO QUE BRINDA TODOS LOS USUARIOS QUE PERTENECEN A LA EMPRESA QUE EL USUARIO ESTA LOGIN SIN MOSTRAR LOS DE LAS EMPRESAS HIJAS
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
-  @Get()
+  @Get('my_user')
   async findAll(@GetPrincipal() user: any) {
-    return await this.userService.getUser();
+    return await this.userService.getUser(user);
   }
-
+  //SERVICIO PARA OBTENER USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA
   @Roles('ADMIN')
   @ApiBearerAuth()
   @Auth()
   @Get(':id')
-  async getUserByID(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    return await this.userService.getUserById(id);
+  async getUserByID(
+    @Param('id', ParseIntPipe) id: number,
+    @GetPrincipal() user: any,
+  ): Promise<any> {
+    return await this.userService.getUserById(id, user.company);
   }
 
   @Roles('ADMIN')

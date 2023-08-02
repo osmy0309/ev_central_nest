@@ -61,7 +61,7 @@ export class AuthService {
 
   async profileService(id: number): Promise<any> {
     try {
-      const findUser = await this.usersService.getUserById(id);
+      const findUser = await this.usersService.getUserByIdAuth(id);
       if (findUser.response == 'USER_NOT_FOUND') {
         throw new HttpException(
           'Unable to log in with provided credentials.',
