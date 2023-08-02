@@ -36,12 +36,20 @@ export class CardController {
     return await this.cardService.asingCard(asing);
   }
 
+  @Roles('ADMIN', 'AUTOR')
+  @ApiBearerAuth()
+  @Auth()
+  @Get('by_user_autentication')
+  async getCardsByUserAutentication(@GetPrincipal() user: any) {
+    return await this.cardService.getCardsByUserAutentication(user.userid);
+  }
+
   @Roles('ADMIN')
   @ApiBearerAuth()
   @Auth()
-  @Get()
-  async findAll(@GetPrincipal() user: any) {
-    return await this.cardService.getCards(user.userid);
+  @Get('by_admin')
+  async findAll() {
+    return await this.cardService.getAllCards();
   }
 
   @Roles('ADMIN')

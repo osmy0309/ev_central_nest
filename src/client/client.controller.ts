@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Auth } from 'src/decorators/auth.decorator';
+import { GetPrincipal } from 'src/decorators/get-principal.decorator';
 import { Roles } from 'src/rol/decorator/rol.decorator';
 import { ClientService } from './client.service';
 import { createClientDto, updateClientDto } from './dto/client.dto';
@@ -23,8 +24,27 @@ export class ClientController {
   @ApiBearerAuth()
   @Auth()
   @Post()
-  async createClient(@Body() newClient: createClientDto): Promise<Company> {
-    return await this.clientService.create(newClient);
+  async createClient(
+    @GetPrincipal() user: any,
+    @Body() newClient: createClientDto,
+  ): Promise<Company> {
+    return await this.clientService.create(newClient, user.company);
+  }
+
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @Post(':id_client_other')
+  async createClientByOtherClient(
+    @Param('id_client_other', ParseIntPipe) id_client_other: number,
+    @GetPrincipal() user: any,
+    @Body() newClient: createClientDto,
+  ): Promise<Company> {
+    return await this.clientService.createClientByOtherClient(
+      newClient,
+      user.company,
+      id_client_other,
+    );
   }
 
   @Get()

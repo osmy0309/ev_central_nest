@@ -9,6 +9,14 @@ import {
 
 export class createClientDto {
   @IsNotEmpty()
+  @IsString()
+  @ApiProperty({
+    example: 'admin@gmail.com',
+    description: 'nombre de la compañia',
+  })
+  name: string;
+
+  @IsNotEmpty()
   @IsEmail()
   @ApiProperty({
     example: 'admin@gmail.com',

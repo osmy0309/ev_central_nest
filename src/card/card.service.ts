@@ -48,8 +48,8 @@ export class CardService {
       .leftJoinAndSelect('card.user', 'user')
       .where('card.id = :id', { id: asing.id_card })
       .getMany();
+    console.log(relation);
 
-    if (relation[0].user) throw new HttpException('CARD_IN_USED', 400);
     if (userFind.length == 0) {
       throw new HttpException('USER_NOT_EXIST', 400);
     } else {
@@ -62,13 +62,27 @@ export class CardService {
       if (!cardFind) {
         throw new HttpException('CARD_NOT_EXIST', HttpStatus.CONFLICT);
       }
-
+      if (relation[0].user) throw new HttpException('CARD_IN_USED', 400);
       cardFind.user = userFind[0];
       return await this.patchCards(cardFind, asing.id_card, asing.id_user);
     }
   }
 
-  async getCards(id: number): Promise<Object> {
+  async getAllCards(): Promise<Object> {
+    const results = await this.dataSource
+      .createQueryBuilder()
+      .select('card')
+      .from(Card, 'card')
+      .getMany();
+
+    if (results.length == 0) {
+      throw new HttpException('NO_DATA', 400);
+    }
+
+    return { results };
+  }
+
+  async getCardsByUserAutentication(id: number): Promise<Object> {
     console.log(id);
     const results = await this.dataSource
       .createQueryBuilder()

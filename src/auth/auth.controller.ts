@@ -4,7 +4,9 @@ import { loginUserDto } from './dto/login-auth.dto';
 import { registerUserDto } from './dto/register.dto';
 import { AuthGuard } from '../guards/auth.guard';
 import { GetPrincipal } from 'src/decorators/get-principal.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/rol/decorator/rol.decorator';
+import { Auth } from 'src/decorators/auth.decorator';
 @ApiTags('Autentication')
 @Controller('auth')
 export class AuthController {
@@ -20,12 +22,17 @@ export class AuthController {
   loginUser(@Body() userLogin: loginUserDto) {
     return this.authService.login(userLogin);
   }
+  @Roles('ADMIN', 'AUTOR')
+  @ApiBearerAuth()
+  @Auth()
   @Get('logoutall')
   logout() {
     return this.authService.logoutall();
   }
 
-  @UseGuards(AuthGuard)
+  @Roles('ADMIN', 'AUTOR')
+  @ApiBearerAuth()
+  @Auth()
   @Get('profile')
   profileUser(@GetPrincipal() user: any) {
     return this.authService.profileService(user.id);

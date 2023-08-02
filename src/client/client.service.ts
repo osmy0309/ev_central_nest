@@ -10,7 +10,7 @@ export class ClientService {
     @InjectRepository(Company) private clientRepository: Repository<Company>,
   ) {}
 
-  async create(client: createClientDto): Promise<Company> {
+  async create(client: createClientDto, id_company: number): Promise<Company> {
     const clientFind = await this.clientRepository.findOne({
       //BUSCAR PARA QUE NO EXISTAN USUARIOS REPETIDOS
       where: {
@@ -20,7 +20,47 @@ export class ClientService {
     if (clientFind) {
       throw new HttpException('CLIENT_EXIST', 400);
     }
+    client.id_pather = id_company;
+    const newClient = this.clientRepository.create(client);
+    return await this.clientRepository.save(newClient);
+  }
 
+  async createClientByOtherClient(
+    client: createClientDto,
+    id_company: number,
+    id_client_other: number,
+  ): Promise<Company> {
+    let id_client_search = id_client_other;
+    let flag = false;
+    const clientFind = await this.clientRepository.findOne({
+      where: {
+        email: client.email,
+      },
+    });
+    if (clientFind) {
+      throw new HttpException('CLIENT_EXIST', 400);
+    }
+    console.log(id_client_search);
+
+    do {
+      const response = await this.getClientById(id_client_search);
+      console.log(id_company, 'idcompany');
+      console.log(response);
+      id_client_search = response.id_pather;
+      if (response.id_pather == id_company) {
+        flag = true;
+        break;
+      } else if (
+        id_client_search == id_company &&
+        response.id_pather == id_company
+      ) {
+        flag = true;
+        break;
+      }
+    } while (id_client_search != id_company && id_client_search != 0);
+
+    if (!flag) throw new HttpException('COMPANY_NOT_IS_SON', 400);
+    client.id_pather = id_client_other;
     const newClient = this.clientRepository.create(client);
     return await this.clientRepository.save(newClient);
   }
