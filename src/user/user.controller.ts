@@ -11,9 +11,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { createUserDto, updateUserDto } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
 import { GetPrincipal } from 'src/decorators/get-principal.decorator';
-import { AuthGuard } from '../guards/auth.guard';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/rol/decorator/rol.decorator';
 import { Auth } from 'src/decorators/auth.decorator';
@@ -38,7 +36,7 @@ export class UserController {
   @ApiBearerAuth()
   @Auth()
   @Get('my_user')
-  async findAll(@GetPrincipal() user: any) {
+  async myUser(@GetPrincipal() user: any) {
     return await this.userService.getUser(user);
   }
   //SERVICIO PARA OBTENER USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA

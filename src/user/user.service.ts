@@ -75,7 +75,7 @@ export class UserService {
     return user;
   }
 
-  async getUserById(id: number, usercompany: any): Promise<User> {
+  async getUserById(id: number, usercompany: number): Promise<User> {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.client', 'company')
@@ -91,9 +91,10 @@ export class UserService {
         'user.roles',
         'company.id',
       ])
-      .where('user.clientId = :id', { id: usercompany })
+      .where('user.clientId = :idcompany', { idcompany: usercompany })
       .andWhere('user.id = :id', { id })
       .getOne();
+    console.log(id);
     if (!user) {
       throw new HttpException('USER_NOT_THIS_COMPANY', 400);
     }
