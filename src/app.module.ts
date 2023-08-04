@@ -29,16 +29,18 @@ import { UserController } from './user/user.controller';
 import { UserseederModule } from './userseeder/userseeder.module';
 import { UserSeederService } from './userseeder/userseeder.service';
 import { ClientModule } from './client/client.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost', //'192.168.31.100',
-      port: 3306,
-      username: 'osmy', //'root',
-      password: 'osmy', //'AMiyares',
-      database: 'ev_central_nest',
+      host: process.env.DATABASE_HOST || 'localhost', //'localhost', //'192.168.31.100',
+      port: parseInt(process.env.DATABASE_PORT) || 3306,
+      username: process.env.DATABASE_USER, //'root',
+      password: process.env.DATABASE_PASSWORD, //'AMiyares',
+      database: process.env.DATABASE_NAME || 'ev_central_nest',
       synchronize: true,
       autoLoadEntities: true,
     }),
