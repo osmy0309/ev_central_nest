@@ -34,10 +34,10 @@ export class createClientDto {
 
   @IsOptional()
   @IsNumber()
-  @ApiProperty({
+  /* @ApiProperty({
     example: 0,
     description: 'id padre del arbol de cleintes',
-  })
+  })*/
   id_pather: number;
 
   @IsOptional()
@@ -84,10 +84,10 @@ export class updateClientDto {
 
   @IsOptional()
   @IsNumber()
-  @ApiProperty({
+  /* @ApiProperty({
     example: 0,
     description: 'id padre del arbol de cleintes',
-  })
+  })*/
   id_pather?: number;
 
   @IsOptional()

@@ -23,8 +23,6 @@ export class createUserDto {
   username: string;
 
   @IsNotEmpty()
-  @MinLength(4)
-  @MaxLength(12)
   @ApiProperty({
     example: 'admin123',
     description: 'password del usuario',
@@ -90,7 +88,8 @@ export class createUserDto {
   rolname: RolName;*/
 }
 
-export class updateUserDto {
+export class userUpdateDto {
+  @IsOptional()
   @IsString()
   @ApiProperty({
     example: 'oprieto',
@@ -98,7 +97,7 @@ export class updateUserDto {
   })
   username?: string;
 
-  @MinLength(8)
+  @IsOptional()
   @IsString()
   @ApiProperty({
     example: 'admin123',
@@ -106,6 +105,7 @@ export class updateUserDto {
   })
   password?: string;
 
+  @IsOptional()
   @IsString()
   @ApiProperty({
     example: 'administrador',
@@ -113,6 +113,7 @@ export class updateUserDto {
   })
   firstName?: string;
 
+  @IsOptional()
   @IsString()
   @ApiProperty({
     example: 'Jefe',
@@ -120,20 +121,15 @@ export class updateUserDto {
   })
   lastName?: string;
 
-  @IsBoolean()
-  @ApiProperty({
-    example: false,
-    description: 'activar o desactivar usuario',
-  })
-  isActive?: boolean;
-
-  @IsString()
+  @IsOptional()
+  @IsEmail()
   @ApiProperty({
     example: 'admin@gmail.com',
     description: 'email del usuario',
   })
   email?: string;
 
+  @IsOptional()
   @IsString()
   @ApiProperty({
     example: 'Barcelona',
@@ -141,6 +137,7 @@ export class updateUserDto {
   })
   direction?: string;
 
+  @IsOptional()
   @IsString()
   @ApiProperty({
     example: '9365487',
@@ -148,12 +145,21 @@ export class updateUserDto {
   })
   dni?: string;
 
+  @IsOptional()
+  @IsArray()
+  @IsEnum(AppRoles, {
+    each: true,
+    message: `must be a valid role value admin or autor`,
+  })
   @ApiProperty({
     example: ['ADMIN, AUTOR'],
     description: 'Rol del usuario hasta el momento ADMIN o AUTOR',
   })
-  roles: string[];
+  roles?: string[];
 
   @IsOptional()
   client?: Company;
+
+  /* @IsEnum(RolName, { message: 'Los roles establecidos son user o admin' })
+  rolname: RolName;*/
 }

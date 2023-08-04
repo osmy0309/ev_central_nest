@@ -1,17 +1,21 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
+import { DataSource, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { createUserDto, updateUserDto } from './dto/create-user.dto';
+import { createUserDto, userUpdateDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from 'bcrypt';
 import { Rol } from 'src/rol/entities/rol.entity';
 import { Company } from 'src/client/entities/client.entity';
+import { ClientService } from 'src/client/client.service';
+import { success } from 'jsonrpc-lite';
 
 @Injectable()
 export class UserService {
   constructor(
+    //  @Inject(ClientService) private clientService: ClientService,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Company) private clientRepository: Repository<Company>,
+    private dataSource: DataSource,
   ) {}
 
   async create(user: createUserDto, id_client: number): Promise<User> {
@@ -41,6 +45,7 @@ export class UserService {
     return await this.userRepository.save(newUser);
   }
 
+  //DEVUELVE TODOS LOS USUARIOS BASES DE LA COMPAñIA DEL USUARIO LOGUEADO
   async getUser(user: any): Promise<User[]> {
     const users = await this.userRepository
       .createQueryBuilder('user')
@@ -62,7 +67,7 @@ export class UserService {
     if (users.length == 0) throw new HttpException('USER_NOT_FOUND', 400);
     return users;
   }
-
+  //DEVULEVE SOLO LOS DATOS DEL USUARIO LOGUEADO
   async getUserByIdAuth(id: number): Promise<any> {
     const user = await this.userRepository.findOne({
       where: {
@@ -94,7 +99,6 @@ export class UserService {
       .where('user.clientId = :idcompany', { idcompany: usercompany })
       .andWhere('user.id = :id', { id })
       .getOne();
-    console.log(id);
     if (!user) {
       throw new HttpException('USER_NOT_THIS_COMPANY', 400);
     }
@@ -108,7 +112,6 @@ export class UserService {
       .select(['user', 'company.id'])
       .where('user.username = :username', { username })
       .getOne();
-    console.log(user);
     /*const user = await this.userRepository.findOne({
       where: {
         username,
@@ -121,19 +124,244 @@ export class UserService {
     return user;
   }
 
-  async deleteUser(id: number): Promise<any> {
-    const user = await this.userRepository.delete({ id });
-    if (user.affected === 0) {
+  async deleteUser(id: number, id_company: number): Promise<any> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.client', 'company')
+      .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.isActive',
+        'user.username',
+        'user.email',
+        'user.direction',
+        'user.dni',
+        'user.roles',
+        'company.id',
+      ])
+      .where('user.clientId = :idcompany', { idcompany: id_company })
+      .andWhere('user.id = :id', { id })
+      .getOne();
+    if (!user) {
+      throw new HttpException('USER_NOT_THIS_COMPANY', 400);
+    }
+
+    const userdelete = await this.userRepository.delete({ id: user.id });
+    if (userdelete.affected === 0) {
       throw new HttpException('USER_NOT_FOUND', 400);
     }
     return user;
   }
 
-  async updateUser(id: number, user: updateUserDto): Promise<any> {
+  async updateUser(
+    id: number,
+    user: userUpdateDto,
+    id_company: number,
+  ): Promise<any> {
+    const usercompany = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.client', 'company')
+      .select(['user.id', 'company.id'])
+      .where('user.clientId = :idcompany', { idcompany: id_company })
+      .andWhere('user.id = :id', { id })
+      .getOne();
+    if (!usercompany) {
+      throw new HttpException('USER_NOT_THIS_COMPANY', 400);
+    }
+
     const response = await this.userRepository.update({ id }, user);
     if (response.affected === 0) {
       throw new HttpException('USER_NOT_FOUND', 400);
     }
-    return response;
+
+    const userresponse = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.client', 'company')
+      .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.isActive',
+        'user.username',
+        'user.email',
+        'user.direction',
+        'user.dni',
+        'user.roles',
+        'company.id',
+      ])
+      .where('user.id = :id', { id })
+      .getOne();
+    return userresponse;
+  }
+
+  //---------------------USUARIOS EN EL ARBOL DE COMPAñIAS ---------------------------------------
+
+  //SERVICIO PARA DETERMINAR SI LA COMAñIA ES HIJA
+  async companyIsMySon(id_company: number, id_son: number): Promise<any> {
+    async function getMyClientsTreeA(
+      id_company: number,
+      dataSource: any,
+    ): Promise<any> {
+      const companies = await dataSource
+        .createQueryBuilder()
+        .select('company')
+        .from(Company, 'company')
+        .where('id_pather = :id', { id: id_company })
+        .getMany();
+
+      for (const company of companies) {
+        const children = await getMyClientsTreeA(company.id, dataSource);
+        if (children.length) {
+          company.company_son = children;
+        }
+      }
+
+      return companies;
+    }
+
+    const treeClient = await getMyClientsTreeA(id_company, this.dataSource);
+    if (treeClient.length == 0) {
+      throw new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
+    }
+
+    async function idExistsInTree(
+      data: any[],
+      idToFind: number,
+    ): Promise<boolean> {
+      for (const item of data) {
+        if (item.id === idToFind) {
+          return true;
+        }
+        if (item.company_son) {
+          const idExistsInChildren = await idExistsInTree(
+            item.company_son,
+            idToFind,
+          );
+          if (idExistsInChildren) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    return await idExistsInTree(treeClient, id_son);
+  }
+
+  async createClientSon(
+    user: createUserDto,
+    id_client: number,
+    id_client_son: number,
+  ): Promise<User> {
+    const client = await this.clientRepository.findOne({
+      where: {
+        id: id_client_son,
+      },
+    });
+    if (!client) {
+      throw new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
+    }
+
+    const userFind = await this.userRepository.findOne({
+      //BUSCAR PARA QUE NO EXISTAN USUARIOS REPETIDOS
+      where: {
+        username: user.username,
+      },
+    });
+    if (userFind) {
+      throw new HttpException('USER_EXIST', HttpStatus.CONFLICT);
+    }
+    if (id_client != id_client_son) {
+      if (!(await this.companyIsMySon(id_client, id_client_son)))
+        throw new HttpException('THIS_COMPANY_NOT_RELATION', 400);
+    }
+
+    user.password = await hash(user.password, 10);
+    user.client = client;
+    await this.clientRepository.save(client);
+    const newUser = this.userRepository.create(user);
+    return await this.userRepository.save(newUser);
+  }
+
+  async deleteUserOtherCompanySon(
+    id: number,
+    id_company: number,
+  ): Promise<{ success: boolean }> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.client', 'company')
+      .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.isActive',
+        'user.username',
+        'user.email',
+        'user.direction',
+        'user.dni',
+        'user.roles',
+        'company.id',
+      ])
+      .where('user.id = :id', { id })
+      .getOne();
+    if (!user) {
+      throw new HttpException('USER_NOT_THIS_COMPANY', 400);
+    }
+
+    if (id_company != user.client.id) {
+      if (!(await this.companyIsMySon(id_company, user.client.id)))
+        throw new HttpException('THIS_COMPANY_NOT_RELATION', 400);
+    }
+
+    const userdelete = await this.userRepository.delete({ id: user.id });
+    if (userdelete.affected === 0) {
+      throw new HttpException('USER_NOT_FOUND', 400);
+    }
+    return { success: true };
+  }
+
+  async updateUserOtherCompanySon(
+    id: number,
+    user: userUpdateDto,
+    id_company: number,
+  ): Promise<any> {
+    const usercompany = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.client', 'company')
+      .select(['user.id', 'company.id'])
+      .where('user.id = :id', { id })
+      .getOne();
+    if (!usercompany) {
+      throw new HttpException('USER_NOT_THIS_COMPANY', 400);
+    }
+    if (id_company != usercompany.client.id) {
+      if (!(await this.companyIsMySon(id_company, usercompany.client.id)))
+        throw new HttpException('THIS_COMPANY_NOT_RELATION', 400);
+    }
+
+    const response = await this.userRepository.update({ id }, user);
+    if (response.affected === 0) {
+      throw new HttpException('USER_NOT_FOUND', 400);
+    }
+
+    const userresponse = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.client', 'company')
+      .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.isActive',
+        'user.username',
+        'user.email',
+        'user.direction',
+        'user.dni',
+        'user.roles',
+        'company.id',
+      ])
+      .where('user.id = :id', { id })
+      .getOne();
+    return userresponse;
   }
 }

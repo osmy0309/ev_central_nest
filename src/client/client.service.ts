@@ -184,6 +184,32 @@ export class ClientService {
     return { success: true };
   }
 
+  async clientIsMy(id_cliente: number, id_son: number): Promise<boolean> {
+    const treeClient = await this.getMyClientsTree(id_cliente);
+    async function idExistsInTree(
+      data: any[],
+      idToFind: number,
+    ): Promise<boolean> {
+      for (const item of data) {
+        if (item.id === idToFind) {
+          return true;
+        }
+        if (item.company_son) {
+          const idExistsInChildren = await idExistsInTree(
+            item.company_son,
+            idToFind,
+          );
+          if (idExistsInChildren) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    return await idExistsInTree(treeClient, id_son);
+  }
+
   async updateClient(
     id: number,
     client: updateClientDto,
@@ -214,7 +240,7 @@ export class ClientService {
 
       const found = await idExistsInTree(treeClient, id);
 
-      if (!found) throw new HttpException('CLIENT_NOT_EXIST', 400);
+      if (!found) throw new HttpException('CLIENT_NOT_RELATION', 400);
     }
 
     const response = await this.clientRepository.update({ id }, client);

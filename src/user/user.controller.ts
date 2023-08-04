@@ -8,27 +8,43 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { createUserDto, updateUserDto } from './dto/create-user.dto';
+import { createUserDto, userUpdateDto } from './dto/create-user.dto';
 import { GetPrincipal } from 'src/decorators/get-principal.decorator';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/rol/decorator/rol.decorator';
 import { Auth } from 'src/decorators/auth.decorator';
+import { User } from './entities/user.entity';
 @ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-  //SERVICIO PARA ADICIONAR USUARIOS A UNA COMPAÑIA DETERMINADA
+  //SERVICIO PARA ADICIONAR USUARIOS A LA COMPAÑIA DEL USUARIO LOGUEADO
   @Roles('ADMIN')
   @ApiBearerAuth()
   @Auth()
-  @Post(':id_client')
-  async createUser(
-    @Param('id_company', ParseIntPipe) id_client: number,
+  @Post()
+  async createUser(@Body() newUser: createUserDto, @GetPrincipal() user: any) {
+    return await this.userService.create(newUser, user.company);
+  }
+
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @Post(':id_client_son')
+  async createClientSon(
+    @Param('id_client_son', ParseIntPipe) id_client_son: number,
     @Body() newUser: createUserDto,
+    @GetPrincipal() user: any,
   ) {
-    return await this.userService.create(newUser, id_client);
+    console.log('here');
+    return await this.userService.createClientSon(
+      newUser,
+      user.company,
+      id_client_son,
+    );
   }
 
   //SERVICIO QUE BRINDA TODOS LOS USUARIOS QUE PERTENECEN A LA EMPRESA QUE EL USUARIO ESTA LOGIN SIN MOSTRAR LOS DE LAS EMPRESAS HIJAS
@@ -50,23 +66,62 @@ export class UserController {
   ): Promise<any> {
     return await this.userService.getUserById(id, user.company);
   }
-
+  //SERVICIO PARA Modificar USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA
   @Roles('ADMIN')
   @ApiBearerAuth()
   @Auth()
-  @Patch(':id')
+  @Patch(':my_users_id')
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
-    @Body() userModify: any,
+    @Body() userModify: userUpdateDto,
+    @GetPrincipal() user: any,
   ) {
-    return await this.userService.updateUser(id, userModify);
+    return await this.userService.updateUser(id, userModify, user.company);
+  }
+  //SERVICIO PARA ELIMINAR USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @Delete(':my_users_id')
+  async deleteUsers(
+    @Param('my_user_id', ParseIntPipe) id: number,
+    @GetPrincipal() user: any,
+  ): Promise<any> {
+    return await this.userService.deleteUser(id, user.company);
   }
 
   @Roles('ADMIN')
   @ApiBearerAuth()
   @Auth()
-  @Delete(':id')
-  async deleteUsers(@Param('id', ParseIntPipe) id: number): Promise<any> {
-    return await this.userService.deleteUser(id);
+  @Delete('user_son/:user_id')
+  async deleteUserOtherCompanySon(
+    @Param('user_id', ParseIntPipe) user_id: number,
+    @GetPrincipal() user: any,
+  ): Promise<any> {
+    if (isNaN(user_id)) {
+      throw new BadRequestException('Los parámetros deben ser números enteros');
+    }
+    return await this.userService.deleteUserOtherCompanySon(
+      user_id,
+      user.company,
+    );
+  }
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @Patch('user_son/:user_id')
+  async updateUserOtherCompanySon(
+    @Param('user_id', ParseIntPipe) user_id: number,
+    @GetPrincipal() user: any,
+    @Body() userModify: userUpdateDto,
+  ): Promise<User> {
+    if (isNaN(user_id)) {
+      throw new BadRequestException('Los parámetros deben ser números enteros');
+    }
+    return await this.userService.updateUserOtherCompanySon(
+      user_id,
+      userModify,
+      user.company,
+    );
   }
 }
