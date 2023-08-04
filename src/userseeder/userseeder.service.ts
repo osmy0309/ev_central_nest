@@ -18,8 +18,9 @@ export class UserSeederService implements OnModuleInit {
     const clients = await this.clientRepository.find();
     if (clients.length === 0) {
       const nuevoClient = new createClientDto();
-      (nuevoClient.business_name = 'Provicional'),
-        (nuevoClient.direction = 'Provicional'),
+      (nuevoClient.business_name = 'Principal'),
+        (nuevoClient.name = 'Principal'),
+        (nuevoClient.direction = 'Principal'),
         (nuevoClient.email = 'prueba@gmail.com'),
         (nuevoClient.id_pather = 0),
         (nuevoClient.nif = 'provicional'),
