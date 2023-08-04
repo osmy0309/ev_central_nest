@@ -7,11 +7,9 @@ import {
   Param,
   Delete,
   ParseIntPipe,
-  UseGuards,
 } from '@nestjs/common';
 import { ChargeService } from './charge.service';
 import { GetPrincipal } from 'src/decorators/get-principal.decorator';
-import { AuthGuard } from '../guards/auth.guard';
 import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { createChargerDto, updateUserDto } from './dto/charge.dto';
 import { Charge } from './entities/charge.entity';
@@ -19,48 +17,153 @@ import {
   createCard_ChargerDto,
   deleteCard_ChargerDto,
 } from './dto/card_charge.dto';
+import { Roles } from 'src/rol/decorator/rol.decorator';
+import { Auth } from 'src/decorators/auth.decorator';
 
-@ApiTags('Charges')
 @Controller('charge')
 export class ChargeController {
   constructor(private readonly chargeService: ChargeService) {}
-  //@ApiBearerAuth()
-  // @UseGuards(AuthGuard)
-  @Post(':id_company/create')
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @ApiTags('Charges')
+  @Post('create')
   async createCharge(
-    @Param('id_client', ParseIntPipe) id_client: number,
     @Body() newCharge: createChargerDto,
+    @GetPrincipal() user: any,
   ) {
-    return await this.chargeService.create(newCharge, id_client);
+    return await this.chargeService.create(newCharge, user.company);
   }
 
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @ApiTags('Charges')
   @Get(':id')
-  async getChargeById(@Param('id', ParseIntPipe) id: number): Promise<Charge> {
-    return await this.chargeService.getChargeById(id);
+  async getChargeById(
+    @Param('id', ParseIntPipe) id: number,
+    @GetPrincipal() user: any,
+  ): Promise<Charge> {
+    return await this.chargeService.getChargeById(id, user.company);
   }
+
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @ApiTags('Charges')
   @Get()
   async getChargeAllAdmin(): Promise<Charge[]> {
     return await this.chargeService.getChargeAllAdmin();
   }
 
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @ApiTags('Charges')
   @Patch(':id')
   async updateCharge(
     @Param('id', ParseIntPipe) id: number,
     @Body() chargeModify: updateUserDto,
+    @GetPrincipal() user: any,
   ) {
-    return await this.chargeService.patchCharge(chargeModify, id);
+    return await this.chargeService.patchCharge(chargeModify, id, user.company);
   }
+
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @ApiTags('Charges')
+  @Delete(':id')
+  async deleteCharge(
+    @Param('id', ParseIntPipe) id: number,
+    @GetPrincipal() user: any,
+  ) {
+    return await this.chargeService.deleteCharge(id, user.company);
+  }
+  //SERVICIOS PARA INTERACTUAR CON LOS CARGADORES HIJOS
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @ApiTags('Charges')
+  @Post('create/:id_company_son')
+  async createChargeSon(
+    @Body() newCharge: createChargerDto,
+    @Param('id_company_son', ParseIntPipe) id_company_son: number,
+    @GetPrincipal() user: any,
+  ) {
+    return await this.chargeService.createChargeSon(
+      newCharge,
+      user.company,
+      id_company_son,
+    );
+  }
+
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @ApiTags('Charges')
+  @Get('charges_son/:id_charge_son')
+  async getChargeByIdSon(
+    @Param('id_charge_son', ParseIntPipe) id_charge_son: number,
+    @GetPrincipal() user: any,
+  ) {
+    return await this.chargeService.getChargeByIdSon(
+      user.company,
+      id_charge_son,
+    );
+  }
+
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @ApiTags('Charges')
+  @Patch('chargeson/:id')
+  async patchChargeSon(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() chargeModify: updateUserDto,
+    @GetPrincipal() user: any,
+  ) {
+    return await this.chargeService.patchChargeSon(
+      chargeModify,
+      id,
+      user.company,
+    );
+  }
+
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @ApiTags('Charges')
+  @Delete('chargeson/:id')
+  async deleteChargeSon(
+    @Param('id', ParseIntPipe) id: number,
+    @GetPrincipal() user: any,
+  ) {
+    return await this.chargeService.deleteChargeSon(id, user.company);
+  }
+
+  // CARGADORES-TARJETA
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
   @ApiTags('Card-Charges')
   @Post('new_card_charge')
   async newCard_Charge(@Body() newCard_Charge: createCard_ChargerDto) {
     return await this.chargeService.newCard_Charge(newCard_Charge);
   }
+
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
   @ApiTags('Card-Charges')
   @Post('changestate')
   async changeStateCard_Charge(@Body() newCard_Charge: createCard_ChargerDto) {
     return await this.chargeService.changeStateCard_Charge(newCard_Charge);
   }
 
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
   @ApiTags('Card-Charges')
   @Post('delete_card_change_relations')
   @ApiBody({
