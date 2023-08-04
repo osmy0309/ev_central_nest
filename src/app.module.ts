@@ -36,10 +36,10 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: process.env.DATABASE_HOST || 'localhost', //'localhost', //'192.168.31.100',
+      host: process.env.DATABASE_HOST || 'localhost',
       port: parseInt(process.env.DATABASE_PORT) || 3306,
-      username: process.env.DATABASE_USER, //'root',
-      password: process.env.DATABASE_PASSWORD, //'AMiyares',
+      username: process.env.DATABASE_USER,
+      password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME || 'ev_central_nest',
       synchronize: true,
       autoLoadEntities: true,
