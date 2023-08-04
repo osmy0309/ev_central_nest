@@ -1,0 +1,18 @@
+version: '3.4'
+
+services:
+  simonevcentralfront:
+    image: simonevcentralbackend
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      - NODE_ENV=production
+      - DATABASE_PORT = 3306
+      - DATABASE_HOST = localhost
+      - DATABASE_USER = root
+      - DATABASE_PASSWORD = mypwd
+      - DATABASE_NAME = ev_central_nest
+
+    ports:
+      - 3000:3000
