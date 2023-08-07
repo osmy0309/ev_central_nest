@@ -27,8 +27,8 @@ export class UserSeederService implements OnModuleInit {
         (nuevoClient.phone = 'provicional');
       const newClient = this.clientRepository.create(nuevoClient);
       const cliente_response = await this.clientRepository.save(newClient);
-
       const usuarios = await this.userRepository.find();
+      //Poner usuario si la base de datos esta vacia
       if (usuarios.length === 0) {
         const nuevoUsuario = new createUserDto();
         nuevoUsuario.username = 'admin';
