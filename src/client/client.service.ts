@@ -250,4 +250,56 @@ export class ClientService {
     const client_response = await this.getClientById(id);
     return client_response;
   }
+
+  async deleteClientSon(
+    id: number,
+    id_company: number,
+  ): Promise<{ success: boolean }> {
+    console.log('here');
+    if (id != id_company) {
+      const treeClient = await this.getMyClientsTree(id_company);
+      async function idExistsInTree(
+        data: any[],
+        idToFind: number,
+      ): Promise<boolean> {
+        for (const item of data) {
+          if (item.id === idToFind) {
+            return true;
+          }
+          if (item.company_son) {
+            const idExistsInChildren = await idExistsInTree(
+              item.company_son,
+              idToFind,
+            );
+            if (idExistsInChildren) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+
+      const found = await idExistsInTree(treeClient, id);
+
+      if (!found) throw new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
+    }
+
+    async function deleteTree(data: any[], clientRepository) {
+      data.forEach(async (company) => {
+        if (company.company_son) {
+          await deleteTree(company.company_son, clientRepository);
+        }
+        await clientRepository.delete({ id: company.id });
+      });
+
+      const clientsDelete = await this.getMyClientsTree(id);
+      await deleteTree(clientsDelete, this.clientRepository);
+    }
+
+    const client = await this.clientRepository.delete({ id });
+    if (client.affected === 0) {
+      throw new HttpException('CLIENT_NOT_FOUND', 400);
+    }
+    return { success: true };
+  }
 }

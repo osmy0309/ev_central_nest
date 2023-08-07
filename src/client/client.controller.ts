@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { BlobOptions } from 'buffer';
 import { Auth } from 'src/decorators/auth.decorator';
 import { GetPrincipal } from 'src/decorators/get-principal.decorator';
 import { Roles } from 'src/rol/decorator/rol.decorator';
@@ -86,6 +87,22 @@ export class ClientController {
     @Param('id', ParseIntPipe) id: number,
     @GetPrincipal() user: any,
   ): Promise<{ success: boolean }> {
+    console.log('here3');
     return await this.clientService.deleteClient(id, user.company);
+  }
+
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @Delete('delete/:id_company_son')
+  async clientDeleteEvery(
+    @Param('id_company_son', ParseIntPipe) id_company_son: number,
+    @GetPrincipal() user: any,
+  ): Promise<any> {
+    console.log('here2');
+    return await this.clientService.deleteClientSon(
+      id_company_son,
+      user.company,
+    );
   }
 }

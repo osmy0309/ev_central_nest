@@ -13,7 +13,7 @@ import { RolesGuard } from 'src/guards/roles.guard';
 export class RolController {
   constructor(private readonly rolService: RolService) {}
 
-  @Roles('ADMIN', 'AUTOR')
+  /* @Roles('ADMIN', 'AUTOR')
   @Auth()
   @Get()
   async findAll() {
@@ -25,5 +25,5 @@ export class RolController {
   @Post()
   async create(@Body() createRolDTO: createRolDTO) {
     return await this.rolService.create(createRolDTO);
-  }
+  }*/
 }

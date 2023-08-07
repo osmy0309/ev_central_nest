@@ -5,7 +5,7 @@ import { connectDto } from './dto/client_ocpp.dto';
 @Controller('client')
 export class ClientOcppController {
   constructor(private readonly clientOcppService: ClientOcppService) {}
-  @Post('connect')
+  /* @Post('connect')
   async connect(@Body() newConnection: connectDto) {
     console.log(newConnection);
     return await this.clientOcppService.connect(newConnection);
@@ -27,5 +27,5 @@ export class ClientOcppController {
   @Post('stopTransaction')
   async stopTransaction(@Body() newConnection: connectDto) {
     return await this.clientOcppService.stopTransaction(newConnection);
-  }
+  }*/
 }
