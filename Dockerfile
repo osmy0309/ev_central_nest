@@ -7,7 +7,8 @@ COPY . .
 RUN npm run build
 
 FROM node:18-alpine AS production
-EXPOSE 3000
+EXPOSE 3800
+EXPOSE 3100
 ENV NODE_ENV=production
 WORKDIR /usr/src/app
 COPY package*.json ./
