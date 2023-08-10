@@ -20,6 +20,7 @@ async function bootstrap() {
     .addTag('Autentication')
     .addTag('Card-Charges')
     .addTag('Time-Zone')
+    .addTag('Health-check')
     .addTag('Charges')
     .addTag('Company')
     .build();

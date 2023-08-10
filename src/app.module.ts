@@ -30,6 +30,7 @@ import { UserseederModule } from './userseeder/userseeder.module';
 import { UserSeederService } from './userseeder/userseeder.service';
 import { ClientModule } from './client/client.module';
 import { ConfigModule } from '@nestjs/config';
+import { HealthCheckModule } from './health-check/health-check.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { ConfigModule } from '@nestjs/config';
     TimeZoneModule,
     UserseederModule,
     ClientModule,
+    HealthCheckModule,
   ],
   controllers: [
     AppController,
