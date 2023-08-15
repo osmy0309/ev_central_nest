@@ -11,6 +11,7 @@ import {
 import { Card } from 'src/card/entities/card.entity';
 import { Company } from 'src/client/entities/client.entity';
 import { Client } from 'rpc-websockets';
+import { Transaction } from 'src/transaction/entities/transaction.entity';
 
 @Injectable()
 export class ChargeService {
@@ -22,6 +23,8 @@ export class ChargeService {
     @InjectRepository(Card)
     private cardRepository: Repository<Card>,
     @InjectRepository(Company) private clientRepository: Repository<Company>,
+    @InjectRepository(Transaction)
+    private transactionRepository: Repository<Transaction>,
 
     @InjectDataSource()
     private dataSource: DataSource,
@@ -70,14 +73,62 @@ export class ChargeService {
     return change;
   }
 
-  async getChargeAllAdmin(): Promise<Charge[]> {
-    const change = await this.chargeRepository.find();
+  async getChargeAllAdmin(id_company: number): Promise<Charge[]> {
+    const change = await this.chargeRepository
+      .createQueryBuilder('charge')
+      .leftJoinAndSelect('charge.client', 'company')
+      .select(['charge', 'company.id'])
+      .where('company.id = :id_company', { id_company })
+      .getMany();
 
-    if (!change) {
+    if (change.length == 0) {
       throw new HttpException('CHANGE_NOT_DATA', 400);
     }
+    let updatedChange = null;
+    for (const [index, item] of change.entries()) {
+      const transaction = await this.transactionRepository
+        .createQueryBuilder('transaction')
+        .leftJoinAndSelect('transaction.card', 'card')
+        .leftJoinAndSelect('card.user', 'user')
+        .leftJoinAndSelect('transaction.charge', 'charge')
+        .select([
+          'charge',
+          'transaction',
+          'card',
+          'user.username',
+          'user.id',
+          'user.firstName',
+          'user.lastName',
+          'user.dni',
+          'user.email',
+        ])
+        .where('charge.id = :id', { id: item.id })
+        .andWhere('transaction.estado NOT IN (:...estados)', {
+          estados: [3, 4],
+        })
 
-    return change;
+        .getMany();
+
+      if (transaction.length > 0) {
+        change[index].state = transaction[0].estado + 1;
+        updatedChange = change.map((it, i) => {
+          if (i == index) {
+            return {
+              ...it,
+              //  user_transaction: transaction[0].card.user,
+              card_transaction: transaction[0].card,
+            };
+          } else {
+            return {
+              ...it,
+              // user_transaction: null,
+              card_transaction: null,
+            };
+          }
+        });
+      }
+    }
+    return updatedChange;
   }
 
   async patchCharge(
@@ -227,18 +278,62 @@ export class ChargeService {
       .leftJoinAndSelect('charge.client', 'company')
       .select(['charge', 'company.id'])
       .where('charge.id = :id', { id: id_son })
-      .getOne();
+      .getMany();
 
     if (!change) {
       throw new HttpException('CHANGE_NOT_FOUND', 400);
     }
-    if (change.client.id != id_company) {
+    if (change[0].client.id != id_company) {
       {
-        const flag = await this.companyIsMySon(id_company, change.client.id);
+        const flag = await this.companyIsMySon(id_company, change[0].client.id);
         if (!flag) throw new HttpException('THIS_CHARGE_NOT_IS_SON', 400);
       }
 
-      return change;
+      let updatedChange = null;
+      for (const [index, item] of change.entries()) {
+        const transaction = await this.transactionRepository
+          .createQueryBuilder('transaction')
+          .leftJoinAndSelect('transaction.card', 'card')
+          .leftJoinAndSelect('card.user', 'user')
+          .leftJoinAndSelect('transaction.charge', 'charge')
+          .select([
+            'charge',
+            'transaction',
+            'card',
+            'user.username',
+            'user.id',
+            'user.firstName',
+            'user.lastName',
+            'user.dni',
+            'user.email',
+          ])
+          .where('charge.id = :id', { id: item.id })
+          .andWhere('transaction.estado NOT IN (:...estados)', {
+            estados: [3, 4],
+          })
+
+          .getMany();
+
+        if (transaction.length > 0) {
+          change[index].state = transaction[0].estado + 1;
+          updatedChange = change.map((it, i) => {
+            if (i == index) {
+              return {
+                ...it,
+                //user_transaction: {},
+                card_transaction: transaction[0].card,
+              };
+            } else {
+              return {
+                ...it,
+                // user_transaction: null,
+                card_transaction: null,
+              };
+            }
+          });
+        }
+      }
+      return updatedChange;
     }
   }
 

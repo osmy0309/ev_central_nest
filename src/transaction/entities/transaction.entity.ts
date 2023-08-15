@@ -20,7 +20,7 @@ export class Transaction {
   @Column()
   public cardId: number;
 
-  @Column()
+  @Column({ default: 1 })
   public estado: number;
 
   @ManyToOne(() => Charge, (charge) => charge.transaction, {

@@ -11,7 +11,7 @@ import { Charge } from './entities/charge.entity';
 @Module({
   imports: [
     forwardRef(() => Transaction),
-    TypeOrmModule.forFeature([Charge, Card_Charge, Card, Company]),
+    TypeOrmModule.forFeature([Charge, Card_Charge, Card, Company, Transaction]),
   ],
   controllers: [ChargeController],
   providers: [ChargeService],

@@ -27,6 +27,10 @@ export class createChargerDto {
   })
   total_charge: number;
 
+  @IsOptional()
+  @IsNumber()
+  state?: number;
+
   @IsNotEmpty()
   @IsNumber()
   @ApiProperty({
@@ -106,6 +110,14 @@ export class updateUserDto {
     description: 'El usuario que va autenticarse',
   })
   total_charge?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    example: 2,
+    description: '1- Libre, 2- Reservado, 3- Cargando, 4- Deshabilitado',
+  })
+  state?: number;
 
   @IsOptional()
   @IsNumber()

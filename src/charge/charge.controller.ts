@@ -52,8 +52,8 @@ export class ChargeController {
   @Auth()
   @ApiTags('Charges')
   @Get()
-  async getChargeAllAdmin(): Promise<Charge[]> {
-    return await this.chargeService.getChargeAllAdmin();
+  async getChargeAllAdmin(@GetPrincipal() user: any): Promise<Charge[]> {
+    return await this.chargeService.getChargeAllAdmin(user.company);
   }
 
   @Roles('ADMIN')

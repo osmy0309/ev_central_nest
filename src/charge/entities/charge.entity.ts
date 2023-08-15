@@ -5,8 +5,6 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToMany,
-  JoinTable,
   OneToMany,
   ManyToOne,
 } from 'typeorm';
@@ -34,6 +32,9 @@ export class Charge {
 
   @Column()
   latitude: string;
+
+  @Column({ default: 1 })
+  state?: number; // 1- Libre, 2- Reservado, 3- Cargando, 4- Deshabilitado
 
   @Column()
   length: string;

@@ -19,11 +19,7 @@ export class createTrasactionDto {
 
   @IsNotEmpty()
   @IsNumber()
-  @ApiProperty({
-    example: 1,
-    description: 'El usuario que va autenticarse',
-  })
-  estado: number;
+  estado?: number;
 }
 
 export class updateTrasactionDto {
@@ -47,7 +43,7 @@ export class updateTrasactionDto {
   @IsOptional()
   @ApiProperty({
     example: 1,
-    description: 'El usuario que va autenticarse',
+    description: '1-Reservado, 2-activo, 3-finalizada, 4-cancelada',
   })
   estado?: number;
 }
