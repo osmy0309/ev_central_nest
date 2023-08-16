@@ -47,13 +47,13 @@ export class ChargeController {
     return await this.chargeService.getChargeById(id, user.company);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
   @Get()
   async getChargeAllAdmin(@GetPrincipal() user: any): Promise<Charge[]> {
-    return await this.chargeService.getChargeAllAdmin(user.company);
+    return await this.chargeService.getChargeAllAdmin(user.company, user.roles);
   }
 
   @Roles('ADMIN')

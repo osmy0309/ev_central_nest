@@ -66,7 +66,7 @@ export class ClientService {
     return await this.clientRepository.save(newClient);
   }
 
-  async getMyClients(id_company): Promise<Company[]> {
+  async getMyClients(id_company: number): Promise<Company[]> {
     const clients = await this.dataSource
       .createQueryBuilder()
       .select('company')
@@ -79,7 +79,8 @@ export class ClientService {
     return clients;
   }
 
-  async getMyClientsTree(id_company): Promise<any> {
+  async getMyClientsTree(id_company: number, rol): Promise<any> {
+    console.log(rol);
     async function getMyClientsTreeA(
       id_company: number,
       dataSource: any,
@@ -91,10 +92,13 @@ export class ClientService {
         .where('id_pather = :id', { id: id_company })
         .getMany();
 
-      for (const company of companies) {
-        const children = await getMyClientsTreeA(company.id, dataSource);
-        if (children.length) {
-          company.company_son = children;
+      const bool = rol.some((element) => ['ADMIN'].includes(element));
+      if (bool) {
+        for (const company of companies) {
+          const children = await getMyClientsTreeA(company.id, dataSource);
+          if (children.length) {
+            company.company_son = children;
+          }
         }
       }
 
@@ -103,7 +107,7 @@ export class ClientService {
 
     const response = await getMyClientsTreeA(id_company, this.dataSource);
     if (response.length == 0) {
-      throw new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
+      return new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
     }
 
     return response;
@@ -136,9 +140,10 @@ export class ClientService {
   async deleteClient(
     id: number,
     id_company: number,
+    rol,
   ): Promise<{ success: boolean }> {
     if (id != id_company) {
-      const treeClient = await this.getMyClientsTree(id_company);
+      const treeClient = await this.getMyClientsTree(id_company, rol);
       async function idExistsInTree(
         data: any[],
         idToFind: number,
@@ -184,8 +189,8 @@ export class ClientService {
     return { success: true };
   }
 
-  async clientIsMy(id_cliente: number, id_son: number): Promise<boolean> {
-    const treeClient = await this.getMyClientsTree(id_cliente);
+  async clientIsMy(id_cliente: number, id_son: number, rol): Promise<boolean> {
+    const treeClient = await this.getMyClientsTree(id_cliente, rol);
     async function idExistsInTree(
       data: any[],
       idToFind: number,
@@ -214,9 +219,10 @@ export class ClientService {
     id: number,
     client: updateClientDto,
     id_company: number,
+    rol,
   ): Promise<Company> {
     if (id != id_company) {
-      const treeClient = await this.getMyClientsTree(id_company);
+      const treeClient = await this.getMyClientsTree(id_company, rol);
       async function idExistsInTree(
         data: any[],
         idToFind: number,
@@ -254,10 +260,11 @@ export class ClientService {
   async deleteClientSon(
     id: number,
     id_company: number,
+    rol,
   ): Promise<{ success: boolean }> {
     console.log('here');
     if (id != id_company) {
-      const treeClient = await this.getMyClientsTree(id_company);
+      const treeClient = await this.getMyClientsTree(id_company, rol);
       async function idExistsInTree(
         data: any[],
         idToFind: number,

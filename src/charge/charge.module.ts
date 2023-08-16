@@ -1,6 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Card } from 'src/card/entities/card.entity';
+import { ClientService } from 'src/client/client.service';
 import { Company } from 'src/client/entities/client.entity';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
 import { ChargeController } from './charge.controller';
@@ -14,7 +15,7 @@ import { Charge } from './entities/charge.entity';
     TypeOrmModule.forFeature([Charge, Card_Charge, Card, Company, Transaction]),
   ],
   controllers: [ChargeController],
-  providers: [ChargeService],
+  providers: [ChargeService, ClientService],
   exports: [TypeOrmModule.forFeature([Charge])],
 })
 export class ChargeModule {}

@@ -47,12 +47,12 @@ export class ClientController {
     );
   }
 
-  @Roles('ADMIN', 'AUTOR')
+  @Roles('ADMIN')
   @ApiBearerAuth()
   @Auth()
   @Get('companys_son_tree')
   async findAllMyClients(@GetPrincipal() user: any): Promise<Company[]> {
-    return await this.clientService.getMyClientsTree(user.company);
+    return await this.clientService.getMyClientsTree(user.company, user.roles);
   }
 
   @Roles('ADMIN', 'AUTOR')
@@ -76,6 +76,7 @@ export class ClientController {
       id,
       clientModify,
       user.company,
+      user.roles,
     );
   }
 
@@ -87,8 +88,7 @@ export class ClientController {
     @Param('id', ParseIntPipe) id: number,
     @GetPrincipal() user: any,
   ): Promise<{ success: boolean }> {
-    console.log('here3');
-    return await this.clientService.deleteClient(id, user.company);
+    return await this.clientService.deleteClient(id, user.company, user.roles);
   }
 
   @Roles('ADMIN')
@@ -99,10 +99,10 @@ export class ClientController {
     @Param('id_company_son', ParseIntPipe) id_company_son: number,
     @GetPrincipal() user: any,
   ): Promise<any> {
-    console.log('here2');
     return await this.clientService.deleteClientSon(
       id_company_son,
       user.company,
+      user.roles,
     );
   }
 }

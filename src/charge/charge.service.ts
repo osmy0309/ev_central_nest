@@ -12,6 +12,7 @@ import { Card } from 'src/card/entities/card.entity';
 import { Company } from 'src/client/entities/client.entity';
 import { Client } from 'rpc-websockets';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
+import { ClientService } from 'src/client/client.service';
 
 @Injectable()
 export class ChargeService {
@@ -25,6 +26,7 @@ export class ChargeService {
     @InjectRepository(Company) private clientRepository: Repository<Company>,
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
+    private clientService: ClientService,
 
     @InjectDataSource()
     private dataSource: DataSource,
@@ -73,59 +75,96 @@ export class ChargeService {
     return change;
   }
 
-  async getChargeAllAdmin(id_company: number): Promise<Charge[]> {
-    const change = await this.chargeRepository
-      .createQueryBuilder('charge')
-      .leftJoinAndSelect('charge.client', 'company')
-      .select(['charge', 'company.id'])
-      .where('company.id = :id_company', { id_company })
-      .getMany();
+  async getChargeAllAdmin(id_company: number, rol): Promise<Charge[]> {
+    let arrayallcompany = [];
+    let myCompany = [];
+    let updatedChange = [];
+    const companies_son = await this.clientService.getMyClientsTree(
+      id_company,
+      rol,
+    );
+    function addCompanies(companies) {
+      for (const company of companies) {
+        arrayallcompany.push({ ...company }); // Add the company as a charger
 
-    if (change.length == 0) {
-      throw new HttpException('CHANGE_NOT_DATA', 400);
+        if (company.company_son) {
+          // Check if it has child companies
+          addCompanies(company.company_son); // Recursively add the child companies
+        }
+      }
     }
-    let updatedChange = null;
-    for (const [index, item] of change.entries()) {
-      const transaction = await this.transactionRepository
-        .createQueryBuilder('transaction')
-        .leftJoinAndSelect('transaction.card', 'card')
-        .leftJoinAndSelect('card.user', 'user')
-        .leftJoinAndSelect('transaction.charge', 'charge')
-        .select([
-          'charge',
-          'transaction',
-          'card',
-          'user.username',
-          'user.id',
-          'user.firstName',
-          'user.lastName',
-          'user.dni',
-          'user.email',
-        ])
-        .where('charge.id = :id', { id: item.id })
-        .andWhere('transaction.estado NOT IN (:...estados)', {
-          estados: [3, 4],
-        })
 
+    if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
+    myCompany.push({ id: id_company, name: 'My Company' } as Company);
+    addCompanies(myCompany);
+    for (const itemcompa of arrayallcompany) {
+      const change = await this.chargeRepository
+        .createQueryBuilder('charge')
+        .leftJoinAndSelect('charge.client', 'company')
+        .select(['charge', 'company.id'])
+        .where('company.id = :id_company', { id_company: itemcompa.id })
         .getMany();
 
-      if (transaction.length > 0) {
-        change[index].state = transaction[0].estado + 1;
-        updatedChange = change.map((it, i) => {
-          if (i == index) {
-            return {
-              ...it,
-              //  user_transaction: transaction[0].card.user,
-              card_transaction: transaction[0].card,
-            };
-          } else {
-            return {
-              ...it,
-              // user_transaction: null,
-              card_transaction: null,
-            };
-          }
-        });
+      if (change.length == 0) {
+        continue;
+      }
+
+      for (const [index, item] of change.entries()) {
+        const transaction = await this.transactionRepository
+          .createQueryBuilder('transaction')
+          .leftJoinAndSelect('transaction.card', 'card')
+          .leftJoinAndSelect('card.user', 'user')
+          .leftJoinAndSelect('transaction.charge', 'charge')
+          .select([
+            'charge',
+            'transaction',
+            'card',
+            'user.username',
+            'user.id',
+            'user.firstName',
+            'user.lastName',
+            'user.dni',
+            'user.email',
+          ])
+          .where('charge.id = :id', { id: item.id })
+          .andWhere('transaction.estado NOT IN (:...estados)', {
+            estados: [3, 4],
+          })
+
+          .getMany();
+
+        if (transaction.length > 0) {
+          change[index].state = transaction[0].estado + 1;
+
+          updatedChange.push({
+            nombre: item.nombre,
+            id: item.id,
+            last_connection: item.last_connection,
+            maximum_power: item.maximum_power,
+            serial_number: item.serial_number,
+            address: item.address,
+            conectors: item.conectors,
+            latitude: item.latitude,
+            length: item.length,
+            municipality: item.municipality,
+
+            card_transaction: transaction[0].card,
+          });
+        } else {
+          updatedChange.push({
+            nombre: item.nombre,
+            id: item.id,
+            last_connection: item.last_connection,
+            maximum_power: item.maximum_power,
+            serial_number: item.serial_number,
+            address: item.address,
+            conectors: item.conectors,
+            latitude: item.latitude,
+            length: item.length,
+            municipality: item.municipality,
+            card_transaction: null,
+          });
+        }
       }
     }
     return updatedChange;
