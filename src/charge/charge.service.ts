@@ -74,7 +74,7 @@ export class ChargeService {
     return change;
   }
 
-  async getChargeAllAdmin(id_company: number, rol): Promise<Charge[]> {
+  async getChargeAllAdmin(id_company: number, rol): Promise<any[]> {
     let arrayallcompany = [];
     let myCompany = [];
     let updatedChange = [];
@@ -147,7 +147,7 @@ export class ChargeService {
             length: item.length,
             municipality: item.municipality,
             state: item.state,
-            card_transaction: transaction[0].card,
+            card_transaction: [transaction[0].card],
           });
         } else {
           updatedChange.push({
@@ -162,7 +162,7 @@ export class ChargeService {
             length: item.length,
             municipality: item.municipality,
             state: item.state,
-            card_transaction: null,
+            card_transaction: [],
           });
         }
       }

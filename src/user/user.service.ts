@@ -6,7 +6,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from 'bcrypt';
 import { Company } from 'src/client/entities/client.entity';
 import { ClientService } from 'src/client/client.service';
-import { success } from 'jsonrpc-lite';
+import { Card } from 'src/card/entities/card.entity';
+import { Transaction } from 'src/transaction/entities/transaction.entity';
+import { Charge } from 'src/charge/entities/charge.entity';
+import { ChargeService } from 'src/charge/charge.service';
 
 @Injectable()
 export class UserService {
@@ -14,6 +17,11 @@ export class UserService {
     //  @Inject(ClientService) private clientService: ClientService,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Company) private clientRepository: Repository<Company>,
+    // @InjectRepository(Charge) private chargeRepository: Repository<Charge>,
+    /*@InjectRepository(Transaction)
+    private transactionRepository: Repository<Transaction>,*/
+
+    private chargeService: ChargeService,
     private clientService: ClientService,
     private dataSource: DataSource,
   ) {}
@@ -50,6 +58,10 @@ export class UserService {
     let arrayallcompany = [];
     let myCompany = [];
     let allUsers = [];
+    const charges = await this.chargeService.getChargeAllAdmin(
+      user.company,
+      user.roles,
+    );
     const companies_son = await this.clientService.getMyClientsTree(
       user.company,
       user.roles,
@@ -89,6 +101,14 @@ export class UserService {
       if (users.length == 0) continue;
       for (const user of users) {
         allUsers.push(user);
+        for (const char of charges) {
+          if (char.card_transaction.length > 0)
+            for (const transaction of char.card_transaction) {
+              if (user.id == transaction.user.id) {
+                allUsers[allUsers.length - 1].charge_information = [char];
+              }
+            }
+        }
       }
     }
 
