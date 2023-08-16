@@ -1,9 +1,11 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, In } from 'typeorm';
 import { Card } from './entities/card.entity';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { asingCardDto, createCardDto, updateCardDto } from './dto/card.dto';
 import { User } from '../user/entities/user.entity';
+import { UserService } from 'src/user/user.service';
+import { Transaction } from 'src/transaction/entities/transaction.entity';
 
 @Injectable()
 export class CardService {
@@ -11,7 +13,9 @@ export class CardService {
     @InjectRepository(Card)
     private cardRepository: Repository<Card>,
     @InjectRepository(User) private userRepository: Repository<User>,
-
+    @InjectRepository(Transaction)
+    private transactionRepository: Repository<Transaction>,
+    private userService: UserService,
     @InjectDataSource()
     private dataSource: DataSource,
   ) {}
@@ -68,12 +72,38 @@ export class CardService {
     }
   }
 
-  async getAllCards(): Promise<Object> {
-    const results = await this.dataSource
-      .createQueryBuilder()
-      .select('card')
-      .from(Card, 'card')
-      .getMany();
+  async getAllCards(user: any): Promise<Object> {
+    const allCardUser = [];
+    const users = await this.userService.getUser(user);
+    for (const us of users) {
+      const cards = await this.cardRepository
+        .createQueryBuilder('card')
+        .leftJoinAndSelect('card.user', 'user')
+        .select([
+          'card',
+          'user.id',
+          'user.firstName',
+          'user.lastName',
+          'user.email',
+          'user.dni',
+          'user.username',
+        ])
+        .where('card.userId = :id', { id: us.id })
+        .getMany();
+      if (cards.length == 0) continue;
+      for (const card of cards) {
+        const transaction = await this.transactionRepository.find({
+          where: {
+            cardId: card.id,
+            estado: In([2, 3]),
+          },
+        });
+
+        allCardUser.push(card);
+        allCardUser[allCardUser.length - 1].transaction = transaction;
+      }
+    }
+    const results = allCardUser;
 
     if (results.length == 0) {
       throw new HttpException('NO_DATA', 400);
@@ -83,7 +113,6 @@ export class CardService {
   }
 
   async getCardsByUserAutentication(id: number): Promise<Object> {
-    console.log(id);
     const results = await this.dataSource
       .createQueryBuilder()
       .select('card')

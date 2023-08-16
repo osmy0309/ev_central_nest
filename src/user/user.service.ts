@@ -4,7 +4,6 @@ import { User } from './entities/user.entity';
 import { createUserDto, userUpdateDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from 'bcrypt';
-import { Rol } from 'src/rol/entities/rol.entity';
 import { Company } from 'src/client/entities/client.entity';
 import { ClientService } from 'src/client/client.service';
 import { success } from 'jsonrpc-lite';
@@ -15,6 +14,7 @@ export class UserService {
     //  @Inject(ClientService) private clientService: ClientService,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Company) private clientRepository: Repository<Company>,
+    private clientService: ClientService,
     private dataSource: DataSource,
   ) {}
 
@@ -47,25 +47,53 @@ export class UserService {
 
   //DEVUELVE TODOS LOS USUARIOS BASES DE LA COMPAñIA DEL USUARIO LOGUEADO
   async getUser(user: any): Promise<User[]> {
-    const users = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.client', 'company')
-      .select([
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-        'user.isActive',
-        'user.username',
-        'user.email',
-        'user.direction',
-        'user.dni',
-        'user.roles',
-        'company.id',
-      ])
-      .where('user.clientId = :id', { id: user.company })
-      .getMany();
-    if (users.length == 0) throw new HttpException('USER_NOT_FOUND', 400);
-    return users;
+    let arrayallcompany = [];
+    let myCompany = [];
+    let allUsers = [];
+    const companies_son = await this.clientService.getMyClientsTree(
+      user.company,
+      user.roles,
+    );
+    function addCompanies(companies) {
+      for (const company of companies) {
+        arrayallcompany.push({ ...company }); // Add the company as a charger
+
+        if (company.company_son) {
+          // Check if it has child companies
+          addCompanies(company.company_son); // Recursively add the child companies
+        }
+      }
+    }
+
+    if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
+    myCompany.push({ id: user.company, name: 'My Company' } as Company);
+    addCompanies(myCompany);
+    for (const company of arrayallcompany) {
+      const users = await this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.client', 'company')
+        .select([
+          'user.id',
+          'user.firstName',
+          'user.lastName',
+          'user.isActive',
+          'user.username',
+          'user.email',
+          'user.direction',
+          'user.dni',
+          'user.roles',
+          'company.id',
+        ])
+        .where('user.clientId = :id', { id: company.id })
+        .getMany();
+      if (users.length == 0) continue;
+      for (const user of users) {
+        allUsers.push(user);
+      }
+    }
+
+    if (allUsers.length == 0) throw new HttpException('USER_NOT_FOUND', 400);
+    return allUsers;
   }
   //DEVULEVE SOLO LOS DATOS DEL USUARIO LOGUEADO
   async getUserByIdAuth(id: number): Promise<any> {

@@ -6,12 +6,11 @@ import { User } from './entities/user.entity';
 import { Rol } from 'src/rol/entities/rol.entity';
 import { Company } from 'src/client/entities/client.entity';
 import { ClientService } from 'src/client/client.service';
-import { ClientModule } from 'src/client/client.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Rol, Company])],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, ClientService],
   exports: [UserService, TypeOrmModule.forFeature([User])],
 })
 export class UserModule {}

@@ -48,20 +48,19 @@ export class CardController {
   @ApiBearerAuth()
   @Auth()
   @Get('by_admin')
-  async findAll() {
-    return await this.cardService.getAllCards();
+  async findAll(@GetPrincipal() user: any) {
+    return await this.cardService.getAllCards(user);
   }
 
   @Roles('ADMIN')
   @ApiBearerAuth()
   @Auth()
   @Patch(':id')
-  async updateUser(
+  async updateCard(
     @Param('id', ParseIntPipe) id: number,
     @Body() cardModify: updateCardDto,
     @GetPrincipal() user: any,
   ) {
-    console.log(user);
     return await this.cardService.patchCards(cardModify, id, user.userid);
   }
 

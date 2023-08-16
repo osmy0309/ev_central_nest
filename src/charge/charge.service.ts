@@ -10,7 +10,6 @@ import {
 } from './dto/card_charge.dto';
 import { Card } from 'src/card/entities/card.entity';
 import { Company } from 'src/client/entities/client.entity';
-import { Client } from 'rpc-websockets';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
 import { ClientService } from 'src/client/client.service';
 
