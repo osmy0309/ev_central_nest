@@ -47,7 +47,7 @@ export class CardController {
   @Roles('ADMIN')
   @ApiBearerAuth()
   @Auth()
-  @Get('by_admin')
+  @Get()
   async findAll(@GetPrincipal() user: any) {
     return await this.cardService.getAllCards(user);
   }
