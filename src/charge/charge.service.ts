@@ -147,7 +147,7 @@ export class ChargeService {
             latitude: item.latitude,
             length: item.length,
             municipality: item.municipality,
-
+            state: item.state,
             card_transaction: transaction[0].card,
           });
         } else {
@@ -162,6 +162,7 @@ export class ChargeService {
             latitude: item.latitude,
             length: item.length,
             municipality: item.municipality,
+            state: item.state,
             card_transaction: null,
           });
         }
