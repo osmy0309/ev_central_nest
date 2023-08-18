@@ -1,0 +1,59 @@
+pipeline {
+    agent {
+        node { label 'docker' }
+    }
+    environment {
+        branch = 'JenkinsPipelines'
+        scmUrl = 'ssh://git@git.simon-cloud.com:27/selba/evr-back.git'   
+        registryRepoName = '219526371337.dkr.ecr.eu-west-1.amazonaws.com/evr_back'
+        version = 'null'
+        def buildVersion = sh(script: "echo `date +%s`", returnStdout: true).trim()
+    }
+    stages {
+        stage("Initialization") {
+            steps {
+                script {
+                    def tag = ref.substring(ref.lastIndexOf('/') + 1, ref.length())
+                    echo "${tag}"
+                    buildName "${tag}"
+                    branch = ref
+                    version = tag
+                }
+                buildDescription "Executed @ ${NODE_NAME}"
+                echo "${branch}"
+                echo "${version}"
+            }
+        }
+        stage('checkout git') {
+            steps {
+                checkout([$class: 'GitSCM',
+                    branches: [[name: branch]],
+                    extensions: [[$class: 'WipeWorkspace']],
+                    userRemoteConfigs: [[credentialsId: 'jenkins_git', url: scmUrl]]
+                ])
+            }
+        }
+
+        stage ('Build') {
+            steps {
+                //sh "sudo docker build --target build -t ${registryRepoName}:${version}-debug -t ${registryRepoName}:latest ."
+                sh "sudo docker build -t ${registryRepoName}:${version} -t ${registryRepoName}:latest ."
+            }
+        }
+
+        stage ('Push') {
+            steps {
+                sh 'eval sudo $(aws ecr get-login --no-include-email --region eu-west-1 | sed "s|https://||")'
+                sh "sudo docker push ${registryRepoName}:latest"
+                sh "sudo docker push ${registryRepoName}:${version}"
+            }
+        }
+
+
+    }
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
