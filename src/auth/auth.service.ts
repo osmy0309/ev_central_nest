@@ -56,7 +56,7 @@ export class AuthService {
     const data = {
       user: findUser,
       token,
-      expires_in: expiresIn,
+      expires_in: new Date(Date.now() + expiresIn),
     };
     return data;
   }

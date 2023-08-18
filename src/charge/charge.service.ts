@@ -138,6 +138,7 @@ export class ChargeService {
           updatedChange.push({
             nombre: item.nombre,
             id: item.id,
+            total_charge: item.total_charge,
             last_connection: item.last_connection,
             maximum_power: item.maximum_power,
             serial_number: item.serial_number,
@@ -153,6 +154,7 @@ export class ChargeService {
           updatedChange.push({
             nombre: item.nombre,
             id: item.id,
+            total_charge: item.total_charge,
             last_connection: item.last_connection,
             maximum_power: item.maximum_power,
             serial_number: item.serial_number,
