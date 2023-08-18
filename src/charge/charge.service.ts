@@ -12,6 +12,7 @@ import { Card } from 'src/card/entities/card.entity';
 import { Company } from 'src/client/entities/client.entity';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
 import { ClientService } from 'src/client/client.service';
+import { TimeZoneService } from 'src/time_zone/time_zone.service';
 
 @Injectable()
 export class ChargeService {
@@ -26,6 +27,7 @@ export class ChargeService {
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
     private clientService: ClientService,
+    private timeZoneService: TimeZoneService,
 
     @InjectDataSource()
     private dataSource: DataSource,
@@ -133,23 +135,38 @@ export class ChargeService {
           .getMany();
 
         if (transaction.length > 0) {
-          change[index].state = transaction[0].estado + 1;
+          for (const itemtransaction of transaction) {
+            change[index].state = itemtransaction.estado + 1;
+            const timeZone =
+              await this.timeZoneService.getTimeZoneByIdTransaction(
+                itemtransaction.id,
+              );
 
-          updatedChange.push({
-            nombre: item.nombre,
-            id: item.id,
-            total_charge: item.total_charge,
-            last_connection: item.last_connection,
-            maximum_power: item.maximum_power,
-            serial_number: item.serial_number,
-            address: item.address,
-            conectors: item.conectors,
-            latitude: item.latitude,
-            length: item.length,
-            municipality: item.municipality,
-            state: item.state,
-            card_transaction: [transaction[0].card],
-          });
+            updatedChange.push({
+              nombre: item.nombre,
+              id: item.id,
+              total_charge: item.total_charge,
+              last_connection: item.last_connection,
+              maximum_power: item.maximum_power,
+              serial_number: item.serial_number,
+              address: item.address,
+              conectors: item.conectors,
+              latitude: item.latitude,
+              length: item.length,
+              municipality: item.municipality,
+              state: item.state,
+              card_transaction: [
+                {
+                  id: itemtransaction.card.id,
+                  no_serie: itemtransaction.card.no_serie,
+                  balance: itemtransaction.card.balance,
+                  idTarjetaPadre: itemtransaction.card.idTarjetaPadre,
+                  user: itemtransaction.card.user,
+                  time_zone: [timeZone],
+                },
+              ],
+            });
+          }
         } else {
           updatedChange.push({
             nombre: item.nombre,

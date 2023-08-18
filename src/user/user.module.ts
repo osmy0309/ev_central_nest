@@ -11,6 +11,8 @@ import { Card } from 'src/card/entities/card.entity';
 import { Charge } from 'src/charge/entities/charge.entity';
 import { Card_Charge } from 'src/charge/entities/card_charge.entity';
 import { ChargeService } from 'src/charge/charge.service';
+import { Timezone } from 'src/time_zone/entities/time_zone.entity';
+import { TimeZoneService } from 'src/time_zone/time_zone.service';
 
 @Module({
   imports: [
@@ -21,10 +23,11 @@ import { ChargeService } from 'src/charge/charge.service';
       Charge,
       Card_Charge,
       User,
+      Timezone,
     ]),
   ],
   controllers: [UserController],
-  providers: [UserService, ClientService, ChargeService],
+  providers: [UserService, ClientService, ChargeService, TimeZoneService],
   exports: [UserService, TypeOrmModule.forFeature([User])],
 })
 export class UserModule {}

@@ -9,6 +9,6 @@ import { Transaction } from 'src/transaction/entities/transaction.entity';
   providers: [TimeZoneService],
   controllers: [TimeZoneController],
   imports: [TypeOrmModule.forFeature([Timezone, Transaction])],
-  exports: [TypeOrmModule.forFeature([Timezone])],
+  exports: [TypeOrmModule.forFeature([Timezone]), TimeZoneService],
 })
 export class TimeZoneModule {}
