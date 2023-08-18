@@ -162,7 +162,7 @@ export class ChargeService {
                   balance: itemtransaction.card.balance,
                   idTarjetaPadre: itemtransaction.card.idTarjetaPadre,
                   user: itemtransaction.card.user,
-                  time_zone: [timeZone],
+                  time_zone: timeZone,
                 },
               ],
             });
