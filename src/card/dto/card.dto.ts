@@ -6,6 +6,7 @@ import {
   IsOptional,
   ValidateNested,
 } from 'class-validator';
+import { Company } from 'src/client/entities/client.entity';
 import { User } from 'src/user/entities/user.entity';
 
 export class createCardDto {
@@ -13,15 +14,15 @@ export class createCardDto {
   @IsString()
   @ApiProperty({
     example: '123',
-    description: 'El usuario que va autenticarse',
+    description: 'Numerio de serie de la Tarjeta',
   })
   no_serie: string;
 
   @IsNumber()
   @IsOptional()
   @ApiProperty({
-    example: '1 Opcional',
-    description: 'El usuario que va autenticarse',
+    example: 0,
+    description: 'Tarjeta Padre',
   })
   idTarjetaPadre?: number;
 
@@ -29,25 +30,40 @@ export class createCardDto {
   @IsNumber()
   @ApiProperty({
     example: 2,
-    description: 'El usuario que va autenticarse',
+    description: 'Balance de la Tarjeta',
   })
   balance: number;
 
   @IsOptional()
   user?: User;
+
+  @IsOptional()
+  company?: Company;
 }
 
 export class updateCardDto {
   @IsOptional()
   @IsString()
+  @ApiProperty({
+    example: '123',
+    description: 'Numerio de serie de la Tarjeta',
+  })
   no_serie?: string;
 
   @IsOptional()
   @IsNumber()
+  @ApiProperty({
+    example: 0,
+    description: 'Tarjeta Padre',
+  })
   idTarjetaPadre?: number;
 
   @IsOptional()
   @IsNumber()
+  @ApiProperty({
+    example: 2,
+    description: 'Balance de la Tarjeta',
+  })
   balance?: number;
 
   @IsOptional()

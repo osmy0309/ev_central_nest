@@ -1,3 +1,4 @@
+import { Card } from 'src/card/entities/card.entity';
 import { Charge } from 'src/charge/entities/charge.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
@@ -33,4 +34,9 @@ export class Company {
 
   @OneToMany(() => Charge, (charge) => charge.client, { cascade: true })
   charges: Charge[];
+
+  @OneToMany(() => Card, (card) => card.user, {
+    cascade: true,
+  })
+  cards: Card[];
 }

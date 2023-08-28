@@ -15,6 +15,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { createCardDto, updateCardDto, asingCardDto } from './dto/card.dto';
 import { Roles } from 'src/rol/decorator/rol.decorator';
 import { Auth } from 'src/decorators/auth.decorator';
+import { userLoginDto } from 'src/gralDTO/userLogin.dto';
 
 @ApiTags('Cards')
 @Controller('card')
@@ -24,8 +25,11 @@ export class CardController {
   @ApiBearerAuth()
   @Auth()
   @Post()
-  async createCard(@Body() newCard: createCardDto) {
-    return await this.cardService.create(newCard);
+  async createCard(
+    @Body() newCard: createCardDto,
+    @GetPrincipal() user: userLoginDto,
+  ) {
+    return await this.cardService.create(newCard, user);
   }
 
   @Roles('ADMIN')
@@ -48,7 +52,7 @@ export class CardController {
   @ApiBearerAuth()
   @Auth()
   @Get()
-  async findAll(@GetPrincipal() user: any) {
+  async findAll(@GetPrincipal() user: userLoginDto) {
     return await this.cardService.getAllCards(user);
   }
 
@@ -59,9 +63,14 @@ export class CardController {
   async updateCard(
     @Param('id', ParseIntPipe) id: number,
     @Body() cardModify: updateCardDto,
-    @GetPrincipal() user: any,
+    @GetPrincipal() user: userLoginDto,
   ) {
-    return await this.cardService.patchCards(cardModify, id, user.userid);
+    return await this.cardService.patchCards(
+      cardModify,
+      id,
+      user.userid,
+      false,
+    );
   }
 
   @Roles('ADMIN')

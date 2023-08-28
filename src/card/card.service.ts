@@ -6,6 +6,9 @@ import { asingCardDto, createCardDto, updateCardDto } from './dto/card.dto';
 import { User } from '../user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
+import { userLoginDto } from 'src/gralDTO/userLogin.dto';
+import { Company } from 'src/client/entities/client.entity';
+import { ClientService } from 'src/client/client.service';
 
 @Injectable()
 export class CardService {
@@ -15,16 +18,15 @@ export class CardService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
+    @InjectRepository(Company)
+    private companyRepository: Repository<Company>,
     private userService: UserService,
     @InjectDataSource()
     private dataSource: DataSource,
+    private clientService: ClientService,
   ) {}
 
-  async create(card: createCardDto): Promise<Card> {
-    /*const userFind = await this.userRepository.find({
-      where: { id },
-    });*/
-
+  async create(card: createCardDto, user: userLoginDto): Promise<Card> {
     const cardFind = await this.cardRepository.findOne({
       where: {
         no_serie: card.no_serie,
@@ -34,6 +36,12 @@ export class CardService {
       throw new HttpException('CARD_EXIST', HttpStatus.CONFLICT);
     }
 
+    const companyToAsing = await this.companyRepository.findOne({
+      where: {
+        id: user.company,
+      },
+    });
+    card.company = companyToAsing;
     //card.user = userFind[0];
     const newCard = this.cardRepository.create(card);
     // await this.userRepository.save(userFind[0]);
@@ -68,14 +76,38 @@ export class CardService {
       }
       if (relation[0].user) throw new HttpException('CARD_IN_USED', 400);
       cardFind.user = userFind[0];
-      return await this.patchCards(cardFind, asing.id_card, asing.id_user);
+      return await this.patchCards(
+        cardFind,
+        asing.id_card,
+        asing.id_user,
+        true,
+      );
     }
   }
 
-  async getAllCards(user: any): Promise<Object> {
-    const allCardUser = [];
-    const users = await this.userService.getUser(user);
-    for (const us of users) {
+  async getAllCards(user: userLoginDto): Promise<Object> {
+    let myCompany = [];
+    let arrayallcompany = [];
+    let results = [];
+    function addCompanies(companies) {
+      for (const company of companies) {
+        arrayallcompany.push({ ...company }); // Add the company as a charger
+
+        if (company.company_son) {
+          // Check if it has child companies
+          addCompanies(company.company_son); // Recursively add the child companies
+        }
+      }
+    }
+    const companies_son = await this.clientService.getMyClientsTree(
+      user.company,
+      user.roles,
+    );
+
+    if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
+    myCompany.push({ id: user.company, name: 'My Company' } as Company);
+    addCompanies(myCompany);
+    for (const company of arrayallcompany) {
       const cards = await this.cardRepository
         .createQueryBuilder('card')
         .leftJoinAndSelect('card.user', 'user')
@@ -88,28 +120,15 @@ export class CardService {
           'user.dni',
           'user.username',
         ])
-        .where('card.userId = :id', { id: us.id })
+        .where('card.companyId = :id', { id: company.id })
         .getMany();
       if (cards.length == 0) continue;
-      for (const card of cards) {
-        const transaction = await this.transactionRepository.find({
-          where: {
-            cardId: card.id,
-            estado: In([2, 3]),
-          },
-        });
 
-        allCardUser.push(card);
-        allCardUser[allCardUser.length - 1].transaction = transaction;
+      for (const card of cards) {
+        results.push(card);
       }
     }
-    const results = allCardUser;
-
-    if (results.length == 0) {
-      throw new HttpException('NO_DATA', 400);
-    }
-
-    return { results };
+    return results;
   }
 
   async getCardsByUserAutentication(id: number): Promise<Object> {
@@ -121,17 +140,14 @@ export class CardService {
       .where('userId = :id', { id })
       .getMany();
 
-    if (results.length == 0) {
-      throw new HttpException('NO_DATA', 400);
-    }
-
-    return { results };
+    return results;
   }
 
   async patchCards(
     card: updateCardDto,
     idcard: number,
     id: number,
+    midifyUser: boolean,
   ): Promise<Card> {
     const cardToUpdate = await this.dataSource
       .createQueryBuilder()
@@ -139,28 +155,27 @@ export class CardService {
       .from(Card, 'card')
       .where('id = :id', { id: idcard })
       .getOne(); // Cambiar de getMany() a getOne()
-    console.log(id);
 
     if (!cardToUpdate) {
       throw new HttpException('Card_not_found', 400);
     }
+    if (midifyUser) {
+      const user = await this.dataSource
+        .createQueryBuilder()
+        .select('user')
+        .from(User, 'user')
+        .where('id = :id', { id })
+        .getOne(); // Cambiar de getMany() a getOne()
 
-    const user = await this.dataSource
-      .createQueryBuilder()
-      .select('user')
-      .from(User, 'user')
-      .where('id = :id', { id })
-      .getOne(); // Cambiar de getMany() a getOne()
-
-    if (!user) {
-      throw new HttpException('USER_NOT_FOUND', 400);
+      if (!user) {
+        throw new HttpException('USER_NOT_FOUND', 400);
+      }
+      cardToUpdate.user = user;
     }
 
-    console.log(cardToUpdate.id);
     cardToUpdate.no_serie = card.no_serie;
     cardToUpdate.balance = card.balance;
     cardToUpdate.idTarjetaPadre = card.idTarjetaPadre;
-    cardToUpdate.user = user;
 
     return await this.cardRepository.save(cardToUpdate);
   }
@@ -168,7 +183,8 @@ export class CardService {
   async deleteCard(id: number): Promise<{ success: boolean }> {
     const card = await this.cardRepository.delete({ id });
     if (card.affected === 0) {
-      throw new HttpException('CARD_NOT_FOUND', 400);
+      // throw new HttpException('CARD_NOT_FOUND', 400);
+      return { success: false };
     }
     return { success: true };
   }

@@ -1,4 +1,5 @@
 import { Card_Charge } from 'src/charge/entities/card_charge.entity';
+import { Company } from 'src/client/entities/client.entity';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
 import {
   Entity,
@@ -29,6 +30,12 @@ export class Card {
     nullable: true,
   })
   user: User;
+
+  @ManyToOne(() => Company, (company) => company.cards, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  company: Company;
 
   @OneToMany(() => Card_Charge, (card_charge) => card_charge.card, {
     cascade: true,
