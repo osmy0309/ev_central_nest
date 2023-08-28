@@ -37,6 +37,7 @@ pipeline {
         stage ('Build') {
             steps {
                 //sh "sudo docker build --target build -t ${registryRepoName}:${version}-debug -t ${registryRepoName}:latest ."
+                sh "sudo docker -v"
                 sh "sudo docker build -t ${registryRepoName}:${version} -t ${registryRepoName}:latest ."
             }
         }
