@@ -84,6 +84,10 @@ export class UserService {
       const users = await this.userRepository
         .createQueryBuilder('user')
         .leftJoinAndSelect('user.client', 'company')
+        .leftJoinAndSelect('user.cards', 'card')
+        .leftJoinAndSelect('card.transaction', 'transaction')
+        .leftJoinAndSelect('transaction.timezones', 'timezones')
+        //   .leftJoinAndSelect('transaction.charge', 'charge_information')
         .select([
           'user.id',
           'user.firstName',
@@ -95,6 +99,10 @@ export class UserService {
           'user.dni',
           'user.roles',
           'company.id',
+          'card',
+          'transaction',
+          'timezones',
+          //   'charge_information',
         ])
         .where('user.clientId = :id', { id: company.id })
         .getMany();
@@ -112,7 +120,7 @@ export class UserService {
       }
     }
 
-    if (allUsers.length == 0) throw new HttpException('USER_NOT_FOUND', 400);
+    //if (allUsers.length == 0) throw new HttpException('USER_NOT_FOUND', 400);
     return allUsers;
   }
   //DEVULEVE SOLO LOS DATOS DEL USUARIO LOGUEADO

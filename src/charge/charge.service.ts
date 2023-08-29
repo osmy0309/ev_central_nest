@@ -66,11 +66,13 @@ export class ChargeService {
       .getOne();
 
     if (!change) {
-      throw new HttpException('CHANGE_NOT_FOUND', 400);
+      //throw new HttpException('CHANGE_NOT_FOUND', 400);
+      return {} as Charge;
     }
 
     if (change.client.id != id_company) {
-      throw new HttpException('CHANGE_NOT_EXIST_IN_THIS_COMPANY', 400);
+      //throw new HttpException('CHANGE_NOT_EXIST_IN_THIS_COMPANY', 400);
+      return {} as Charge;
     }
 
     return change;
@@ -202,14 +204,16 @@ export class ChargeService {
       .getOne();
 
     if (!change) {
-      throw new HttpException('CHANGE_NOT_FOUND', 400);
+      //throw new HttpException('CHANGE_NOT_FOUND', 400);
+      return {} as Charge;
     }
 
     if (change.client.id != id_company) {
-      throw new HttpException('CHANGE_NOT_EXIST_IN_THIS_COMPANY', 400);
+      ///throw new HttpException('CHANGE_NOT_EXIST_IN_THIS_COMPANY', 400);
+      return {} as Charge;
     }
 
-    const response = await this.chargeRepository.update({ id }, charge);
+    //const response = await this.chargeRepository.update({ id }, charge);
     /* if (response.affected === 0) {
       throw new HttpException('CHARGE_NOT_FOUND', 400);
     }*/
@@ -232,16 +236,19 @@ export class ChargeService {
       .getOne();
 
     if (!change) {
-      throw new HttpException('CHANGE_NOT_FOUND', 400);
+      //throw new HttpException('CHANGE_NOT_FOUND', 400);
+      return {} as Charge;
     }
 
     if (change.client.id != id_company) {
-      throw new HttpException('CHANGE_NOT_EXIST_IN_THIS_COMPANY', 400);
+      //throw new HttpException('CHANGE_NOT_EXIST_IN_THIS_COMPANY', 400);
+      return {} as Charge;
     }
 
     const charge = await this.chargeRepository.delete({ id });
     if (charge.affected === 0) {
-      throw new HttpException('CHARGE_NOT_FOUND', 400);
+      //throw new HttpException('CHARGE_NOT_FOUND', 400);
+      return {} as Charge;
     }
 
     return change;
@@ -272,7 +279,8 @@ export class ChargeService {
 
     const treeClient = await getMyClientsTreeA(id_company, this.dataSource);
     if (treeClient.length == 0) {
-      throw new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
+      // throw new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
+      return {};
     }
 
     async function idExistsInTree(
@@ -339,12 +347,14 @@ export class ChargeService {
       .getMany();
 
     if (!change) {
-      throw new HttpException('CHANGE_NOT_FOUND', 400);
+      //throw new HttpException('CHANGE_NOT_FOUND', 400);
+      return {} as Charge;
     }
     if (change[0].client.id != id_company) {
       {
         const flag = await this.companyIsMySon(id_company, change[0].client.id);
-        if (!flag) throw new HttpException('THIS_CHARGE_NOT_IS_SON', 400);
+        if (!flag)
+          /*throw new HttpException('THIS_CHARGE_NOT_IS_SON', 400)*/ return {} as Charge;
       }
 
       let updatedChange = null;
@@ -408,12 +418,15 @@ export class ChargeService {
       .getOne();
 
     if (!change) {
-      throw new HttpException('CHANGE_NOT_FOUND', 400);
+      //throw new HttpException('CHANGE_NOT_FOUND', 400);
+      return {} as Charge;
     }
 
     if (change.client.id != id_company) {
       const flag = await this.companyIsMySon(id_company, change.client.id);
-      if (!flag) throw new HttpException('THIS_COMPANY_NOT_IS_SON', 400);
+      if (!flag)
+        //throw new HttpException('THIS_COMPANY_NOT_IS_SON', 400);
+        return {} as Charge;
     }
 
     await this.chargeRepository.update({ id }, charge);
@@ -534,7 +547,6 @@ export class ChargeService {
           cardId: deleteCard_ChargerDto.cardId,
         },
       });
-      console.log(searchCardCharge);
       if (searchCardCharge.length == 0)
         throw new HttpException('CARD_NOT_RELATION', 400);
       searchCardCharge.forEach(async (item) => {
