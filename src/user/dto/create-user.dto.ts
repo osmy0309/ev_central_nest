@@ -2,9 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsString,
-  MinLength,
-  IsBoolean,
-  MaxLength,
   IsEnum,
   IsArray,
   IsOptional,
@@ -22,13 +19,14 @@ export class createUserDto {
   })
   username: string;
 
-  @IsNotEmpty()
+  @IsOptional()
+  //@IsNotEmpty()
   @ApiProperty({
     example: 'admin123',
     description: 'password del usuario',
   })
   @IsString()
-  password: string;
+  password?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -68,9 +66,10 @@ export class createUserDto {
     example: '9365487',
     description: 'dni del usuario',
   })
-  dni: string;
+  dni?: string;
 
   @IsArray()
+  @IsOptional()
   @IsEnum(AppRoles, {
     each: true,
     message: `must be a valid role value admin or autor`,
@@ -79,7 +78,7 @@ export class createUserDto {
     example: ['ADMIN, AUTOR'],
     description: 'Rol del usuario hasta el momento ADMIN o AUTOR',
   })
-  roles: string[];
+  roles?: string[];
 
   @IsOptional()
   client?: Company;

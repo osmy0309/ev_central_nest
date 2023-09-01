@@ -28,16 +28,16 @@ export class User {
   @Column({ unique: true })
   username: string;
 
-  @Column()
-  password: string;
+  @Column({ default: '123' })
+  password?: string;
 
   @Column()
   email: string;
 
-  @Column()
+  @Column({ default: '' })
   direction: string;
 
-  @Column()
+  @Column({ default: '' })
   dni: string;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })

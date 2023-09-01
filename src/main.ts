@@ -4,10 +4,23 @@ import { SwaggerModule } from '@nestjs/swagger/dist';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
+import * as session from 'express-session';
+import * as passport from 'passport';
 
 async function bootstrap() {
   dotenv.config();
   const app = await NestFactory.create(AppModule);
+  //await app.setGlobalPrefix('simon');
+  app.use(
+    session({
+      secret: 'asdasdasdasdaddsdsdsad',
+      saveUninitialized: false,
+      resave: false,
+      cookie: {
+        maxAge: 60000,
+      },
+    }),
+  );
 
   const config = new DocumentBuilder()
 
@@ -28,6 +41,8 @@ async function bootstrap() {
   app.enableCors();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('documentation', app, document);
+  app.use(passport.initialize());
+  app.use(passport.session());
   await app.listen(3800);
 }
 bootstrap();
