@@ -116,7 +116,7 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 80
-  targetport: 3100
+  targetport: 3800
   sessionAffinity: None
   # secondary internal service 
   secondaryService: true
