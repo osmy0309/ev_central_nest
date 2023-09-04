@@ -120,8 +120,10 @@ service:
   sessionAffinity: None
   # secondary internal service 
   secondaryService: true
-  secondaryPort: 3800
-  secondaryTargetPort: 3800
+  secondaryPort: 3100
+  secondaryTargetPort: 3100
+  # secondaryPort: 3800
+  # secondaryTargetPort: 3800
   secondaryPortName: apifront
 
 ingress:
