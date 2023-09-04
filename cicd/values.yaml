@@ -86,10 +86,17 @@ nameOverride: ""
 fullnameOverride: "evr-back-int"
 customProbe:
   livenessPath: /health-check
-  livenessPort: apifront
+  livenessPort: http
   readinessPath: /health-check
-  readinessPort: apifront
+  readinessPort: http
   initialDelaySeconds: 30
+
+#customProbe:
+#  livenessPath: /health-check
+#  livenessPort: apifront
+#  readinessPath: /health-check
+#  readinessPort: apifront
+#  initialDelaySeconds: 30
 
 serviceAccount:
   # Specifies whether a service account should be created
