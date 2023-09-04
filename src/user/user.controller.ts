@@ -39,7 +39,6 @@ export class UserController {
     @Body() newUser: createUserDto,
     @GetPrincipal() user: any,
   ) {
-    console.log('here');
     return await this.userService.createClientSon(
       newUser,
       user.company,

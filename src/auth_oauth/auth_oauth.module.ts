@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Company } from 'src/client/entities/client.entity';
 import { User } from 'src/user/entities/user.entity';
@@ -8,7 +9,10 @@ import { SessionSerializer } from './serializer/oauth.serializer';
 import { OAuth2Strategy } from './strategy/oauth2.strategy';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Company])],
+  imports: [
+    TypeOrmModule.forFeature([User, Company]),
+    PassportModule.register({ defaultStrategy: 'oauth2' }),
+  ],
   controllers: [AuthOauthController],
   providers: [
     { provide: 'AUTH_SERVICE', useClass: AuthOauthService },

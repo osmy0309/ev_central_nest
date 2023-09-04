@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'src/client/entities/client.entity';
 import { createUserDto } from 'src/user/dto/create-user.dto';
@@ -7,11 +7,13 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthOauthService {
-  constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(Company) private companyRepository: Repository<Company>,
-  ) {}
-
+  constructor() {}
+  @Optional()
+  @InjectRepository(User)
+  private readonly userRepository: Repository<User>;
+  @Optional()
+  @InjectRepository(Company)
+  private readonly companyRepository: Repository<Company>;
   async validateUser(details: createUserDto) {
     console.log('validateUser');
     const user = await this.userRepository
@@ -24,6 +26,7 @@ export class AuthOauthService {
         'user.email',
         'user.dni',
         'user.username',
+        'user.roles',
         'company',
       ])
       .where('user.email = :email', { email: details.email })
@@ -45,6 +48,7 @@ export class AuthOauthService {
         'user.email',
         'user.dni',
         'user.username',
+        'user.roles',
         'company',
       ])
       .where('user.email = :email', { email: details.email })

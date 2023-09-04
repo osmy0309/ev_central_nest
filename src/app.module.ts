@@ -31,6 +31,9 @@ import { UserSeederService } from './userseeder/userseeder.service';
 import { ClientModule } from './client/client.module';
 import { ConfigModule } from '@nestjs/config';
 import { HealthCheckModule } from './health-check/health-check.module';
+import { AuthOauthModule } from './auth_oauth/auth_oauth.module';
+import { PassportModule } from '@nestjs/passport';
+import { session } from 'passport';
 
 @Module({
   imports: [
@@ -45,6 +48,7 @@ import { HealthCheckModule } from './health-check/health-check.module';
       synchronize: true,
       autoLoadEntities: true,
     }),
+    PassportModule.register({ session: true }),
     AccessControlModule.forRoles(roles),
     AuthModule,
     OcppModule,
@@ -58,6 +62,7 @@ import { HealthCheckModule } from './health-check/health-check.module';
     UserseederModule,
     ClientModule,
     HealthCheckModule,
+    AuthOauthModule,
   ],
   controllers: [
     AppController,

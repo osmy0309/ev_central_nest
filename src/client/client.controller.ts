@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { BlobOptions } from 'buffer';
 import { Auth } from 'src/decorators/auth.decorator';
 import { GetPrincipal } from 'src/decorators/get-principal.decorator';
+import { OAuthAuthGuard } from 'src/guards/newguard.guard';
 import { Roles } from 'src/rol/decorator/rol.decorator';
 import { ClientService } from './client.service';
 import { createClientDto, updateClientDto } from './dto/client.dto';
@@ -49,7 +51,8 @@ export class ClientController {
 
   @Roles('ADMIN')
   @ApiBearerAuth()
-  @Auth()
+  @UseGuards(OAuthAuthGuard)
+  //@Auth()
   @Get('companys_son_tree')
   async findAllMyClients(@GetPrincipal() user: any): Promise<Company[]> {
     return await this.clientService.getMyClientsTree(user.company, user.roles);

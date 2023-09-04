@@ -36,7 +36,6 @@ export class OAuth2Strategy extends PassportStrategy(Strategy) {
     };
     const expiresIn = 1000 * 60 * 60 * 24;
     const user = await this.authService.validateUser(newUser);
-    console.log(user);
     const data = {
       user,
       token: accessToken,
