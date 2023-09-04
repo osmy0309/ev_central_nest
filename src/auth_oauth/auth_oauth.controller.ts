@@ -13,9 +13,8 @@ export class AuthOauthController {
   }
 
   @Get('redirect')
-  @UseGuards(AuthOauthGuard)
+  @UseGuards(OAuthAuthGuard)
   heandleRedirect(@Req() req: any, @GetPrincipal() user: any) {
-    console.log('HERE------------', req.user, '-------------');
     return req.user;
   }
 }

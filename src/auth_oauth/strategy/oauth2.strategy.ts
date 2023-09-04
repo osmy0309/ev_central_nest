@@ -5,7 +5,7 @@ import { createUserDto } from 'src/user/dto/create-user.dto';
 import { AuthOauthService } from '../auth_oauth.service';
 
 @Injectable()
-export class OAuth2Strategy extends PassportStrategy(Strategy) {
+export class OAuth2Strategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     @Inject('AUTH_SERVICE') private readonly authService: AuthOauthService,
   ) {

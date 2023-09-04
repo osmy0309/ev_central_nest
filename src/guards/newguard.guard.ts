@@ -8,7 +8,9 @@ import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class OAuthAuthGuard extends AuthGuard('google') implements CanActivate {
+export class OAuthAuthGuard extends AuthGuard(
+  'google',
+) /*implements CanActivate*/ {
   async canActivate(context: ExecutionContext): Promise<any> {
     const active = await super.canActivate(context);
     console.log('ACTIVE', active);
@@ -19,6 +21,7 @@ export class OAuthAuthGuard extends AuthGuard('google') implements CanActivate {
   }
 
   handleRequest(err: any, user: any, info: any, context: any) {
+    console.log(user);
     if (err || !user) {
       throw new HttpException('NOT_AUTHORIZED', 401);
     }

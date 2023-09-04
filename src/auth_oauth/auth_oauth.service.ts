@@ -57,8 +57,6 @@ export class AuthOauthService {
   }
 
   async findUser(id: number) {
-    console.log('findUser');
-
     const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.client', 'company')
