@@ -17,7 +17,7 @@ export class AuthService {
   private generateToken(payload: any): Promise<string> {
     return this.jwtService.signAsync(payload, {
       secret: jwtConstants.secret,
-      expiresIn: '1h',
+      expiresIn: '7d',
     });
   }
 
@@ -50,7 +50,7 @@ export class AuthService {
       company: findUser.client.id,
     };
     const token = await this.generateToken(payload);
-    const expiresIn = 1000 * 60 * 60 * 24;
+    const expiresIn = 1000 * 60 * 60 * 24 * 7;
     delete findUser['password'];
     const data = {
       user: findUser,
