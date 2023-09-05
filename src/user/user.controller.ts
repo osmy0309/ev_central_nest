@@ -72,11 +72,15 @@ export class UserController {
   @Auth()
   @Patch(':my_users_id')
   async updateUser(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('my_users_id', ParseIntPipe) my_users_id: number,
     @Body() userModify: userUpdateDto,
     @GetPrincipal() user: any,
   ) {
-    return await this.userService.updateUser(id, userModify, user.company);
+    return await this.userService.updateUser(
+      my_users_id,
+      userModify,
+      user.company,
+    );
   }
   //SERVICIO PARA ELIMINAR USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA
   @Roles('ADMIN')

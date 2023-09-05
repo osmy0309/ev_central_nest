@@ -45,7 +45,9 @@ export class UserService {
     if (userFind) {
       throw new HttpException('USER_EXIST', HttpStatus.CONFLICT);
     }
-
+    if (!user.roles || user.roles.length == 0) {
+      user.roles.push('AUTOR');
+    }
     user.password = await hash(user.password, 10);
     user.client = client;
     await this.clientRepository.save(client);
