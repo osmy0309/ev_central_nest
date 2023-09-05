@@ -42,7 +42,6 @@ export class AuthService {
         'Unable to log in with provided credentials.',
         400,
       );
-    console.log(findUser);
     const payload = {
       userid: findUser.id,
       username: username,
