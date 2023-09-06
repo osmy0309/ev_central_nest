@@ -32,7 +32,7 @@ export class createCardDto {
     example: 2,
     description: 'Balance de la Tarjeta',
   })
-  balance: number;
+  credit: number;
 
   @IsOptional()
   user?: User;

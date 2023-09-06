@@ -37,7 +37,7 @@ export class Charge {
   state?: number; // 1- Libre, 2- Reservado, 3- Cargando, 4- Deshabilitado
 
   @Column()
-  length: string;
+  longitude: string;
 
   @Column()
   municipality: string;

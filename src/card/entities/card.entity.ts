@@ -23,7 +23,7 @@ export class Card {
   idTarjetaPadre?: number;
 
   @Column({ type: 'float', default: () => 0 })
-  balance: number;
+  credit: number;
 
   @ManyToOne(() => User, (user) => user.cards, {
     onDelete: 'CASCADE',

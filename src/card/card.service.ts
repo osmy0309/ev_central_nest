@@ -174,7 +174,7 @@ export class CardService {
     }
 
     cardToUpdate.no_serie = card.no_serie;
-    cardToUpdate.balance = card.balance;
+    cardToUpdate.credit = card.balance;
     cardToUpdate.idTarjetaPadre = card.idTarjetaPadre;
 
     return await this.cardRepository.save(cardToUpdate);

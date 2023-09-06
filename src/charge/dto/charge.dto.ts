@@ -59,7 +59,7 @@ export class createChargerDto {
     example: 'length string',
     description: 'El usuario que va autenticarse',
   })
-  length: string;
+  longitude: string;
 
   @IsString()
   @ApiProperty({
