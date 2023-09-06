@@ -76,11 +76,12 @@ export class createChargerDto {
   address: string;
 
   @IsString()
+  @IsOptional()
   @ApiProperty({
     example: '2023-07-31',
     description: 'El usuario que va autenticarse',
   })
-  last_connection: Date;
+  last_connection?: Date;
 
   @IsOptional()
   client: Company;

@@ -209,14 +209,14 @@ export class ChargeService {
     }
 
     if (change.client.id != id_company) {
-      ///throw new HttpException('CHANGE_NOT_EXIST_IN_THIS_COMPANY', 400);
+      throw new HttpException('CHANGE_NOT_EXIST_IN_THIS_COMPANY', 400);
       return {} as Charge;
     }
 
-    //const response = await this.chargeRepository.update({ id }, charge);
-    /* if (response.affected === 0) {
-      throw new HttpException('CHARGE_NOT_FOUND', 400);
-    }*/
+    const response = await this.chargeRepository.update({ id }, charge);
+    if (response.affected === 0) {
+      throw new HttpException('CHARGE_NOT_MODIFY', 400);
+    }
 
     const updatedCharge = await this.chargeRepository.findOne({
       where: {
