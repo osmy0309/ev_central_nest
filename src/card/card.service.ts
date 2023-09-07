@@ -49,6 +49,27 @@ export class CardService {
   }
 
   async asingCard(asing: asingCardDto): Promise<Card> {
+    if (asing.id_user == 0) {
+      const cardrelation = await this.dataSource
+        .createQueryBuilder()
+        .select('card')
+        .from(Card, 'card')
+        .leftJoinAndSelect('card.user', 'user')
+        .where('card.id = :id', { id: asing.id_card })
+        .getMany();
+      if (cardrelation.length == 0)
+        throw new HttpException('CARD_NOT_EXIST', 400);
+      let cardModify = cardrelation[0];
+      cardModify.user = null;
+      const response = await this.cardRepository.update(
+        { id: asing.id_card },
+        cardModify,
+      );
+      if (response.affected !== 0) {
+        return cardModify;
+      }
+    }
+
     const userFind = await this.userRepository.find({
       where: { id: asing.id_user },
     });
@@ -60,7 +81,6 @@ export class CardService {
       .leftJoinAndSelect('card.user', 'user')
       .where('card.id = :id', { id: asing.id_card })
       .getMany();
-    console.log(relation);
 
     if (userFind.length == 0) {
       throw new HttpException('USER_NOT_EXIST', 400);

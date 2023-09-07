@@ -251,7 +251,7 @@ export class ClientService {
 
     const response = await this.clientRepository.update({ id }, client);
     if (response.affected === 0) {
-      throw new HttpException('CLIENT_NOT_FOUND', 400);
+      throw new HttpException('CLIENT_NOT_UPDATE', 400);
     }
     const client_response = await this.getClientById(id);
     return client_response;
