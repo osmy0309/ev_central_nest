@@ -154,7 +154,7 @@ export class ChargeService {
               address: item.address,
               conectors: item.conectors,
               latitude: item.latitude,
-              length: item.longitude,
+              longitude: item.longitude,
               municipality: item.municipality,
               state: item.state,
               card_transaction: [
@@ -180,7 +180,7 @@ export class ChargeService {
             address: item.address,
             conectors: item.conectors,
             latitude: item.latitude,
-            length: item.longitude,
+            longitude: item.longitude,
             municipality: item.municipality,
             state: item.state,
             card_transaction: [],
