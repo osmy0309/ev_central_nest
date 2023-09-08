@@ -10,11 +10,13 @@ import { Card } from 'src/card/entities/card.entity';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
 import { Charge } from 'src/charge/entities/charge.entity';
 import { ChargeService } from 'src/charge/charge.service';
+import { Response } from 'express';
+import { createObjectCsvWriter } from 'csv-writer';
+import * as fs from 'fs';
 
 @Injectable()
 export class UserService {
   constructor(
-    //  @Inject(ClientService) private clientService: ClientService,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Company) private clientRepository: Repository<Company>,
     // @InjectRepository(Charge) private chargeRepository: Repository<Charge>,
@@ -421,5 +423,44 @@ export class UserService {
       .where('user.id = :id', { id })
       .getOne();
     return userresponse;
+  }
+
+  async exportUserCSV(res: Response, user: any) {
+    const listUser = await this.getUser(user);
+    console.log(listUser);
+    let record = [];
+    const csvWriter = createObjectCsvWriter({
+      path: 'public/user.csv',
+      header: [
+        { id: 'firstName', title: 'firstName' },
+        { id: 'lastName', title: 'lastName' },
+        { id: 'username', title: 'username' },
+        { id: 'email', title: 'email' },
+        { id: 'direction', title: 'direction' },
+        { id: 'dni', title: 'dni' },
+      ],
+    });
+    listUser.forEach(async (item) => {
+      record.push({
+        firstName: item.firstName,
+        lastName: item.lastName,
+        username: item.username,
+        email: item.email,
+        direction: item.direction,
+        dni: item.dni,
+      });
+    });
+    const records = [
+      { NAME: 'Bob', LANGUAGE: 'French, English' },
+      { NAME: 'Mary', LANGUAGE: 'English' },
+    ];
+
+    await csvWriter.writeRecords(record);
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=user.csv');
+
+    const fileStream = fs.createReadStream('public/user.csv');
+    fileStream.pipe(res);
   }
 }

@@ -17,6 +17,10 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/rol/decorator/rol.decorator';
 import { Auth } from 'src/decorators/auth.decorator';
 import { User } from './entities/user.entity';
+import { createObjectCsvWriter } from 'csv-writer';
+import { Res } from '@nestjs/common/decorators/http';
+import { Response } from 'express';
+import * as fs from 'fs';
 @ApiTags('User')
 @Controller('user')
 export class UserController {
@@ -54,6 +58,17 @@ export class UserController {
   @Get()
   async myUser(@GetPrincipal() user: any) {
     return await this.userService.getUser(user);
+  }
+
+  @Roles('ADMIN', 'AUTOR')
+  @ApiBearerAuth()
+  @Auth()
+  @Get('exportCSV')
+  async exportUser(
+    @Res() res: Response,
+    @GetPrincipal() user: any,
+  ): Promise<void> {
+    return await this.userService.exportUserCSV(res, user);
   }
   //SERVICIO PARA OBTENER USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA
   @Roles('ADMIN')
