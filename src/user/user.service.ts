@@ -439,6 +439,7 @@ export class UserService {
         { id: 'direction', title: 'direction' },
         { id: 'dni', title: 'dni' },
       ],
+      fieldDelimiter: ';',
     });
     listUser.forEach(async (item) => {
       record.push({
@@ -450,10 +451,6 @@ export class UserService {
         dni: item.dni,
       });
     });
-    const records = [
-      { NAME: 'Bob', LANGUAGE: 'French, English' },
-      { NAME: 'Mary', LANGUAGE: 'English' },
-    ];
 
     await csvWriter.writeRecords(record);
 
