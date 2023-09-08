@@ -86,12 +86,12 @@ export class UserController {
   @Roles('ADMIN')
   @ApiBearerAuth()
   @Auth()
-  @Delete(':my_users_id')
+  @Delete(':my_user_id')
   async deleteUsers(
-    @Param('my_user_id', ParseIntPipe) my_users_id: number,
+    @Param('my_user_id', ParseIntPipe) my_user_id: number,
     @GetPrincipal() user: any,
   ): Promise<any> {
-    return await this.userService.deleteUser(my_users_id, user.company);
+    return await this.userService.deleteUser(my_user_id, user.company);
   }
 
   @Roles('ADMIN')
