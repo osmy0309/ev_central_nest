@@ -3,6 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { createClientDto, updateClientDto } from './dto/client.dto';
 import { Company } from './entities/client.entity';
+import { Response } from 'express';
+import { createObjectCsvWriter } from 'csv-writer';
+import * as fs from 'fs';
 
 @Injectable()
 export class ClientService {
@@ -80,7 +83,6 @@ export class ClientService {
   }
 
   async getMyClientsTree(id_company: number, rol): Promise<any> {
-    console.log(rol);
     async function getMyClientsTreeA(
       id_company: number,
       dataSource: any,

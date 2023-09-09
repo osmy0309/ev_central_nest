@@ -9,6 +9,9 @@ import { Transaction } from 'src/transaction/entities/transaction.entity';
 import { userLoginDto } from 'src/gralDTO/userLogin.dto';
 import { Company } from 'src/client/entities/client.entity';
 import { ClientService } from 'src/client/client.service';
+import { Response } from 'express';
+import { createObjectCsvWriter } from 'csv-writer';
+import * as fs from 'fs';
 
 @Injectable()
 export class CardService {
@@ -207,5 +210,40 @@ export class CardService {
       return { success: false };
     }
     return { success: true };
+  }
+
+  async exportCardCSV(res: Response, user: any): Promise<any> {
+    const listCard = await this.getAllCards(user);
+    let record = [];
+    const csvWriter = createObjectCsvWriter({
+      path: 'public/card.csv',
+      header: [
+        { id: 'no_serie', title: 'Número de serie' },
+        { id: 'credit', title: 'Credito' },
+        { id: 'userfirstName', title: 'Nombre Propietario' },
+        { id: 'userlastName', title: 'Apellidos Propietario' },
+        { id: 'email', title: 'Correo Eléctronico' },
+        { id: 'dni', title: 'DNI' },
+      ],
+      fieldDelimiter: ';',
+    });
+    for (const key in listCard) {
+      record.push({
+        no_serie: listCard[key].no_serie,
+        credit: listCard[key].credit,
+        userfirstName: listCard[key].user ? listCard[key].user.firstName : '-',
+        userlastName: listCard[key].user ? listCard[key].user.lastName : '-',
+        email: listCard[key].user ? listCard[key].user.email : '-',
+        dni: listCard[key].user ? listCard[key].user.dni : '-',
+      });
+    }
+
+    await csvWriter.writeRecords(record);
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=user.csv');
+
+    const fileStream = fs.createReadStream('public/card.csv');
+    fileStream.pipe(res);
   }
 }

@@ -16,6 +16,8 @@ import { Roles } from 'src/rol/decorator/rol.decorator';
 import { ClientService } from './client.service';
 import { createClientDto, updateClientDto } from './dto/client.dto';
 import { Company } from './entities/client.entity';
+import { Res } from '@nestjs/common/decorators/http';
+import { Response } from 'express';
 @ApiTags('Company')
 @Controller('company')
 export class ClientController {

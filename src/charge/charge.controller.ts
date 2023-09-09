@@ -19,10 +19,24 @@ import {
 } from './dto/card_charge.dto';
 import { Roles } from 'src/rol/decorator/rol.decorator';
 import { Auth } from 'src/decorators/auth.decorator';
+import { Res } from '@nestjs/common/decorators/http';
+import { Response } from 'express';
 
 @Controller('charge')
 export class ChargeController {
   constructor(private readonly chargeService: ChargeService) {}
+  @Roles('ADMIN', 'AUTOR')
+  @ApiBearerAuth()
+  @Auth()
+  @ApiTags('Charges')
+  @Get('exportCSV')
+  async exportCharge(
+    @Res() res: Response,
+    @GetPrincipal() user: any,
+  ): Promise<any> {
+    return await this.chargeService.exportChargeCSV(res, user);
+  }
+
   @Roles('ADMIN')
   @ApiBearerAuth()
   @Auth()

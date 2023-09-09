@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
-  UseGuards,
+  Res,
 } from '@nestjs/common';
 import { CardService } from './card.service';
 import { GetPrincipal } from 'src/decorators/get-principal.decorator';
@@ -16,6 +16,7 @@ import { createCardDto, updateCardDto, asingCardDto } from './dto/card.dto';
 import { Roles } from 'src/rol/decorator/rol.decorator';
 import { Auth } from 'src/decorators/auth.decorator';
 import { userLoginDto } from 'src/gralDTO/userLogin.dto';
+import { Response } from 'express';
 
 @ApiTags('Cards')
 @Controller('card')
@@ -38,6 +39,17 @@ export class CardController {
   @Post('asing_to_card')
   async asingCard(@Body() asing: asingCardDto) {
     return await this.cardService.asingCard(asing);
+  }
+
+  @Roles('ADMIN', 'AUTOR')
+  @ApiBearerAuth()
+  @Auth()
+  @Get('exportCSV')
+  async exportCard(
+    @Res() res: Response,
+    @GetPrincipal() user: any,
+  ): Promise<any> {
+    return await this.cardService.exportCardCSV(res, user);
   }
 
   @Roles('ADMIN', 'AUTOR')
