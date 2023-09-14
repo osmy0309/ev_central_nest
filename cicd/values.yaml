@@ -8,42 +8,37 @@ secrets:
   parameterSecrets: true
   all: {}
   data:
-  - key: NODE_ENV
-    objectName: node_env
-  - key: DATABASE_PORT
-    objectName: database_port
-  - key: DATABASE_HOST
-    objectName: database_host
-  - key: DATABASE_USER
-    objectName: database_user
-  - key: DATABASE_PASSWORD
-    objectName: database_password
-  - key: DATABASE_NAME
-    objectName: database_name
+    - key: NODE_ENV
+      objectName: node_env
+    - key: DATABASE_PORT
+      objectName: database_port
+    - key: DATABASE_HOST
+      objectName: database_host
+    - key: DATABASE_USER
+      objectName: database_user
+    - key: DATABASE_PASSWORD
+      objectName: database_password
+    - key: DATABASE_NAME
+      objectName: database_name
   objects:
-  - objectAlias: node_env
-    objectName: /simon-develop/int/evr-back/node_env
-    objectType: ssmparameter
-  - objectAlias: database_port
-    objectName: /simon-develop/int/evr-back/database_port
-    objectType: ssmparameter
-  - objectAlias: database_host
-    objectName: /simon-develop/int/evr-back/database_host
-    objectType: ssmparameter
-  - objectAlias: database_user
-    objectName: /simon-develop/int/evr-back/database_user
-    objectType: ssmparameter
-  - objectAlias: database_password
-    objectName: /simon-develop/int/evr-back/database_password
-    objectType: ssmparameter
-  - objectAlias: database_name
-    objectName: /simon-develop/int/evr-back/database_name
-    objectType: ssmparameter
-
-
-
-
-
+    - objectAlias: node_env
+      objectName: /simon-develop/int/evr-back/node_env
+      objectType: ssmparameter
+    - objectAlias: database_port
+      objectName: /simon-develop/int/evr-back/database_port
+      objectType: ssmparameter
+    - objectAlias: database_host
+      objectName: /simon-develop/int/evr-back/database_host
+      objectType: ssmparameter
+    - objectAlias: database_user
+      objectName: /simon-develop/int/evr-back/database_user
+      objectType: ssmparameter
+    - objectAlias: database_password
+      objectName: /simon-develop/int/evr-back/database_password
+      objectType: ssmparameter
+    - objectAlias: database_name
+      objectName: /simon-develop/int/evr-back/database_name
+      objectType: ssmparameter
 
 migrateSecrets:
   all: {}
@@ -57,13 +52,13 @@ command:
   # - -c
   # - |
   #   SYMFONY_ENV=dev
-  #   /usr/local/bin/php bin/console assets:install --env=dev && \  
+  #   /usr/local/bin/php bin/console assets:install --env=dev && \
   #   /usr/local/bin/php bin/console cache:clear --no-warmup --env=$SYMFONY_ENV && \
   #   /bin/chown www-data:www-data ./var/cache/ ./var/logs/ ./var/sessions/ -R && \
-  #   /boot.sh 
+  #   /boot.sh
 
 # this commmand  run one time
-migrateDB: 
+migrateDB:
   enabled: false
   command:
   # - sh
@@ -79,11 +74,11 @@ image:
   repository: 219526371337.dkr.ecr.eu-west-1.amazonaws.com/evr_back
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1.0.10"
+  tag: 'v1.0.12'
   symfony_env: dev
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: "evr-back-int"
+nameOverride: ''
+fullnameOverride: 'evr-back-int'
 customProbe:
   livenessPath: /health-check
   livenessPort: http
@@ -102,17 +97,22 @@ serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # Annotations to add to the service account
-  annotations: {"eks.amazonaws.com/role-arn":"arn:aws:iam::757841268213:role/simon-develop-access-evr-back-int"}
+  annotations:
+    {
+      'eks.amazonaws.com/role-arn': 'arn:aws:iam::757841268213:role/simon-develop-access-evr-back-int',
+    }
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: "evr-back-int"
+  name: 'evr-back-int'
 
 podAnnotations: {}
 
-podSecurityContext: {}
+podSecurityContext:
+  {}
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
+  {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -125,7 +125,7 @@ service:
   port: 80
   targetport: 3800
   sessionAffinity: None
-  # secondary internal service 
+  # secondary internal service
   secondaryService: true
   secondaryPort: 3100
   secondaryTargetPort: 3100
@@ -136,23 +136,23 @@ service:
 ingress:
   enabled: true
   groupOrder: 25-
-  className: "alb"
-  annotations: 
-    alb.ingress.kubernetes.io/group.name: "develop-public" # Use same ALB for every ingress with current group name
-    alb.ingress.kubernetes.io/group.order: "25"
-    alb.ingress.kubernetes.io/target-type: "ip" 
-    alb.ingress.kubernetes.io/scheme: "internet-facing" # internet-facing to use public subnets  internal
-    alb.ingress.kubernetes.io/target-group-attributes: "stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60"
+  className: 'alb'
+  annotations:
+    alb.ingress.kubernetes.io/group.name: 'develop-public' # Use same ALB for every ingress with current group name
+    alb.ingress.kubernetes.io/group.order: '25'
+    alb.ingress.kubernetes.io/target-type: 'ip'
+    alb.ingress.kubernetes.io/scheme: 'internet-facing' # internet-facing to use public subnets  internal
+    alb.ingress.kubernetes.io/target-group-attributes: 'stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60'
     alb.ingress.kubernetes.io/healthcheck-path: /health-check
     #alb.ingress.kubernetes.io/success-codes: 200,404,301,302
     #alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=180
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
     #alb.ingress.kubernetes.io/backend-protocol-version: HTTP2 #GRPC
-    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-west-1:757841268213:certificate/0bfdee67-358a-4328-91f8-ef0875ac8cd2"
+    alb.ingress.kubernetes.io/certificate-arn: 'arn:aws:acm:eu-west-1:757841268213:certificate/0bfdee67-358a-4328-91f8-ef0875ac8cd2'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
-    alb.ingress.kubernetes.io/ssl-policy: "ELBSecurityPolicy-TLS-1-1-2017-01"
-    alb.ingress.kubernetes.io/tags: "Environment=develop"
-    alb.ingress.kubernetes.io/backend-protocol: "HTTP"
+    alb.ingress.kubernetes.io/ssl-policy: 'ELBSecurityPolicy-TLS-1-1-2017-01'
+    alb.ingress.kubernetes.io/tags: 'Environment=develop'
+    alb.ingress.kubernetes.io/backend-protocol: 'HTTP'
 
   hosts:
     - host: evr-back-int.k8s.simon-cloud.com
@@ -164,18 +164,18 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-  - hosts:
-    - evr-back-int.simon-cloud.com
+    - hosts:
+        - evr-back-int.simon-cloud.com
 ingressInternal:
   enabled: false
   groupOrder: 25-
-  className: "alb"
-  annotations: 
-    alb.ingress.kubernetes.io/group.name: "develop-private" # Use same ALB for every ingress with current group name
-    alb.ingress.kubernetes.io/group.order: "25"
-    alb.ingress.kubernetes.io/target-type: "ip" 
-    alb.ingress.kubernetes.io/scheme: "internal" # internet-facing to use public subnets  internal
-    alb.ingress.kubernetes.io/target-group-attributes: "stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60"
+  className: 'alb'
+  annotations:
+    alb.ingress.kubernetes.io/group.name: 'develop-private' # Use same ALB for every ingress with current group name
+    alb.ingress.kubernetes.io/group.order: '25'
+    alb.ingress.kubernetes.io/target-type: 'ip'
+    alb.ingress.kubernetes.io/scheme: 'internal' # internet-facing to use public subnets  internal
+    alb.ingress.kubernetes.io/target-group-attributes: 'stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60'
     #external-dns.alpha.kubernetes.io/hostname: int-api-auth2.k8s.simon-electric.com, int-api-auth2.simon-electric.com
     #alb.ingress.kubernetes.io/healthcheck-path: /simon/manager/signin
     #alb.ingress.kubernetes.io/success-codes: 200,404,301,302
@@ -185,8 +185,8 @@ ingressInternal:
     #alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-west-1:757841268213:certificate/0bfdee67-358a-4328-91f8-ef0875ac8cd2"
     #alb.ingress.kubernetes.io/ssl-redirect: '443'
     #alb.ingress.kubernetes.io/ssl-policy: "ELBSecurityPolicy-TLS-1-1-2017-01"
-    alb.ingress.kubernetes.io/tags: "Environment=develop"
-    alb.ingress.kubernetes.io/backend-protocol: "HTTP"
+    alb.ingress.kubernetes.io/tags: 'Environment=develop'
+    alb.ingress.kubernetes.io/backend-protocol: 'HTTP'
     #alb.ingress.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.bucket=my-access-log-bucket,access_logs.s3.prefix=steve01
   hosts:
     - host: evr-back-int.wk8s.simon-cloud.com
@@ -195,15 +195,13 @@ ingressInternal:
           pathType: Prefix
   tls: {}
 
-
-resources: 
+resources:
   limits:
     cpu: 200m
     memory: 256Mi
   requests:
     cpu: 200m
     memory: 256Mi
-
 
 autoscaling:
   enabled: false
@@ -220,8 +218,8 @@ affinity: {}
 
 cronJob1:
   enabled: false
-  schedule: "*/1 * * * *"
-  command: 
+  schedule: '*/1 * * * *'
+  command:
     # - sh
     # - -c
     # - |
@@ -230,14 +228,13 @@ cronJob1:
     #   APPLICATION=simon-sns
     #   kubectl get pod -l app.kubernetes.io/instance=$APPLICATION-$NAMESPACE -n $NAMESPACE \
     #   -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | \
-    #   xargs -I {} sh -c "kubectl exec {} -n $NAMESPACE -- /usr/local/bin/php bin/console cache:clear --no-warmup --env=$SYMFONY_ENV; 
-    #   kubectl exec {} -n $NAMESPACE -- /bin/chown www-data:www-data ./var/cache/ ./var/logs/ ./var/sessions/ -R " 
-
+    #   xargs -I {} sh -c "kubectl exec {} -n $NAMESPACE -- /usr/local/bin/php bin/console cache:clear --no-warmup --env=$SYMFONY_ENV;
+    #   kubectl exec {} -n $NAMESPACE -- /bin/chown www-data:www-data ./var/cache/ ./var/logs/ ./var/sessions/ -R "
 
 cronJob2:
   enabled: false
-  schedule: "*/1 * * * *"
-  command: 
+  schedule: '*/1 * * * *'
+  command:
     # - sh
     # - -c
     # - |
@@ -246,8 +243,8 @@ cronJob2:
     #   APPLICATION=simon-sns
     #   kubectl get pod -l app.kubernetes.io/instance=$APPLICATION-$NAMESPACE -n $NAMESPACE \
     #   -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | \
-    #   xargs -I {} sh -c "kubectl exec {} -n $NAMESPACE -- /usr/local/bin/php bin/console app:timezones:upload; 
-    #   kubectl exec {} -n $NAMESPACE -- /usr/local/bin/php bin/console cache:clear --no-warmup --env=$SYNFONY_ENV; 
+    #   xargs -I {} sh -c "kubectl exec {} -n $NAMESPACE -- /usr/local/bin/php bin/console app:timezones:upload;
+    #   kubectl exec {} -n $NAMESPACE -- /usr/local/bin/php bin/console cache:clear --no-warmup --env=$SYNFONY_ENV;
     #   kubectl exec {} -n $NAMESPACE -- /bin/chown www-data:www-data ./var/cache/ ./var/logs/ ./var/sessions/ -R "
 
 serviceAccountCronJob:
@@ -255,4 +252,4 @@ serviceAccountCronJob:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  name: ''

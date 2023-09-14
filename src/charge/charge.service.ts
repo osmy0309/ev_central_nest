@@ -607,7 +607,7 @@ export class ChargeService {
       csvStringifier.getHeaderString() +
       csvStringifier.stringifyRecords(record);
     res.set('Content-Type', 'text/csv');
-    res.set('Content-Disposition', 'attachment; filename=user.csv');
+    res.set('Content-Disposition', 'attachment; filename=charge.csv');
     res.send(csvString);
   }
 }

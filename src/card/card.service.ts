@@ -244,7 +244,7 @@ export class CardService {
       csvStringifier.stringifyRecords(record);
 
     res.set('Content-Type', 'text/csv');
-    res.set('Content-Disposition', 'attachment; filename=user.csv');
+    res.set('Content-Disposition', 'attachment; filename=card.csv');
     res.send(csvString);
   }
 }
