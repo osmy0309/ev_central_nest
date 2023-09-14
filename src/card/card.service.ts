@@ -10,7 +10,7 @@ import { userLoginDto } from 'src/gralDTO/userLogin.dto';
 import { Company } from 'src/client/entities/client.entity';
 import { ClientService } from 'src/client/client.service';
 import { Response } from 'express';
-import { createObjectCsvWriter } from 'csv-writer';
+import { createObjectCsvStringifier, createObjectCsvWriter } from 'csv-writer';
 import * as fs from 'fs';
 
 @Injectable()
@@ -215,18 +215,7 @@ export class CardService {
   async exportCardCSV(res: Response, user: any): Promise<any> {
     const listCard = await this.getAllCards(user);
     let record = [];
-    const csvWriter = createObjectCsvWriter({
-      path: 'public/card.csv',
-      header: [
-        { id: 'no_serie', title: 'Número de serie' },
-        { id: 'credit', title: 'Credito' },
-        { id: 'userfirstName', title: 'Nombre Propietario' },
-        { id: 'userlastName', title: 'Apellidos Propietario' },
-        { id: 'email', title: 'Correo Eléctronico' },
-        { id: 'dni', title: 'DNI' },
-      ],
-      fieldDelimiter: ';',
-    });
+
     for (const key in listCard) {
       record.push({
         no_serie: listCard[key].no_serie,
@@ -238,12 +227,24 @@ export class CardService {
       });
     }
 
-    await csvWriter.writeRecords(record);
+    const csvStringifier = createObjectCsvStringifier({
+      header: [
+        { id: 'no_serie', title: 'Número de serie' },
+        { id: 'credit', title: 'Crédito' },
+        { id: 'userfirstName', title: 'Nombre Propietario' },
+        { id: 'userlastName', title: 'Apellidos Propietario' },
+        { id: 'email', title: 'Correo Electrónico' },
+        { id: 'dni', title: 'DNI' },
+      ],
+      fieldDelimiter: ';',
+    });
 
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=user.csv');
+    const csvString =
+      csvStringifier.getHeaderString() +
+      csvStringifier.stringifyRecords(record);
 
-    const fileStream = fs.createReadStream('public/card.csv');
-    fileStream.pipe(res);
+    res.set('Content-Type', 'text/csv');
+    res.set('Content-Disposition', 'attachment; filename=user.csv');
+    res.send(csvString);
   }
 }

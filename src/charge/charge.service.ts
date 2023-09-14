@@ -14,7 +14,7 @@ import { Transaction } from 'src/transaction/entities/transaction.entity';
 import { ClientService } from 'src/client/client.service';
 import { TimeZoneService } from 'src/time_zone/time_zone.service';
 import { Response } from 'express';
-import { createObjectCsvWriter } from 'csv-writer';
+import { createObjectCsvStringifier, createObjectCsvWriter } from 'csv-writer';
 import * as fs from 'fs';
 
 @Injectable()
@@ -576,21 +576,7 @@ export class ChargeService {
   async exportChargeCSV(res: Response, user: any): Promise<any> {
     const listCharge = await this.getChargeAllAdmin(user.company, user.roles);
     let record = [];
-    const csvWriter = createObjectCsvWriter({
-      path: 'public/charge.csv',
-      header: [
-        { id: 'nombre', title: 'Nombre' },
-        { id: 'total_charge', title: 'Carga total' },
-        { id: 'last_connection', title: 'Ultima conexión' },
-        { id: 'maximum_power', title: 'Poder máximo' },
-        { id: 'serial_number', title: 'Número de serie' },
-        { id: 'address', title: 'Dirección' },
-        { id: 'municipality', title: 'Municipio' },
-      ],
-      fieldDelimiter: ';',
-      encoding: 'utf8',
-    });
-    listCharge.forEach(async (item) => {
+    listCharge.forEach((item) => {
       record.push({
         nombre: item.nombre,
         total_charge: item.total_charge,
@@ -604,12 +590,24 @@ export class ChargeService {
       });
     });
 
-    await csvWriter.writeRecords(record);
+    const csvStringifier = createObjectCsvStringifier({
+      header: [
+        { id: 'nombre', title: 'Nombre' },
+        { id: 'total_charge', title: 'Carga total' },
+        { id: 'last_connection', title: 'Ultima conexión' },
+        { id: 'maximum_power', title: 'Poder máximo' },
+        { id: 'serial_number', title: 'Número de serie' },
+        { id: 'address', title: 'Dirección' },
+        { id: 'municipality', title: 'Municipio' },
+      ],
+      fieldDelimiter: ';',
+    });
 
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=user.csv');
-
-    const fileStream = fs.createReadStream('public/charge.csv');
-    fileStream.pipe(res);
+    const csvString =
+      csvStringifier.getHeaderString() +
+      csvStringifier.stringifyRecords(record);
+    res.set('Content-Type', 'text/csv');
+    res.set('Content-Disposition', 'attachment; filename=user.csv');
+    res.send(csvString);
   }
 }

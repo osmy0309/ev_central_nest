@@ -8,7 +8,7 @@ import { Company } from 'src/client/entities/client.entity';
 import { ClientService } from 'src/client/client.service';
 import { ChargeService } from 'src/charge/charge.service';
 import { Response } from 'express';
-import { createObjectCsvWriter } from 'csv-writer';
+import { createObjectCsvWriter, createObjectCsvStringifier } from 'csv-writer';
 import * as fs from 'fs';
 
 @Injectable()
@@ -425,19 +425,8 @@ export class UserService {
   async exportUserCSV(res: Response, user: any) {
     const listUser = await this.getUser(user);
     let record = [];
-    const csvWriter = createObjectCsvWriter({
-      path: 'public/user.csv',
-      header: [
-        { id: 'firstName', title: 'Nombre' },
-        { id: 'lastName', title: 'Apellidos' },
-        { id: 'username', title: 'Usuario' },
-        { id: 'email', title: 'Correo eléctronico' },
-        { id: 'direction', title: 'Dirección' },
-        { id: 'dni', title: 'dni' },
-      ],
-      fieldDelimiter: ';',
-    });
-    listUser.forEach(async (item) => {
+
+    listUser.forEach((item) => {
       record.push({
         firstName: item.firstName,
         lastName: item.lastName,
@@ -448,55 +437,24 @@ export class UserService {
       });
     });
 
-    await csvWriter.writeRecords(record);
-
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=user.csv');
-
-    const fileStream = fs.createReadStream('public/user.csv');
-    fileStream.pipe(res);
-  }
-
-  /* async exportChargeCSV(res: Response, user: any): Promise<any> {
-    const listCharge = await this.chargeService.getChargeAllAdmin(
-      user.company,
-      user.roles,
-    );
-    let record = [];
-    const csvWriter = createObjectCsvWriter({
-      path: 'public/charge.csv',
+    const csvStringifier = createObjectCsvStringifier({
       header: [
-        { id: 'nombre', title: 'Nombre' },
-        { id: 'total_charge', title: 'Carga total' },
-        { id: 'last_connection', title: 'Ultima conexión' },
-        { id: 'maximum_power', title: 'Poder máximo' },
-        { id: 'serial_number', title: 'Número de serie' },
-        { id: 'address', title: 'Dirección' },
-        { id: 'municipality', title: 'Municipio' },
+        { id: 'firstName', title: 'Nombre' },
+        { id: 'lastName', title: 'Apellidos' },
+        { id: 'username', title: 'Usuario' },
+        { id: 'email', title: 'Correo eléctronico' },
+        { id: 'direction', title: 'Dirección' },
+        { id: 'dni', title: 'dni' },
       ],
       fieldDelimiter: ';',
-      encoding: 'utf8',
-    });
-    listCharge.forEach(async (item) => {
-      record.push({
-        nombre: item.nombre,
-        total_charge: item.total_charge,
-        last_connection: `${item.last_connection.getDate()}/${
-          item.last_connection.getMonth() + 1
-        }/${item.last_connection.getFullYear()}`,
-        maximum_power: item.maximum_power,
-        serial_number: item.serial_number,
-        address: item.address,
-        municipality: item.municipality,
-      });
     });
 
-    await csvWriter.writeRecords(record);
+    const csvString =
+      csvStringifier.getHeaderString() +
+      csvStringifier.stringifyRecords(record);
 
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=user.csv');
-
-    const fileStream = fs.createReadStream('public/charge.csv');
-    fileStream.pipe(res);
-  }*/
+    res.set('Content-Type', 'text/csv');
+    res.set('Content-Disposition', 'attachment; filename=user.csv');
+    res.send(csvString);
+  }
 }
