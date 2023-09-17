@@ -31,6 +31,8 @@ import { UserSeederService } from './userseeder/userseeder.service';
 import { ClientModule } from './client/client.module';
 import { ConfigModule } from '@nestjs/config';
 import { HealthCheckModule } from './health-check/health-check.module';
+import { AuthOauthModule } from './auth-oauth/auth-oauth.module';
+import { AuthOauthService } from './auth-oauth/auth-oauth.service';
 
 @Module({
   imports: [
@@ -58,6 +60,7 @@ import { HealthCheckModule } from './health-check/health-check.module';
     UserseederModule,
     ClientModule,
     HealthCheckModule,
+    AuthOauthModule,
   ],
   controllers: [
     AppController,
@@ -78,6 +81,7 @@ import { HealthCheckModule } from './health-check/health-check.module';
     TimeZoneService,
     ChargeService,
     UserSeederService,
+    AuthOauthService,
   ],
 })
 export class AppModule {}

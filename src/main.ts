@@ -23,6 +23,7 @@ async function bootstrap() {
     .addTag('Health-check')
     .addTag('Charges')
     .addTag('Company')
+    .addTag('Auth-oauth')
     .build();
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
