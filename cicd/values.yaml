@@ -1,5 +1,5 @@
 ############################
-## Helm simon-app v0.1.52
+## Helm simon-app v0.1.61
 ############################
 
 awsRegion: eu-west-1
@@ -79,19 +79,6 @@ image:
 imagePullSecrets: []
 nameOverride: ''
 fullnameOverride: 'evr-back-int'
-customProbe:
-  livenessPath: /health-check
-  livenessPort: http
-  readinessPath: /health-check
-  readinessPort: http
-  initialDelaySeconds: 30
-
-#customProbe:
-#  livenessPath: /health-check
-#  livenessPort: apifront
-#  readinessPath: /health-check
-#  readinessPort: apifront
-#  initialDelaySeconds: 30
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -120,18 +107,23 @@ securityContext:
   # runAsNonRoot: true
   # runAsUser: 1000
 
+customProbe:
+  # If not set default is http, allowed options: http or secondary 
+  livenessPath: /health-check
+  #livenessPort: http
+  readinessPath: /health-check
+  #readinessPort: http
+  initialDelaySeconds: 30
+
 service:
   type: ClusterIP
   port: 80
   targetport: 3800
   sessionAffinity: None
-  # secondary internal service
+  # secondary service
   secondaryService: true
-  secondaryPort: 3100
+  secondaryPort: 80
   secondaryTargetPort: 3100
-  # secondaryPort: 3800
-  # secondaryTargetPort: 3800
-  secondaryPortName: apifront
 
 ingress:
   enabled: true
@@ -166,6 +158,40 @@ ingress:
   tls:
     - hosts:
         - evr-back-int.simon-cloud.com
+
+ingressSecondary:
+  enabled: true
+  groupOrder: 26-
+  className: "alb"
+  annotations: 
+    alb.ingress.kubernetes.io/group.name: 'develop-public' # Use same ALB for every ingress with current group name
+    alb.ingress.kubernetes.io/group.order: '26'
+    alb.ingress.kubernetes.io/target-type: 'ip'
+    alb.ingress.kubernetes.io/scheme: 'internet-facing' # internet-facing to use public subnets  internal
+    alb.ingress.kubernetes.io/target-group-attributes: 'stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60'
+    alb.ingress.kubernetes.io/healthcheck-path: /health-check
+    #alb.ingress.kubernetes.io/success-codes: 200,404,301,302
+    #alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=180
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    #alb.ingress.kubernetes.io/backend-protocol-version: HTTP2 #GRPC
+    alb.ingress.kubernetes.io/certificate-arn: 'arn:aws:acm:eu-west-1:757841268213:certificate/0bfdee67-358a-4328-91f8-ef0875ac8cd2'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/ssl-policy: 'ELBSecurityPolicy-TLS-1-1-2017-01'
+    alb.ingress.kubernetes.io/tags: 'Environment=develop'
+    alb.ingress.kubernetes.io/backend-protocol: 'HTTP'
+  hosts:
+    - host: evr-ocpp-int.k8s.simon-cloud.com
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: evr-ocpp-int.simon-cloud.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - evr-ocpp-int.simon-cloud.com
+
 ingressInternal:
   enabled: false
   groupOrder: 25-
@@ -253,3 +279,9 @@ serviceAccountCronJob:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ''
+
+# Enable efs persistent data for integration environment
+int:
+  enabled: false
+  fileSystemId: fs-040b7da2a
+  storage: 5Gi
