@@ -22,7 +22,7 @@ import { Response } from 'express';
 @Controller('card')
 export class CardController {
   constructor(private readonly cardService: CardService) {}
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Post()
@@ -33,7 +33,7 @@ export class CardController {
     return await this.cardService.create(newCard, user);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Post('asing_to_card')
@@ -41,7 +41,7 @@ export class CardController {
     return await this.cardService.asingCard(asing);
   }
 
-  @Roles('ADMIN', 'AUTOR')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Get('exportCSV')
@@ -52,7 +52,7 @@ export class CardController {
     return await this.cardService.exportCardCSV(res, user);
   }
 
-  @Roles('ADMIN', 'AUTOR')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Get('by_user_autentication')
@@ -60,7 +60,7 @@ export class CardController {
     return await this.cardService.getCardsByUserAutentication(user.userid);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Get()
@@ -68,7 +68,7 @@ export class CardController {
     return await this.cardService.getAllCards(user);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Patch(':id')
@@ -85,7 +85,7 @@ export class CardController {
     );
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @Auth()
   @Delete(':id')
   async deleteUsers(@Param('id', ParseIntPipe) id: number): Promise<any> {

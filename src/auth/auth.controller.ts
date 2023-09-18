@@ -25,7 +25,7 @@ export class AuthController {
   loginUser(@Body() userLogin: loginUserDto) {
     return this.authService.login(userLogin);
   }
-  @Roles('ADMIN', 'AUTOR')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Get('logoutall')
@@ -33,7 +33,7 @@ export class AuthController {
     return this.authService.logoutall();
   }
 
-  @Roles('ADMIN', 'AUTOR')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Get('profile')
