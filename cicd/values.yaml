@@ -179,6 +179,7 @@ ingressSecondary:
     alb.ingress.kubernetes.io/ssl-policy: 'ELBSecurityPolicy-TLS-1-1-2017-01'
     alb.ingress.kubernetes.io/tags: 'Environment=develop'
     alb.ingress.kubernetes.io/backend-protocol: 'HTTP'
+    
   hosts:
     - host: evr-ocpp-int.k8s.simon-cloud.com
       paths:
