@@ -54,7 +54,6 @@ export class UserController {
   @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
-  @UseGuards(TokenGuard)
   @Get()
   async myUser(@GetPrincipal() user: any) {
     return await this.userService.getUser(user);
