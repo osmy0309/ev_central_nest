@@ -21,7 +21,7 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(TokenGuard)
   // @Post('login')
-  @Get('login')
+  @Post('login')
   loginUser(@Body() userLogin: loginUserDto) {
     return this.authService.login(userLogin);
   }
