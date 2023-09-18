@@ -181,6 +181,16 @@ export class UserService {
     return user;
   }
 
+  async getUserByUserEmail(email: string): Promise<any> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.client', 'company')
+      .select(['user', 'company.id'])
+      .where('user.email = :email', { email })
+      .getOne();
+    return user;
+  }
+
   async deleteUser(id: number, id_company: number): Promise<any> {
     const user = await this.userRepository
       .createQueryBuilder('user')
@@ -323,7 +333,7 @@ export class UserService {
     const userFind = await this.userRepository.findOne({
       //BUSCAR PARA QUE NO EXISTAN USUARIOS REPETIDOS
       where: {
-        username: user.username,
+        email: user.email,
       },
     });
     if (userFind) {

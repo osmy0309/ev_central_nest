@@ -13,7 +13,7 @@ import { RolesGuard } from 'src/guards/roles.guard';
 export class RolController {
   constructor(private readonly rolService: RolService) {}
 
-  /* @Roles('ADMIN', 'AUTOR')
+  /*  @Roles('ADMIN', 'ROLE_USER')
   @Auth()
   @Get()
   async findAll() {

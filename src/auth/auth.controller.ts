@@ -7,6 +7,7 @@ import { GetPrincipal } from 'src/decorators/get-principal.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/rol/decorator/rol.decorator';
 import { Auth } from 'src/decorators/auth.decorator';
+import { TokenGuard } from 'src/guards/token.guard';
 @ApiTags('Autentication')
 @Controller('auth')
 export class AuthController {
@@ -17,8 +18,10 @@ export class AuthController {
   registerUser(@Body() userObjet: registerUserDto) {
     return this.authService.register(userObjet);
   }*/
-
-  @Post('login')
+  @ApiBearerAuth()
+  @UseGuards(TokenGuard)
+  // @Post('login')
+  @Get('login')
   loginUser(@Body() userLogin: loginUserDto) {
     return this.authService.login(userLogin);
   }

@@ -13,14 +13,14 @@ import {
 } from './dto/transaction.dto';
 import { TransactionService } from './transaction.service';
 @ApiTags('Transaction')
-@Roles('ADMIN')
+@Roles('ADMIN', 'ROLE_USER')
 @ApiBearerAuth()
 @Auth()
 @Controller('transaction')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Post('new_transaction')
@@ -28,7 +28,7 @@ export class TransactionController {
     return await this.transactionService.newTransaction(newTrasaction);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Post('change_state_transaction')
@@ -38,7 +38,7 @@ export class TransactionController {
     );
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Delete('delete_transaction_relations')

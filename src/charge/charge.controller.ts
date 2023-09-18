@@ -25,7 +25,7 @@ import { Response } from 'express';
 @Controller('charge')
 export class ChargeController {
   constructor(private readonly chargeService: ChargeService) {}
-  @Roles('ADMIN', 'AUTOR')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
@@ -37,7 +37,7 @@ export class ChargeController {
     return await this.chargeService.exportChargeCSV(res, user);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
@@ -49,7 +49,7 @@ export class ChargeController {
     return await this.chargeService.create(newCharge, user.company);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
@@ -61,7 +61,7 @@ export class ChargeController {
     return await this.chargeService.getChargeById(id, user.company);
   }
 
-  @Roles('ADMIN', 'AUTOR')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
@@ -70,7 +70,7 @@ export class ChargeController {
     return await this.chargeService.getChargeAllAdmin(user.company, user.roles);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
@@ -83,7 +83,7 @@ export class ChargeController {
     return await this.chargeService.patchCharge(chargeModify, id, user.company);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
@@ -95,7 +95,7 @@ export class ChargeController {
     return await this.chargeService.deleteCharge(id, user.company);
   }
   //SERVICIOS PARA INTERACTUAR CON LOS CARGADORES HIJOS
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
@@ -112,7 +112,7 @@ export class ChargeController {
     );
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
@@ -127,7 +127,7 @@ export class ChargeController {
     );
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
@@ -144,7 +144,7 @@ export class ChargeController {
     );
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
@@ -157,7 +157,7 @@ export class ChargeController {
   }
 
   // CARGADORES-TARJETA
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Card-Charges')
@@ -166,7 +166,7 @@ export class ChargeController {
     return await this.chargeService.newCard_Charge(newCard_Charge);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Card-Charges')
@@ -175,7 +175,7 @@ export class ChargeController {
     return await this.chargeService.changeStateCard_Charge(newCard_Charge);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Card-Charges')

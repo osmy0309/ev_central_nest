@@ -22,7 +22,7 @@ import { Response } from 'express';
 @Controller('company')
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Post()
@@ -33,7 +33,7 @@ export class ClientController {
     return await this.clientService.create(newClient, user.company);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Post(':id_client_other')
@@ -49,7 +49,7 @@ export class ClientController {
     );
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Get('companys_son_tree')
@@ -57,7 +57,7 @@ export class ClientController {
     return await this.clientService.getMyClientsTree(user.company, user.roles);
   }
 
-  @Roles('ADMIN', 'AUTOR')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Get('company_login')
@@ -65,7 +65,7 @@ export class ClientController {
     return await this.clientService.getClientById(user.company);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Patch(':id')
@@ -82,7 +82,7 @@ export class ClientController {
     );
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Delete(':id')
@@ -93,7 +93,7 @@ export class ClientController {
     return await this.clientService.deleteClient(id, user.company, user.roles);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Delete('delete/:id_company_son')

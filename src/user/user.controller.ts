@@ -19,12 +19,13 @@ import { Auth } from 'src/decorators/auth.decorator';
 import { User } from './entities/user.entity';
 import { Res } from '@nestjs/common/decorators/http';
 import { Response } from 'express';
+import { TokenGuard } from 'src/guards/token.guard';
 @ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
   //SERVICIO PARA ADICIONAR USUARIOS A LA COMPAÑIA DEL USUARIO LOGUEADO
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Post()
@@ -32,7 +33,7 @@ export class UserController {
     return await this.userService.create(newUser, user.company);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Post(':id_client_son')
@@ -50,15 +51,16 @@ export class UserController {
   }
 
   //SERVICIO QUE BRINDA TODOS LOS USUARIOS QUE PERTENECEN A LA EMPRESA QUE EL USUARIO ESTA LOGIN SIN MOSTRAR LOS DE LAS EMPRESAS HIJAS
-  @Roles('ADMIN', 'AUTOR')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
+  @UseGuards(TokenGuard)
   @Get()
   async myUser(@GetPrincipal() user: any) {
     return await this.userService.getUser(user);
   }
 
-  @Roles('ADMIN', 'AUTOR')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Get('exportCSV')
@@ -80,7 +82,7 @@ export class UserController {
     return await this.userService.exportChargeCSV(res, user);
   }*/
   //SERVICIO PARA OBTENER USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Get(':id')
@@ -91,7 +93,7 @@ export class UserController {
     return await this.userService.getUserById(id, user.company);
   }
   //SERVICIO PARA Modificar USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Patch(':my_users_id')
@@ -107,7 +109,7 @@ export class UserController {
     );
   }
   //SERVICIO PARA ELIMINAR USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Delete(':my_user_id')
@@ -118,7 +120,7 @@ export class UserController {
     return await this.userService.deleteUser(my_user_id, user.company);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Delete('user_son/:user_id')
@@ -134,7 +136,7 @@ export class UserController {
       user.company,
     );
   }
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Patch('user_son/:user_id')

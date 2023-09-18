@@ -13,6 +13,7 @@ import { Card_Charge } from 'src/charge/entities/card_charge.entity';
 import { ChargeService } from 'src/charge/charge.service';
 import { Timezone } from 'src/time_zone/entities/time_zone.entity';
 import { TimeZoneService } from 'src/time_zone/time_zone.service';
+import { AuthOauthService } from 'src/auth-oauth/auth-oauth.service';
 
 @Module({
   imports: [
@@ -27,7 +28,13 @@ import { TimeZoneService } from 'src/time_zone/time_zone.service';
     ]),
   ],
   controllers: [UserController],
-  providers: [UserService, ClientService, ChargeService, TimeZoneService],
+  providers: [
+    UserService,
+    ClientService,
+    ChargeService,
+    TimeZoneService,
+    AuthOauthService,
+  ],
   exports: [UserService, TypeOrmModule.forFeature([User])],
 })
 export class UserModule {}

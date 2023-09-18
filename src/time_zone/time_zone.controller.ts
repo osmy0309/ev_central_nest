@@ -10,7 +10,7 @@ import { TimeZoneService } from './time_zone.service';
 @Controller('time-zone')
 export class TimeZoneController {
   constructor(private readonly timeZOneService: TimeZoneService) {}
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Post(':id')
@@ -20,14 +20,14 @@ export class TimeZoneController {
   ) {
     return await this.timeZOneService.newTimeZone(id, newTimeZone);
   }
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Get('by_id_transaction/:id')
   async getTimeZoneByIdTransaction(@Param('id', ParseIntPipe) id: number) {
     return await this.timeZOneService.getTimeZoneByIdTransaction(id);
   }
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()
   @Auth()
   @Get(':id')
