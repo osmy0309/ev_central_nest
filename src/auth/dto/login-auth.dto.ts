@@ -11,7 +11,7 @@ export class loginUserDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
-    example: 'usuario@gmail.com',
+    example: 'arodrigueza@napptilus.com',
     description: 'El usuario que va autenticarse',
   })
   username: string;

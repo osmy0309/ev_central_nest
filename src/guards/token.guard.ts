@@ -32,13 +32,13 @@ export class TokenGuard implements CanActivate {
       );
       if (validateEmail == null) {
         const createUser = new createUserDto();
-        createUser.dni = '1';
+        createUser.dni = '';
         createUser.email = resultValidate.user.email;
         createUser.firstName = resultValidate.user.name;
         createUser.lastName = resultValidate.user.lastName;
         createUser.roles = resultValidate.user.roles;
         createUser.username = resultValidate.user.email;
-        createUser.password = '123';
+        createUser.password = '';
         createUser.direction = '';
         this.userService.create(createUser, 1);
       }
