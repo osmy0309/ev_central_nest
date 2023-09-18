@@ -50,7 +50,7 @@ export class AuthService {
       company: findUser.client.id,
     };
     const token = await this.generateToken(payload);
-    const expiresIn = 3600; //1000 * 60 * 60 * 24 * 7;
+    const expiresIn = 3600 * 1000; //1000 * 60 * 60 * 24 * 7;
     delete findUser['password'];
     const data = {
       user: findUser,
