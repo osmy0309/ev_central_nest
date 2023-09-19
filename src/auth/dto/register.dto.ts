@@ -73,7 +73,7 @@ export class registerUserDto {
   @IsArray()
   @IsEnum(AppRoles, {
     each: true,
-    message: `must be a valid role value admin or autor`,
+    message: `must be a valid role value admin or rol_user `,
   })
   roles: string[];
 }
