@@ -44,7 +44,8 @@ pipeline {
 
         stage ('Push') {
             steps {
-                sh 'eval sudo $(aws ecr get-login --no-include-email --region eu-west-1 | sed "s|https://||")'
+                //sh 'eval sudo $(aws ecr get-login --no-include-email --region eu-west-1 | sed "s|https://||")'
+                sh 'sudo $(aws ecr get-login --no-include-email --region eu-west-1 | sed "s|https://||")'
                 sh "sudo docker push ${registryRepoName}:latest"
                 sh "sudo docker push ${registryRepoName}:${version}"
             }
