@@ -4,9 +4,10 @@ pipeline {
     }
     environment {
         branch = 'JenkinsPipelines'
-        scmUrl = 'ssh://git@git.simon-cloud.com:27/selba/evr-back.git'   
-        registryRepoName = '219526371337.dkr.ecr.eu-west-1.amazonaws.com/evr_back'
-        registry = '219526371337.dkr.ecr.eu-west-1.amazonaws.com'
+        scmUrl = 'ssh://git@git.simon-cloud.com:27/selba/evr-back.git'  
+        registry = '219526371337.dkr.ecr.eu-west-1.amazonaws.com' 
+        registryRepoName = '${registry}/evr_back'
+        
         version = 'null'
         def buildVersion = sh(script: "echo `date +%s`", returnStdout: true).trim()
     }
