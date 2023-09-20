@@ -81,6 +81,17 @@ export class ChargeService {
     return change;
   }
 
+  async getChargeBySerial(id: string): Promise<Charge> {
+    const change = await this.chargeRepository
+      .createQueryBuilder('charge')
+      .leftJoinAndSelect('charge.client', 'company')
+      .select(['charge', 'company.id'])
+      .where('charge.serial_number = :id', { id })
+      .getOne();
+
+    return change;
+  }
+
   async getChargeAllAdmin(id_company: number, rol): Promise<any[]> {
     let arrayallcompany = [];
     let myCompany = [];

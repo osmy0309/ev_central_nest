@@ -59,6 +59,13 @@ export class CardController {
   async getCardsByUserAutentication(@GetPrincipal() user: any) {
     return await this.cardService.getCardsByUserAutentication(user.userid);
   }
+  @Roles('ADMIN', 'ROLE_USER')
+  @ApiBearerAuth()
+  @Auth()
+  @Get(':no_serie')
+  async getChargeBySerial(@Param('no_serie', ParseIntPipe) no_serie: string) {
+    return await this.cardService.getChargeBySerial(no_serie);
+  }
 
   @Roles('ADMIN', 'ROLE_USER')
   @ApiBearerAuth()

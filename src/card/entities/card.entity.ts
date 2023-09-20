@@ -16,7 +16,7 @@ export class Card {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   no_serie: string;
 
   @Column({ default: 0 })
