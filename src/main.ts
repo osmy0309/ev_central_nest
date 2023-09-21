@@ -5,9 +5,6 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { OcppService } from './ocpp/ocpp.service';
 import * as dotenv from 'dotenv';
-import { OcppModule } from './ocpp/ocpp.module';
-import { OcppController } from './ocpp/ocpp.controller';
-import { Transport } from '@nestjs/microservices/enums';
 
 async function bootstrap() {
   dotenv.config();
