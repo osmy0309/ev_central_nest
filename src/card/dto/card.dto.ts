@@ -64,11 +64,14 @@ export class updateCardDto {
     example: 2,
     description: 'Balance de la Tarjeta',
   })
-  balance?: number;
+  credit?: number;
 
   @IsOptional()
   @ValidateNested()
   user?: User;
+
+  @IsOptional()
+  company?: Company;
 }
 
 export class asingCardDto {

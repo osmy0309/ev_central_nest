@@ -73,9 +73,12 @@ export class CardService {
       }
     }
 
-    const userFind = await this.userRepository.find({
-      where: { id: asing.id_user },
-    });
+    const userFind = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.client', 'client')
+      .select(['user', 'client'])
+      .where('user.id = :id', { id: asing.id_user })
+      .getMany();
 
     const relation = await this.dataSource
       .createQueryBuilder()
@@ -85,7 +88,7 @@ export class CardService {
       .where('card.id = :id', { id: asing.id_card })
       .getMany();
 
-    if (userFind.length == 0) {
+    if (!userFind) {
       throw new HttpException('USER_NOT_EXIST', 400);
     } else {
       userFind[0].password = '';
@@ -97,8 +100,14 @@ export class CardService {
       if (!cardFind) {
         throw new HttpException('CARD_NOT_EXIST', HttpStatus.CONFLICT);
       }
+
+      const companyFind = await this.companyRepository.find({
+        where: { id: userFind[0].client.id },
+      });
       if (relation[0].user) throw new HttpException('CARD_IN_USED', 400);
       cardFind.user = userFind[0];
+      cardFind.company = companyFind[0];
+
       return await this.patchCards(
         cardFind,
         asing.id_card,
@@ -172,6 +181,8 @@ export class CardService {
     id: number,
     midifyUser: boolean,
   ): Promise<Card> {
+    console.log('USERFIND', card);
+
     const cardToUpdate = await this.dataSource
       .createQueryBuilder()
       .select('card')
@@ -197,7 +208,8 @@ export class CardService {
     }
 
     cardToUpdate.no_serie = card.no_serie;
-    cardToUpdate.credit = card.balance;
+    cardToUpdate.credit = card.credit;
+    cardToUpdate.company = card.company;
     cardToUpdate.idTarjetaPadre = card.idTarjetaPadre;
 
     return await this.cardRepository.save(cardToUpdate);
