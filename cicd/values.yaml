@@ -175,7 +175,7 @@ ingressSecondary:
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
     #alb.ingress.kubernetes.io/backend-protocol-version: HTTP2 #GRPC
     alb.ingress.kubernetes.io/certificate-arn: 'arn:aws:acm:eu-west-1:757841268213:certificate/0bfdee67-358a-4328-91f8-ef0875ac8cd2'
-    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    #alb.ingress.kubernetes.io/ssl-redirect: '443'
     alb.ingress.kubernetes.io/ssl-policy: 'ELBSecurityPolicy-TLS-1-1-2017-01'
     alb.ingress.kubernetes.io/tags: 'Environment=develop'
     alb.ingress.kubernetes.io/backend-protocol: 'HTTP'
