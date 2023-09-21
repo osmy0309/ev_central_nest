@@ -247,4 +247,17 @@ export class CardService {
     res.set('Content-Disposition', 'attachment; filename=card.csv');
     res.send(csvString);
   }
+
+  async getChargeBySerial(id: string): Promise<Card> {
+    const card = await this.cardRepository
+      .createQueryBuilder('card')
+      .leftJoinAndSelect('card.company', 'company')
+      .leftJoinAndSelect('card.card_charge', 'card_charge')
+      .leftJoinAndSelect('card.transaction', 'transaction')
+      .leftJoinAndSelect('card.user', 'user')
+      .select(['card', 'card_charge', 'transaction', 'company', 'user'])
+      .where('card.no_serie = :id', { id })
+      .getOne();
+    return card;
+  }
 }
