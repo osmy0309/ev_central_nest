@@ -481,7 +481,7 @@ export class ChargeService {
 
   async newCard_Charge(
     newCard_Charge: createCard_ChargerDto,
-  ): Promise<Card_Charge> {
+  ): Promise<Card_Charge | HttpException> {
     const card = await this.cardRepository.findOne({
       where: {
         id: newCard_Charge.cardId,
@@ -489,7 +489,7 @@ export class ChargeService {
     });
 
     if (!card) {
-      throw new HttpException('CARD_NOT_FOUND', 400);
+      return new HttpException('CARD_NOT_FOUND', 400);
     }
 
     const charge = await this.chargeRepository.findOne({
@@ -499,7 +499,7 @@ export class ChargeService {
     });
 
     if (!charge) {
-      throw new HttpException('CHARGE_NOT_FOUND', 400);
+      return new HttpException('CHARGE_NOT_FOUND', 400);
     }
 
     const relactionexist = await this.card_chargeRepository.findOne({
@@ -509,7 +509,7 @@ export class ChargeService {
       },
     });
     if (relactionexist) {
-      throw new HttpException('RELATION_EXIST', 400);
+      return new HttpException('RELATION_EXIST', 400);
     }
     const newRelation = this.card_chargeRepository.create(newCard_Charge);
     return await this.card_chargeRepository.save(newRelation);

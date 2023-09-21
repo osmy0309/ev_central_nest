@@ -33,6 +33,7 @@ import { ConfigModule } from '@nestjs/config';
 import { HealthCheckModule } from './health-check/health-check.module';
 import { AuthOauthModule } from './auth-oauth/auth-oauth.module';
 import { AuthOauthService } from './auth-oauth/auth-oauth.service';
+import { OcppController } from './ocpp/ocpp.controller';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { AuthOauthService } from './auth-oauth/auth-oauth.service';
     AuthOauthModule,
   ],
   controllers: [
+    OcppController,
     AppController,
     ClientOcppController,
     CardController,

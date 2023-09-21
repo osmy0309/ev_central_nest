@@ -15,6 +15,7 @@ import { TimeZoneService } from 'src/time_zone/time_zone.service';
 import { CardService } from 'src/card/card.service';
 import { UserService } from 'src/user/user.service';
 import { TransactionService } from 'src/transaction/transaction.service';
+import { OcppController } from './ocpp.controller';
 
 @Module({
   imports: [
@@ -39,5 +40,6 @@ import { TransactionService } from 'src/transaction/transaction.service';
     TransactionService,
   ],
   exports: [OcppService],
+  controllers: [OcppController],
 })
 export class OcppModule {}

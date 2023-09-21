@@ -4,7 +4,6 @@ import { ChargeService } from '../charge/charge.service';
 import { CardService } from '../card/card.service';
 import { TransactionService } from '../transaction/transaction.service';
 import { v4 } from 'uuid';
-import { async } from 'rxjs';
 @Injectable()
 export class OcppService {
   constructor(
@@ -13,7 +12,7 @@ export class OcppService {
     private readonly transactionService: TransactionService,
   ) {}
 
-  async startServer() {
+  public async startServer() {
     console.log('Create Server OCPP...');
     const server = new RPCServer({
       protocols: ['ocpp1.6'], // server accepts ocpp1.6 subprotocol
@@ -34,6 +33,12 @@ export class OcppService {
         console.log(`Llamada realizada: ${command.action}`);
       });
 
+      client.on('disconnect', () => {
+        console.log(`${client.identity} disconnected!`);
+        // Aquí puedes agregar la lógica para manejar la desconexión del sistema central
+        // y realizar cualquier acción necesaria en función de los parámetros recibidos.
+      });
+
       console.log(`${client.session.sessionId} connected!`); // `XYZ123 connected!`
 
       // create a specific handler for handling BootNotification requests
@@ -46,7 +51,7 @@ export class OcppService {
         // respond to accept the client
         return {
           status: 'Accepted',
-          interval: 300,
+          interval: 6000,
           currentTime: new Date().toISOString(),
         };
       });
@@ -59,6 +64,7 @@ export class OcppService {
         );
         // Verify the idTag and respond with an appropriate response
         if (card) {
+          console.log('CARD', card);
           return {
             idTagInfo: {
               status: 'Accepted',
@@ -175,24 +181,9 @@ export class OcppService {
           params,
         );
 
-        let response = {};
-
-        /*if (params.status == 'Available') {
-          const ocppClient = new RPCClient({
-            endpoint: 'ws://127.0.0.1:3100',
-            identity: client.session.sessionId,
-            protocols: ['ocpp1.6'],
-            strictMode: false,
-          });
-          ocppClient.connect().then(async () => {
-            response = await this.clientOcppService.authorizeTransaction(
-              ocppClient,
-            );
-            console.log('RESPONSE', response);
-          });
-        }*/
-        const { connectorId, status } = params;
-        return response;
+        if (params.status == 'Available') {
+          console.log('Available', params);
+        }
       });
 
       client.handle('DataTransfer', (objet) => {
@@ -227,87 +218,5 @@ export class OcppService {
     }
 
     startServer();
-  }
-
-  async startClient() {
-    const cli = new RPCClient({
-      endpoint: 'ws://localhost:3100', // the OCPP endpoint URL
-      identity: 'EXAMPLE', // the OCPP identity
-      protocols: ['ocpp1.6'], // client understands ocpp1.6 subprotocol
-      strictMode: true, // enable strict validation of requests & responses
-    });
-
-    // connect to the OCPP server
-    await cli.connect();
-
-    // send a BootNotification request and await the response
-    const bootResponse = await cli.call('BootNotification', {
-      chargePointVendor: 'ocpp-rpc',
-      chargePointModel: 'ocpp-rpc',
-    });
-
-    // check that the server accepted the client
-    if (bootResponse.status === 'Accepted') {
-      // send a Heartbeat request and await the response
-      const heartbeatResponse = await cli.call('Heartbeat', {});
-      // read the current server time from the response
-      console.log('Server time is:', heartbeatResponse.currentTime);
-
-      // send a StatusNotification request for the controller
-
-      await cli
-        .call('StatusNotification', {
-          connectorId: 1,
-          errorCode: 'NoError',
-          status: 'Available',
-        })
-        .then((result) => {
-          console.log('StatusNotification response:', result);
-        })
-        .catch((err) => {
-          console.error('Error sending StatusNotification:', err);
-        });
-
-      await cli
-        .call('Heartbeat', {})
-        .then((result) => {
-          console.log('Heartbeat response:', result);
-        })
-        .catch((err) => {
-          console.error('Error sending Heartbeat:', err);
-        });
-
-      await cli
-        .call('Authorize', {
-          idTag: '12345678',
-        })
-        .then((authorizeResponse) => {
-          console.log('Authorize response:', authorizeResponse);
-          // Si la autorización es exitosa, enviar solicitud de inicio de transacción
-          if (authorizeResponse.idTagInfo.status === 'Accepted') {
-            cli
-              .call('StartTransaction', {
-                connectorId: 1,
-                idTag: '12345678',
-                meterStart: 0,
-                timestamp: new Date().toISOString(),
-                reservationId: 0,
-                purpose: 'ChargePoint',
-              })
-              .then((startTransactionResponse) => {
-                console.log(
-                  'StartTransaction response:',
-                  startTransactionResponse,
-                );
-              })
-              .catch((err) => {
-                console.error('Error en StartTransaction:', err);
-              });
-          }
-        })
-        .catch((err) => {
-          console.error('Error en Authorize:', err);
-        });
-    }
   }
 }
