@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
 export class createTTimeZoneDTO {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @ApiProperty({
     example: '2023-07-31T00:00:00Z',
@@ -36,9 +36,43 @@ export class createTTimeZoneDTO {
 
   @IsOptional()
   transaction: Transaction;
+}
+
+export class updateTTimeZoneDTO {
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    example: '2023-07-31T00:00:00Z',
+    description: 'fecha de inicio',
+  })
+  start: Date;
 
   @IsOptional()
-  transactionId: number;
+  @IsString()
+  @ApiProperty({
+    example: '2023-07-31T00:00:00Z',
+    description: 'fecha de fin',
+  })
+  finish: Date;
+
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    example: 1,
+    description: 'energia',
+  })
+  energy: number;
+
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    example: 1,
+    description: 'energia delta',
+  })
+  deltaEnergy: number;
+
+  @IsOptional()
+  transaction: Transaction;
 }
 
 export class updateTrasactionDto {

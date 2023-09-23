@@ -2,7 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
 import { DataSource, Repository } from 'typeorm';
-import { createTTimeZoneDTO } from './dto/time_zone.dto';
+import { createTTimeZoneDTO, updateTTimeZoneDTO } from './dto/time_zone.dto';
 import { Timezone } from './entities/time_zone.entity';
 
 @Injectable()
@@ -24,9 +24,16 @@ export class TimeZoneService {
     const transactionFind = await this.transactionRepository.find({
       where: { id },
     });
+    const resultsExistTranfer = await this.dataSource
+      .createQueryBuilder()
+      .select('timezone')
+      .from(Timezone, 'timezone')
+      //.leftJoinAndSelect("enterprise.user", "id")
+      .where('transactionId = :id', { id })
+      .getMany();
 
-    if (transactionFind.length == 0) {
-      throw new HttpException('TRANSACTION_NOT_EXIST', 400);
+    if (resultsExistTranfer.length > 0) {
+      return {} as Timezone;
     }
 
     newTimeZone.transaction = transactionFind[0];
@@ -43,9 +50,6 @@ export class TimeZoneService {
       .where('transactionId = :id', { id })
       .getMany();
 
-    if (results.length == 0) {
-      throw new HttpException('TRANSACTION_NOT_EXIST', 400);
-    }
     return results;
   }
 
@@ -62,5 +66,32 @@ export class TimeZoneService {
       throw new HttpException('TIMEZONE_NOT_EXIST', 400);
     }
     return results[0];
+  }
+
+  async modifyTimeZone(
+    idTransaction: number,
+    newTransaction: updateTTimeZoneDTO,
+  ): Promise<Timezone> {
+    console.log(idTransaction);
+    const results = await this.timeRepository
+      .createQueryBuilder('timezone')
+      .leftJoinAndSelect('timezone.transaction', 'transaction')
+      .where('transaction.id = :id', { id: idTransaction })
+      .getOne();
+    /* if (!relactionexist) {
+      return new HttpException('RELATION_NOT_EXIST', 400);
+    }*/
+    results.energy = newTransaction.energy;
+    results.start = newTransaction.start;
+    results.finish = newTransaction.finish;
+    results.deltaEnergy = newTransaction.deltaEnergy;
+
+    await this.timeRepository.update({ id: results.id }, results);
+    const timeResponse = await this.timeRepository.findOne({
+      where: {
+        id: results.id,
+      },
+    });
+    return timeResponse;
   }
 }

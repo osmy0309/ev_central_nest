@@ -1,14 +1,22 @@
 import { RPCServer, createRPCError, RPCClient } from 'ocpp-rpc';
 import { Injectable } from '@nestjs/common';
 import { ChargeService } from '../charge/charge.service';
+import { TimeZoneService } from '../time_zone/time_zone.service';
 import { CardService } from '../card/card.service';
 import { TransactionService } from '../transaction/transaction.service';
 import { v4 } from 'uuid';
+import { createCard_ChargerDto } from 'src/charge/dto/card_charge.dto';
+import { createTrasactionDto } from 'src/transaction/dto/transaction.dto';
+import {
+  createTTimeZoneDTO,
+  updateTTimeZoneDTO,
+} from 'src/time_zone/dto/time_zone.dto';
 @Injectable()
 export class OcppService {
   constructor(
     private readonly chargeService: ChargeService,
     private readonly cardService: CardService,
+    private readonly timeZoneService: TimeZoneService,
     private readonly transactionService: TransactionService,
   ) {}
 
@@ -57,14 +65,32 @@ export class OcppService {
       });
 
       client.handle('Authorize', async (params) => {
-        console.log('Parametro AUTORIZACION: ', params);
+        console.log(
+          'Parametro AUTORIZACION: ',
+          params,
+          'Client:',
+          client.identity,
+        );
+        let flagChangeSon = true;
+        const charge = await this.chargeService.getChargeBySerial(
+          client.identity,
+        );
         // create a wildcard handler to handle any RPC method
         const card = await this.cardService.getChargeBySerial(
           params.params.idTag,
         );
+
+        if (charge.client.id != card.company.id) {
+          flagChangeSon = false;
+          const sonCharge = await this.chargeService.companyIsMySon(
+            card.company.id,
+            charge.client.id,
+          );
+          if (sonCharge) flagChangeSon = true;
+        }
+
         // Verify the idTag and respond with an appropriate response
-        if (card) {
-          console.log('CARD', card);
+        if (card && card.user && charge.id && flagChangeSon) {
           return {
             idTagInfo: {
               status: 'Accepted',
@@ -88,13 +114,32 @@ export class OcppService {
           `Server got RemoteStartTransaction from ${client.identity}:`,
           objet.params,
         );
+        let flagChangeSon = true;
+        const charge = await this.chargeService.getChargeBySerial(
+          client.identity,
+        );
+        // create a wildcard handler to handle any RPC method
         const card = await this.cardService.getChargeBySerial(
           objet.params.idTag,
         );
+
+        if (charge.client.id != card.company.id) {
+          flagChangeSon = false;
+          const sonCharge = await this.chargeService.companyIsMySon(
+            card.company.id,
+            charge.client.id,
+          );
+          if (sonCharge) flagChangeSon = true;
+        }
         const idTransaction = v4();
 
         // Verify the idTag and respond with an appropriate response
-        if (card) {
+        if (card && card.user && charge.id && flagChangeSon) {
+          const cardChangeRelations = new createCard_ChargerDto();
+          cardChangeRelations.cardId = card.id;
+          cardChangeRelations.chargeId = charge.id;
+          cardChangeRelations.estado = 1;
+          await this.chargeService.newCard_Charge(cardChangeRelations);
           return {
             transactionId: idTransaction,
             idTagInfo: {
@@ -108,12 +153,31 @@ export class OcppService {
         }
       });
 
-      client.handle('MeterValues', (objet) => {
+      client.handle('MeterValues', async (objet) => {
         console.log(
           `Server got MeterValues from ${client.identity}:`,
           objet.params,
         );
+        console.log(
+          'METERVALUES',
+          objet.params.meterValue[0].sampledValue[0].value,
+        );
+        const transaction = await this.transactionService.getTransaction(
+          objet.params.transactionId,
+        );
 
+        const lineZone = await this.timeZoneService.getTimeZoneByIdTransaction(
+          transaction.id,
+        );
+
+        (lineZone[0].energy = objet.params.meterValue[0].sampledValue[0].value),
+          (lineZone[0].deltaEnergy =
+            objet.params.meterValue[0].sampledValue[1].value),
+          (lineZone[0].finish = objet.params.meterValue[0].timestamp),
+          await this.timeZoneService.modifyTimeZone(
+            transaction.id,
+            lineZone[0],
+          );
         // Procesar los valores del medidor recibidos y realizar las acciones necesarias
         // ...
 
@@ -128,14 +192,57 @@ export class OcppService {
           `Server got StartTransaction from ${client.identity}:`,
           objet.params,
         );
-        const idTransaction = v4();
+        let flagChangeSon = true;
+        const charge = await this.chargeService.getChargeBySerial(
+          client.identity,
+        );
+        // create a wildcard handler to handle any RPC method
         const card = await this.cardService.getChargeBySerial(
           objet.params.idTag,
         );
+
+        if (charge.client.id != card.company.id) {
+          flagChangeSon = false;
+          const sonCharge = await this.chargeService.companyIsMySon(
+            card.company.id,
+            charge.client.id,
+          );
+          if (sonCharge) flagChangeSon = true;
+        }
+        // const idTransaction = v4();
+
         // Verify the idTag and respond with an appropriate response
-        if (card) {
+        if (card && card.user && charge.id && flagChangeSon) {
+          const cardChangeRelations: createCard_ChargerDto = {
+            cardId: card.id,
+            chargeId: charge.id,
+            estado: 1,
+          };
+          const transactionDTO: createTrasactionDto = {
+            cardId: card.id,
+            chargeId: charge.id,
+            estado: 1,
+          };
+          await this.chargeService.newCard_Charge(cardChangeRelations);
+          const transactionSussess =
+            await this.transactionService.newTransaction(transactionDTO);
+
+          const lineZoneDTO: createTTimeZoneDTO = {
+            transaction: transactionSussess,
+            energy: 0,
+            deltaEnergy: 0,
+            finish: objet.params.timestamp,
+            start: objet.params.timestamp,
+          };
+
+          await this.timeZoneService.newTimeZone(
+            transactionSussess.id,
+            lineZoneDTO,
+          );
+
           return {
-            transactionId: idTransaction,
+            transactionId: transactionSussess.id,
+            timeStampStart: objet.params.timestamp,
             idTagInfo: {
               status: 'Accepted',
               expiryDate: '2023-07-31T12:00:00.000Z',
@@ -147,11 +254,28 @@ export class OcppService {
         }
       });
 
-      client.handle('StopTransaction', ({ params }) => {
+      client.handle('StopTransaction', async ({ params }) => {
         console.log(
           `Server got StopTransaction from ${client.identity}:`,
           params,
         );
+        console.log(params);
+        const transaction = await this.transactionService.getTransaction(
+          params.transactionId,
+        );
+
+        const dateFinish = new Date(params.timestamp);
+
+        const lineZone = await this.timeZoneService.getTimeZoneByIdTransaction(
+          transaction.id,
+        );
+
+        (lineZone[0].energy = params.meterStop),
+          (lineZone[0].finish = dateFinish),
+          await this.timeZoneService.modifyTimeZone(
+            transaction.id,
+            lineZone[0],
+          );
 
         // Aquí puedes agregar la lógica para manejar la solicitud StopTransaction
         // y realizar cualquier acción necesaria en función de los parámetros recibidos.
@@ -199,15 +323,6 @@ export class OcppService {
         return {
           status: 'Accepted',
         };
-      });
-
-      // create a wildcard handler to handle any RPC method
-      client.handle(({ method, params }) => {
-        // This handler will be called if the incoming method cannot be handled elsewhere.
-        console.log(`Server got ${method} from ${client.identity}:`, params);
-
-        // throw an RPC error to inform the server that we don't understand the request.
-        throw createRPCError('NotImplemented');
       });
     });
 

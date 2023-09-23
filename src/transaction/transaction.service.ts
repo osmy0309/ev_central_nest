@@ -33,7 +33,8 @@ export class TransactionService {
     });
 
     if (!card) {
-      throw new HttpException('CARD_NOT_FOUND', 400);
+      //return new HttpException('CARD_NOT_FOUND', 400);
+      return {} as Transaction;
     }
 
     const charge = await this.chargeRepository.findOne({
@@ -43,20 +44,32 @@ export class TransactionService {
     });
 
     if (!charge) {
-      throw new HttpException('CHARGE_NOT_FOUND', 400);
+      //return new HttpException('CHARGE_NOT_FOUND', 400);
+      return {} as Transaction;
     }
 
-    const relactionexist = await this.trasactionRepository.findOne({
+    /*if (relactionexist) {
+      //return new HttpException('RELATION_EXIST', 400);
+      await this.changeStatenewTransaction(newTransaction);
+    }*/
+    const newRelation = this.trasactionRepository.create(newTransaction);
+    const save = await this.trasactionRepository.save(newRelation);
+
+    const transaction = await this.trasactionRepository.findOne({
       where: {
-        cardId: newTransaction.cardId,
-        chargeId: newTransaction.chargeId,
+        id: save.id,
       },
     });
-    if (relactionexist) {
-      throw new HttpException('RELATION_EXIST', 400);
-    }
-    const newRelation = this.trasactionRepository.create(newTransaction);
-    return await this.trasactionRepository.save(newRelation);
+    await this.trasactionRepository.save(newRelation);
+    return transaction;
+  }
+  async getTransaction(id: number): Promise<Transaction> {
+    const transaction = await this.trasactionRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    return transaction;
   }
   // ENDPOINTS PARA LA TABLA RELACIONAL ENTRE TARJETA Y CARGADOR
   async changeStatenewTransaction(
@@ -68,11 +81,18 @@ export class TransactionService {
         chargeId: newTransaction.chargeId,
       },
     });
-    if (!relactionexist) {
-      throw new HttpException('RELATION_NOT_EXIST', 400);
-    }
+    /* if (!relactionexist) {
+      return new HttpException('RELATION_NOT_EXIST', 400);
+    }*/
     relactionexist.estado = newTransaction.estado;
-    return await this.trasactionRepository.save(relactionexist);
+
+    await this.trasactionRepository.save(relactionexist);
+    const transaction = await this.trasactionRepository.findOne({
+      where: {
+        id: relactionexist.id,
+      },
+    });
+    return transaction;
   }
 
   async deleteRelationTrasaction(
