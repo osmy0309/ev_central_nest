@@ -221,7 +221,7 @@ export class OcppService {
           const transactionDTO: createTrasactionDto = {
             cardId: card.id,
             chargeId: charge.id,
-            estado: 1,
+            estado: 2,
           };
           await this.chargeService.newCard_Charge(cardChangeRelations);
           const transactionSussess =
@@ -263,7 +263,8 @@ export class OcppService {
         const transaction = await this.transactionService.getTransaction(
           params.transactionId,
         );
-
+        transaction.estado = 3;
+        await this.transactionService.changeStatenewTransaction(transaction);
         const dateFinish = new Date(params.timestamp);
 
         const lineZone = await this.timeZoneService.getTimeZoneByIdTransaction(
