@@ -118,10 +118,10 @@ customProbe:
 service:
   type: ClusterIP
   port: 80
-  targetport: 80
+  targetport: 3800
   sessionAffinity: None
   # secondary service
-  secondaryService: false
+  secondaryService: true
   secondaryPort: 80
   secondaryTargetPort: 3100
 
@@ -158,6 +158,40 @@ ingress:
   tls:
     - hosts:
         - evr-back-int.simon-cloud.com
+
+ingressSecondary:
+  enabled: false
+  groupOrder: 26-
+  className: "alb"
+  annotations: 
+    alb.ingress.kubernetes.io/group.name: 'develop-public' # Use same ALB for every ingress with current group name
+    alb.ingress.kubernetes.io/group.order: '26'
+    alb.ingress.kubernetes.io/target-type: 'ip'
+    alb.ingress.kubernetes.io/scheme: 'internet-facing' # internet-facing to use public subnets  internal
+    alb.ingress.kubernetes.io/target-group-attributes: 'stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60'
+    #alb.ingress.kubernetes.io/healthcheck-path: /health-check
+    #alb.ingress.kubernetes.io/success-codes: 200,404,301,302
+    #alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=180
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    #alb.ingress.kubernetes.io/backend-protocol-version: HTTP2 #GRPC
+    alb.ingress.kubernetes.io/certificate-arn: 'arn:aws:acm:eu-west-1:757841268213:certificate/0bfdee67-358a-4328-91f8-ef0875ac8cd2'
+    #alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/ssl-policy: 'ELBSecurityPolicy-TLS-1-1-2017-01'
+    alb.ingress.kubernetes.io/tags: 'Environment=develop'
+    alb.ingress.kubernetes.io/backend-protocol: 'HTTP'
+
+  hosts:
+    - host: evr-ocpp-int.k8s.simon-cloud.com
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: evr-ocpp-int.simon-cloud.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - evr-ocpp-int.simon-cloud.com
 
 ingressInternal:
   enabled: false
@@ -232,48 +266,3 @@ int:
   enabled: false
   fileSystemId: fs-040b7da2a
   storage: 5Gi
-
-# proxy service to EVR ocpp websocket
-proxyNginx:
-  enabled: true
-  port: 3800
-  config : 
-    - |
-      worker_processes 1;
-      worker_rlimit_nofile 8192;
-
-      events {
-        worker_connections  1024;
-      }
-
-      http {
-          map $http_upgrade $connection_upgrade {
-              default upgrade;
-              '' close;
-          }
-      
-          upstream websocket {
-              server 127.0.0.1:3100;
-          }
-          upstream api {
-              server 127.0.0.1:3800;
-          }
-      
-          server {
-              listen 80;
-              location /ocpp {
-                  proxy_pass http://websocket;
-                  proxy_http_version 1.1;
-                  proxy_set_header Upgrade $http_upgrade;
-                  proxy_set_header Connection $connection_upgrade;
-                  proxy_set_header Host $host;
-              }
-              location / {
-                  proxy_pass http://api;
-                  proxy_http_version 1.1;
-                  proxy_set_header Upgrade $http_upgrade;
-                  proxy_set_header Connection $connection_upgrade;
-                  proxy_set_header Host $host;
-              }
-          }
-      }
