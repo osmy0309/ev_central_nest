@@ -74,7 +74,7 @@ image:
   repository: 219526371337.dkr.ecr.eu-west-1.amazonaws.com/evr_back
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: 'v1.0.16'
+  tag: 'v1.0.17'
   symfony_env: dev
 imagePullSecrets: []
 nameOverride: ''
@@ -118,10 +118,10 @@ customProbe:
 service:
   type: ClusterIP
   port: 80
-  targetport: 3800
+  targetport: 8080
   sessionAffinity: None
   # secondary service
-  secondaryService: true
+  secondaryService: false
   secondaryPort: 80
   secondaryTargetPort: 3100
 
