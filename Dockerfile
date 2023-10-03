@@ -11,11 +11,12 @@ EXPOSE 3800
 EXPOSE 3100
 EXPOSE 8080
 RUN apk add --no-cache openrc nginx
-COPY ./cicd/nginx.conf /etc/nginx/nginx.conf
-COPY ./cicd/boot.sh ./usr/src/boot.sh
+COPY ./config/nginx.conf /etc/nginx/nginx.conf
+COPY ./config/boot.sh ./usr/src/boot.sh
 RUN chmod +x ./usr/src/boot.sh
-RUN openrc && touch /run/openrc/softlevel
+RUN cp /etc/rc.conf /etc/rc.conf.bk
 RUN echo 'rc_provide="loopback net"' >> /etc/rc.conf
+RUN openrc && touch /run/openrc/softlevel
 ENV NODE_ENV=production
 WORKDIR /usr/src/app
 COPY package*.json ./
