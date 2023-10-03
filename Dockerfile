@@ -9,9 +9,16 @@ RUN npm run build
 FROM node:18-alpine AS production
 EXPOSE 3800
 EXPOSE 3100
+EXPOSE 8080
+RUN apk add --no-cache openrc nginx
+COPY ./cicd/nginx.conf /etc/nginx/nginx.conf
+COPY ./cicd/boot.sh ./usr/src/boot.sh
+RUN chmod +x ./usr/src/boot.sh
+RUN openrc && touch /run/openrc/softlevel
+RUN echo 'rc_provide="loopback net"' >> /etc/rc.conf
 ENV NODE_ENV=production
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install --omit=dev
 COPY --from=build /usr/src/app/dist ./dist
-CMD ["node", "dist/main"]
+CMD ["sh", "./../boot.sh"]

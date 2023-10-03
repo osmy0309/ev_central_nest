@@ -19,6 +19,7 @@ services:
     ports:
       - 3800:3800
       - 3100:3100
+      - 8080:8080
   db:
       image: mariadb:10.3.9
       volumes:
@@ -28,13 +29,5 @@ services:
           - MYSQL_DATABASE=evr
           - MYSQL_USER=evr
           - MYSQL_PASSWORD=mypwd
-  nginx:
-      image: nginx:1.21-alpine
-      volumes:
-        - cicd:/etc/nginx
-            
-      ports:
-        - 8080:8080
 volumes:
     data:
-    cicd:
