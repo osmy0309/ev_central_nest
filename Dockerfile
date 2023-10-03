@@ -9,7 +9,7 @@ RUN npm run build
 FROM node:18-alpine AS production
 EXPOSE 3800
 EXPOSE 3100
-EXPOSE 8080
+EXPOSE 3200
 RUN apk add --no-cache openrc nginx
 COPY ./config/nginx.conf /etc/nginx/nginx.conf
 COPY ./config/boot.sh ./usr/src/boot.sh
