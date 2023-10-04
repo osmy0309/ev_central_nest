@@ -4,6 +4,7 @@ import { Charge } from './entities/charge.entity';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { createChargerDto, updateUserDto } from './dto/charge.dto';
 import { Card_Charge } from './entities/card_charge.entity';
+import { RPCServer, createRPCError, RPCClient } from 'ocpp-rpc';
 import {
   createCard_ChargerDto,
   deleteCard_ChargerDto,
@@ -208,6 +209,21 @@ export class ChargeService {
       }
     }
     return updatedChange;
+  }
+  async updateStateChargeGeneral(id: number, state: number): Promise<Charge> {
+    const change = await this.chargeRepository
+      .createQueryBuilder('charge')
+      .leftJoinAndSelect('charge.client', 'company')
+      .select(['charge', 'company.id'])
+      .where('charge.id = :id', { id })
+      .getOne();
+    if (!change) {
+      //throw new HttpException('CHANGE_NOT_FOUND', 400);
+      return {} as Charge;
+    }
+    change.state = state;
+
+    await this.chargeRepository.update({ id }, change);
   }
 
   async patchCharge(

@@ -46,6 +46,10 @@ export class updateTrasactionDto {
     description: '1-Reservado, 2-activo, 3-finalizada, 4-cancelada',
   })
   estado?: number;
+
+  @IsNumber()
+  @IsOptional()
+  id?: number;
 }
 
 export class deleteTrasactionDto {

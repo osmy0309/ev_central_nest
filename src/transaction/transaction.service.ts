@@ -3,6 +3,7 @@ import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import {
   createTrasactionDto,
+  updateTrasactionDto,
   deleteTrasactionDto,
 } from './dto/transaction.dto';
 import { Card } from 'src/card/entities/card.entity';
@@ -73,12 +74,11 @@ export class TransactionService {
   }
   // ENDPOINTS PARA LA TABLA RELACIONAL ENTRE TARJETA Y CARGADOR
   async changeStatenewTransaction(
-    newTransaction: createTrasactionDto,
+    newTransaction: updateTrasactionDto,
   ): Promise<Transaction> {
     const relactionexist = await this.trasactionRepository.findOne({
       where: {
-        cardId: newTransaction.cardId,
-        chargeId: newTransaction.chargeId,
+        id: newTransaction.id,
       },
     });
     /* if (!relactionexist) {
@@ -86,7 +86,10 @@ export class TransactionService {
     }*/
     relactionexist.estado = newTransaction.estado;
 
-    await this.trasactionRepository.save(relactionexist);
+    await this.trasactionRepository.update(
+      { id: relactionexist.id },
+      relactionexist,
+    );
     const transaction = await this.trasactionRepository.findOne({
       where: {
         id: relactionexist.id,

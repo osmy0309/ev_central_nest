@@ -26,6 +26,7 @@ async function bootstrap() {
     .addTag('Company')
     .addTag('Auth-oauth')
     .build();
+
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
   const document = SwaggerModule.createDocument(app, config);
