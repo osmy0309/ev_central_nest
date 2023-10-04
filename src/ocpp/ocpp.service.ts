@@ -416,7 +416,7 @@ export class OcppService {
       client.handle('DataTransfer', (objet) => {
         console.log(
           `Server got DataTransfer from ${client.identity}:`,
-          objet.params,
+          objet.params.data,
         );
 
         // Procesar la transferencia de datos recibida y realizar las acciones necesarias
