@@ -224,6 +224,8 @@ export class ChargeService {
     change.state = state;
 
     await this.chargeRepository.update({ id }, change);
+
+    return change;
   }
 
   async patchCharge(

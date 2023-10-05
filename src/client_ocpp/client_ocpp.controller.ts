@@ -1,15 +1,22 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ClientOcppService } from './client_ocpp.service';
 import { connectDto } from './dto/client_ocpp.dto';
-
-@Controller('client')
+@ApiTags('Charges')
+@Controller('client_ocpp')
 export class ClientOcppController {
   constructor(private readonly clientOcppService: ClientOcppService) {}
-  /* @Post('connect')
-  async connect(@Body() newConnection: connectDto) {
-    console.log(newConnection);
-    return await this.clientOcppService.connect(newConnection);
+  @Post('disableOCPPcharge')
+  async disble(@Body() newConnection: connectDto) {
+    console.log('here');
+    return await this.clientOcppService.disabledCharge(newConnection);
   }
+  @Post('enableOCPPcharge')
+  async enable(@Body() newConnection: connectDto) {
+    console.log('here');
+    return await this.clientOcppService.enabledCharge(newConnection);
+  }
+  /*
   @Post('heartbeat')
   async heartbeat(@Body() newConnection: connectDto) {
     return await this.clientOcppService.heartbeat(newConnection);

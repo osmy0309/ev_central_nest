@@ -133,4 +133,34 @@ export class ClientOcppService {
       throw new HttpException('NOT_USER_CONNECTION', 400);
     }
   }
+
+  async disabledCharge(newConnection: connectDto) {
+    await this.connect(newConnection);
+    if (this.cli) {
+      const payload = {
+        connectorId: 0,
+        type: 'Inoperative',
+      };
+      try {
+        await this.cli.call('ChangeAvailability', payload);
+      } catch (error) {
+        console.log('ERROR catch', error);
+      }
+    }
+  }
+
+  async enabledCharge(newConnection: connectDto) {
+    await this.connect(newConnection);
+    if (this.cli) {
+      const payload = {
+        connectorId: 0,
+        type: 'Operative',
+      };
+      try {
+        await this.cli.call('ChangeAvailability', payload);
+      } catch (error) {
+        console.log('ERROR catch', error);
+      }
+    }
+  }
 }
