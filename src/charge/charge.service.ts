@@ -31,7 +31,7 @@ export class ChargeService {
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
     private clientService: ClientService,
-    private timeZoneService: TimeZoneService,
+    //private timeZoneService: TimeZoneService,
 
     @InjectDataSource()
     private dataSource: DataSource,
@@ -148,11 +148,12 @@ export class ChargeService {
 
       console.log('TRANSACTION', change);
 
-      updatedChange.push(change);
+      updatedChange = updatedChange.concat(change);
     }
 
     return updatedChange;
   }
+
   async updateStateChargeGeneral(id: number, state: number): Promise<Charge> {
     const change = await this.chargeRepository
       .createQueryBuilder('charge')
