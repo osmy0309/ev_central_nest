@@ -124,7 +124,18 @@ export class ChargeService {
       const change = await this.chargeRepository
         .createQueryBuilder('charge')
         .leftJoinAndSelect('charge.client', 'company')
-        .select(['charge', 'company.id'])
+        .leftJoinAndSelect('charge.transaction', 'transaction')
+        .leftJoinAndSelect('transaction.card', 'card')
+        .leftJoinAndSelect('card.user', 'user')
+        .leftJoinAndSelect('transaction.timezones', 'timezone')
+        .select([
+          'charge',
+          'company.id',
+          'transaction',
+          'card',
+          'user',
+          'timezone',
+        ])
         .where('company.id = :id_company', { id_company: itemcompa.id })
         .getMany();
 
@@ -132,83 +143,11 @@ export class ChargeService {
         continue;
       }
 
-      for (const [index, item] of change.entries()) {
-        const transaction = await this.transactionRepository
-          .createQueryBuilder('transaction')
-          .leftJoinAndSelect('transaction.card', 'card')
-          .leftJoinAndSelect('card.user', 'user')
-          .leftJoinAndSelect('transaction.charge', 'charge')
-          .select([
-            'charge',
-            'transaction',
-            'card',
-            'user.username',
-            'user.id',
-            'user.firstName',
-            'user.lastName',
-            'user.dni',
-            'user.email',
-          ])
-          .where('charge.id = :id', { id: item.id })
-          /*.andWhere('transaction.estado NOT IN (:...estados)', {
-            estados: [3, 4],
-          })*/
+      console.log('TRANSACTION', change);
 
-          .getMany();
-
-        if (transaction.length > 0) {
-          for (const itemtransaction of transaction) {
-            change[index].state = itemtransaction.estado + 1;
-            const timeZone =
-              await this.timeZoneService.getTimeZoneByIdTransaction(
-                itemtransaction.id,
-              );
-
-            updatedChange.push({
-              nombre: item.nombre,
-              id: item.id,
-              total_charge: item.total_charge,
-              last_connection: item.last_connection,
-              maximum_power: item.maximum_power,
-              serial_number: item.serial_number,
-              address: item.address,
-              conectors: item.conectors,
-              latitude: item.latitude,
-              longitude: item.longitude,
-              municipality: item.municipality,
-              state: item.state,
-              card_transaction: [
-                {
-                  id: itemtransaction.card.id,
-                  no_serie: itemtransaction.card.no_serie,
-                  balance: itemtransaction.card.credit,
-                  idTarjetaPadre: itemtransaction.card.idTarjetaPadre,
-                  user: itemtransaction.card.user,
-                  time_zone: timeZone,
-                  state: itemtransaction.estado,
-                },
-              ],
-            });
-          }
-        } else {
-          updatedChange.push({
-            nombre: item.nombre,
-            id: item.id,
-            total_charge: item.total_charge,
-            last_connection: item.last_connection,
-            maximum_power: item.maximum_power,
-            serial_number: item.serial_number,
-            address: item.address,
-            conectors: item.conectors,
-            latitude: item.latitude,
-            longitude: item.longitude,
-            municipality: item.municipality,
-            state: item.state,
-            card_transaction: [],
-          });
-        }
-      }
+      updatedChange.push(change);
     }
+
     return updatedChange;
   }
   async updateStateChargeGeneral(id: number, state: number): Promise<Charge> {
