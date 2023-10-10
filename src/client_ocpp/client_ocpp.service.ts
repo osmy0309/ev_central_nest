@@ -17,7 +17,9 @@ export class ClientOcppService {
     });
 
     // connect to the OCPP server
-    await this.cli.connect();
+    await this.cli.connect({
+      additionalParam: 'valor adicional',
+    });
     if (this.cli) return { connect: 'on' };
   }
   //Service Call Heartbeat
@@ -135,6 +137,7 @@ export class ClientOcppService {
   }
 
   async disabledCharge(newConnection: connectDto) {
+    console.log(newConnection);
     await this.connect(newConnection);
     if (this.cli) {
       const payload = {

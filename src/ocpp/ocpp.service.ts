@@ -35,7 +35,7 @@ export class OcppService {
       );
 
       // accept the incoming client
-      if (charge.id && charge.state != 4) {
+      if (charge.id /*&& charge.state != 4*/) {
         await this.chargeService.updateStateChargeGeneral(charge.id, 1);
         accept({
           // anything passed to accept() will be attached as a 'session' property of the client.
@@ -104,6 +104,7 @@ export class OcppService {
         // Aquí puedes realizar la lógica para habilitar o deshabilitar automáticamente el cargador
         if (clientparam.params.type === 'Operative' && charge.id) {
           await this.chargeService.updateStateChargeGeneral(charge.id, 3);
+          await client.disconnect;
           // Lógica para habilitar el cargador con el ID de conector proporcionado
           // Por ejemplo, enviar una señal para habilitar el cargador o realizar cualquier otra acción necesaria
         } else if (clientparam.params.type === 'Inoperative' && charge.id) {
