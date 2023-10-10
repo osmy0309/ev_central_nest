@@ -133,7 +133,10 @@ export class ChargeService {
           'company.id',
           'transaction',
           'card',
-          'user',
+          'user.id',
+          'user.username',
+          'user.email',
+          'user.id',
           'timezone',
         ])
         .where('company.id = :id_company', { id_company: itemcompa.id })
