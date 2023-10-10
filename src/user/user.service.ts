@@ -111,9 +111,9 @@ export class UserService {
       for (const user of users) {
         allUsers.push(user);
         for (const char of charges) {
-          if (char.card_transaction.length > 0)
-            for (const transaction of char.card_transaction) {
-              if (user.id == transaction.user.id) {
+          if (char.transaction.length > 0)
+            for (const transaction of char.transaction) {
+              if (user.id == transaction.card.user.id) {
                 allUsers[allUsers.length - 1].charge_information = [char];
               }
             }
