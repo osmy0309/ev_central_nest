@@ -134,7 +134,7 @@ export class OcppService {
         );
 
         // create a wildcard handler to handle any RPC method
-        if (charge.id) {
+        if (charge.id && charge.state != 4) {
           // Verify the idTag and respond with an appropriate response
 
           return {
@@ -163,7 +163,7 @@ export class OcppService {
         const card = await this.cardService.getChargeBySerial(
           params.params.idTag,
         );
-        if (card && charge.id) {
+        if (card && charge.id && charge.state != 4) {
           if (charge.client.id != card.company.id && card) {
             flagChangeSon = false;
             const sonCharge = await this.chargeService.companyIsMySon(
@@ -292,7 +292,7 @@ export class OcppService {
         const card = await this.cardService.getChargeBySerial(
           objet.params.idTag,
         );
-        if (card && charge.id) {
+        if (card && charge.id && charge.state != 4) {
           await this.chargeService.updateStateChargeGeneral(charge.id, 2);
           if (charge.client.id != card.company.id) {
             flagChangeSon = false;

@@ -150,9 +150,9 @@ export class ChargeService {
             'user.email',
           ])
           .where('charge.id = :id', { id: item.id })
-          .andWhere('transaction.estado NOT IN (:...estados)', {
+          /*.andWhere('transaction.estado NOT IN (:...estados)', {
             estados: [3, 4],
-          })
+          })*/
 
           .getMany();
 
@@ -185,6 +185,7 @@ export class ChargeService {
                   idTarjetaPadre: itemtransaction.card.idTarjetaPadre,
                   user: itemtransaction.card.user,
                   time_zone: timeZone,
+                  state: itemtransaction.estado,
                 },
               ],
             });

@@ -8,12 +8,10 @@ export class ClientOcppController {
   constructor(private readonly clientOcppService: ClientOcppService) {}
   @Post('disableOCPPcharge')
   async disble(@Body() newConnection: connectDto) {
-    console.log('here');
     return await this.clientOcppService.disabledCharge(newConnection);
   }
   @Post('enableOCPPcharge')
   async enable(@Body() newConnection: connectDto) {
-    console.log('here');
     return await this.clientOcppService.enabledCharge(newConnection);
   }
   /*
