@@ -136,6 +136,8 @@ export class ChargeService {
           'user.id',
           'user.username',
           'user.email',
+          'user.firstName',
+          'user.lastName',
           'user.id',
           'timezone',
         ])
