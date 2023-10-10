@@ -74,7 +74,7 @@ image:
   repository: 219526371337.dkr.ecr.eu-west-1.amazonaws.com/evr_back
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: 'v1.0.19'
+  tag: 'v1.0.21'
   symfony_env: dev
 imagePullSecrets: []
 nameOverride: ''
@@ -127,11 +127,11 @@ service:
 
 ingress:
   enabled: true
-  groupOrder: 25-
+  groupOrder: 26-
   className: 'alb'
   annotations:
     alb.ingress.kubernetes.io/group.name: 'develop-public' # Use same ALB for every ingress with current group name
-    alb.ingress.kubernetes.io/group.order: '25'
+    alb.ingress.kubernetes.io/group.order: '26'
     alb.ingress.kubernetes.io/target-type: 'ip'
     alb.ingress.kubernetes.io/scheme: 'internet-facing' # internet-facing to use public subnets  internal
     alb.ingress.kubernetes.io/target-group-attributes: 'stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60'
@@ -159,47 +159,13 @@ ingress:
     - hosts:
         - evr-back-int.simon-cloud.com
 
-ingressSecondary:
-  enabled: false
-  groupOrder: 26-
-  className: "alb"
-  annotations: 
-    alb.ingress.kubernetes.io/group.name: 'develop-public' # Use same ALB for every ingress with current group name
-    alb.ingress.kubernetes.io/group.order: '26'
-    alb.ingress.kubernetes.io/target-type: 'ip'
-    alb.ingress.kubernetes.io/scheme: 'internet-facing' # internet-facing to use public subnets  internal
-    alb.ingress.kubernetes.io/target-group-attributes: 'stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60'
-    #alb.ingress.kubernetes.io/healthcheck-path: /health-check
-    #alb.ingress.kubernetes.io/success-codes: 200,404,301,302
-    #alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=180
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-    #alb.ingress.kubernetes.io/backend-protocol-version: HTTP2 #GRPC
-    alb.ingress.kubernetes.io/certificate-arn: 'arn:aws:acm:eu-west-1:757841268213:certificate/0bfdee67-358a-4328-91f8-ef0875ac8cd2'
-    #alb.ingress.kubernetes.io/ssl-redirect: '443'
-    alb.ingress.kubernetes.io/ssl-policy: 'ELBSecurityPolicy-TLS-1-1-2017-01'
-    alb.ingress.kubernetes.io/tags: 'Environment=develop'
-    alb.ingress.kubernetes.io/backend-protocol: 'HTTP'
-
-  hosts:
-    - host: evr-ocpp-int.k8s.simon-cloud.com
-      paths:
-        - path: /
-          pathType: Prefix
-    - host: evr-ocpp-int.simon-cloud.com
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - hosts:
-        - evr-ocpp-int.simon-cloud.com
-
 ingressInternal:
   enabled: false
-  groupOrder: 25-
+  groupOrder: 26-
   className: 'alb'
   annotations:
     alb.ingress.kubernetes.io/group.name: 'develop-private' # Use same ALB for every ingress with current group name
-    alb.ingress.kubernetes.io/group.order: '25'
+    alb.ingress.kubernetes.io/group.order: '26'
     alb.ingress.kubernetes.io/target-type: 'ip'
     alb.ingress.kubernetes.io/scheme: 'internal' # internet-facing to use public subnets  internal
     alb.ingress.kubernetes.io/target-group-attributes: 'stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60'
