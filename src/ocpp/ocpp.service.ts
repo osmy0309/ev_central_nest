@@ -30,13 +30,17 @@ export class OcppService {
     });
 
     server.auth(async (accept, reject, handshake) => {
-      const charge = await this.chargeService.getChargeBySerial(
+      const charge = {};
+      charge[handshake.identity] = await this.chargeService.getChargeBySerial(
         handshake.identity,
       );
 
       // accept the incoming client
-      if (charge.id /*&& charge.state != 4*/) {
-        await this.chargeService.updateStateChargeGeneral(charge.id, 1);
+      if (charge[handshake.identity].id /*&& charge.state != 4*/) {
+        await this.chargeService.updateStateChargeGeneral(
+          charge[handshake.identity].id,
+          1,
+        );
         accept({
           // anything passed to accept() will be attached as a 'session' property of the client.
           sessionId: handshake.identity,
@@ -49,9 +53,9 @@ export class OcppService {
     });
 
     server.on('client', async (client) => {
-      const charge = await this.chargeService.getChargeBySerial(
-        client.identity,
-      );
+      const chargeidentity = {};
+      chargeidentity[client.identity] =
+        await this.chargeService.getChargeBySerial(client.identity);
       /*const response = await this.chargeService.updateStateChargeGeneral(
         charge.id,
         1,
@@ -104,13 +108,25 @@ export class OcppService {
         // Obtener los parámetros del comando
 
         // Aquí puedes realizar la lógica para habilitar o deshabilitar automáticamente el cargador
-        if (clientparam.params.type === 'Operative' && charge.id) {
-          await this.chargeService.updateStateChargeGeneral(charge.id, 3);
+        if (
+          clientparam.params.type === 'Operative' &&
+          chargeidentity[client.identity].id
+        ) {
+          await this.chargeService.updateStateChargeGeneral(
+            chargeidentity[client.identity].id,
+            3,
+          );
           await client.disconnect;
           // Lógica para habilitar el cargador con el ID de conector proporcionado
           // Por ejemplo, enviar una señal para habilitar el cargador o realizar cualquier otra acción necesaria
-        } else if (clientparam.params.type === 'Inoperative' && charge.id) {
-          await this.chargeService.updateStateChargeGeneral(charge.id, 4);
+        } else if (
+          clientparam.params.type === 'Inoperative' &&
+          chargeidentity[client.identity].id
+        ) {
+          await this.chargeService.updateStateChargeGeneral(
+            chargeidentity[client.identity].id,
+            4,
+          );
           await client.disconnect;
           // Lógica para deshabilitar el cargador con el ID de conector proporcionado
           // Por ejemplo, enviar una señal para deshabilitar el cargador o realizar cualquier otra acción necesaria
@@ -137,7 +153,10 @@ export class OcppService {
         );
 
         // create a wildcard handler to handle any RPC method
-        if (charge.id && charge.state != 4) {
+        if (
+          chargeidentity[client.identity].id &&
+          chargeidentity[client.identity].state != 4
+        ) {
           // Verify the idTag and respond with an appropriate response
 
           return {
@@ -166,18 +185,31 @@ export class OcppService {
         const card = await this.cardService.getChargeBySerial(
           params.params.idTag,
         );
-        if (card && charge.id && charge.state != 4) {
-          if (charge.client.id != card.company.id && card) {
+        if (
+          card &&
+          chargeidentity[client.identity].id &&
+          chargeidentity[client.identity].state != 4
+        ) {
+          if (
+            chargeidentity[client.identity].client.id != card.company.id &&
+            card
+          ) {
             flagChangeSon = false;
             const sonCharge = await this.chargeService.companyIsMySon(
               card.company.id,
-              charge.client.id,
+              chargeidentity[client.identity].client.id,
             );
             if (sonCharge) flagChangeSon = true;
           }
 
           // Verify the idTag and respond with an appropriate response
-          if (card && card.user && charge.id && flagChangeSon) {
+          if (
+            card &&
+            card.user &&
+            chargeidentity[client.identity].id &&
+            flagChangeSon
+          ) {
+            //   await this.chargeService.updateStateChargeGeneral(charge.id, 5);
             return {
               idTagInfo: {
                 status: 'Accepted',
@@ -215,21 +247,26 @@ export class OcppService {
           objet.params.idTag,
         );
 
-        if (charge.client.id != card.company.id) {
+        if (chargeidentity[client.identity].client.id != card.company.id) {
           flagChangeSon = false;
           const sonCharge = await this.chargeService.companyIsMySon(
             card.company.id,
-            charge.client.id,
+            chargeidentity[client.identity].client.id,
           );
           if (sonCharge) flagChangeSon = true;
         }
         const idTransaction = v4();
 
         // Verify the idTag and respond with an appropriate response
-        if (card && card.user && charge.id && flagChangeSon) {
+        if (
+          card &&
+          card.user &&
+          chargeidentity[client.identity].id &&
+          flagChangeSon
+        ) {
           const cardChangeRelations = new createCard_ChargerDto();
           cardChangeRelations.cardId = card.id;
-          cardChangeRelations.chargeId = charge.id;
+          cardChangeRelations.chargeId = chargeidentity[client.identity].id;
           cardChangeRelations.estado = 1;
           await this.chargeService.newCard_Charge(cardChangeRelations);
           return {
@@ -295,13 +332,20 @@ export class OcppService {
         const card = await this.cardService.getChargeBySerial(
           objet.params.idTag,
         );
-        if (card && charge.id && charge.state != 4) {
-          await this.chargeService.updateStateChargeGeneral(charge.id, 2);
-          if (charge.client.id != card.company.id) {
+        if (
+          card &&
+          chargeidentity[client.identity].id &&
+          chargeidentity[client.identity].state != 4
+        ) {
+          await this.chargeService.updateStateChargeGeneral(
+            chargeidentity[client.identity].id,
+            2,
+          );
+          if (chargeidentity[client.identity].client.id != card.company.id) {
             flagChangeSon = false;
             const sonCharge = await this.chargeService.companyIsMySon(
               card.company.id,
-              charge.client.id,
+              chargeidentity[client.identity].client.id,
             );
             if (sonCharge) flagChangeSon = true;
           }
@@ -309,15 +353,20 @@ export class OcppService {
 
           // Verify the idTag and respond with an appropriate response
 
-          if (card && card.user && charge.id && flagChangeSon) {
+          if (
+            card &&
+            card.user &&
+            chargeidentity[client.identity].id &&
+            flagChangeSon
+          ) {
             const cardChangeRelations: createCard_ChargerDto = {
               cardId: card.id,
-              chargeId: charge.id,
+              chargeId: chargeidentity[client.identity].id,
               estado: 1,
             };
             const transactionDTO: createTrasactionDto = {
               cardId: card.id,
-              chargeId: charge.id,
+              chargeId: chargeidentity[client.identity].id,
               estado: 2,
             };
             await this.chargeService.newCard_Charge(cardChangeRelations);
@@ -383,7 +432,10 @@ export class OcppService {
       });
 
       client.handle('StopTransaction', async ({ params }) => {
-        await this.chargeService.updateStateChargeGeneral(charge.id, 1);
+        await this.chargeService.updateStateChargeGeneral(
+          chargeidentity[client.identity].id,
+          1,
+        );
 
         console.log(
           `Server got StopTransaction from ${client.identity}:`,
@@ -430,14 +482,20 @@ export class OcppService {
 
       // create a specific handler for handling Heartbeat requests
       client.handle('Heartbeat', async ({ params }) => {
-        /* if (charge.id && charge.state == 3) {
-          const response = await this.chargeService.updateStateChargeGeneral(
-            charge.id,
+        console.log(`Server got Heartbeat from ${client.identity}:`, params);
+        chargeidentity[client.identity] =
+          await this.chargeService.getChargeBySerial(client.identity);
+        if (
+          chargeidentity[client.identity].id &&
+          chargeidentity[client.identity].state == 3
+        ) {
+          await this.chargeService.updateStateChargeGeneral(
+            chargeidentity[client.identity].id,
             1,
           );
-        }*/
-        console.log(`Server got Heartbeat from ${client.identity}:`, params);
-        if (charge.state == 3) await client.disconnect;
+        }
+
+        if (chargeidentity[client.identity].state == 4) await client.disconnect;
         // respond with the server's current time.
         return {
           currentTime: new Date().toISOString(),
@@ -463,7 +521,7 @@ export class OcppService {
         // ...
 
         // Responder con una respuesta apropiada
-        if (charge.id) {
+        if (chargeidentity[client.identity].id) {
           return {
             status: 'Accepted',
           };
