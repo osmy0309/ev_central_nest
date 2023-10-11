@@ -571,19 +571,56 @@ export class ChargeService {
 
   async exportChargeCSV(res: Response, user: any): Promise<any> {
     const listCharge = await this.getChargeAllAdmin(user.company, user.roles);
+    console.log('HERE TRANS', listCharge[0].transaction[0]);
     let record = [];
     listCharge.forEach((item) => {
-      record.push({
-        nombre: item.nombre,
-        total_charge: item.total_charge,
-        last_connection: `${item.last_connection.getDate()}/${
-          item.last_connection.getMonth() + 1
-        }/${item.last_connection.getFullYear()}`,
-        maximum_power: item.maximum_power,
-        serial_number: item.serial_number,
-        address: item.address,
-        municipality: item.municipality,
-      });
+      if (item.transaction.length == 0) {
+        record.push({
+          nombre: item.nombre,
+          total_charge: item.total_charge,
+          last_connection: `${item.last_connection.getDate()}/${
+            item.last_connection.getMonth() + 1
+          }/${item.last_connection.getFullYear()}`,
+          maximum_power: item.maximum_power,
+          serial_number: item.serial_number,
+          address: item.address,
+          municipality: item.municipality,
+          fecha: '-',
+          timeinicial: '-',
+          time: '-',
+          potencia: '-',
+        });
+      } else {
+        item.transaction.forEach((itemTransaction) => {
+          const date = new Date(itemTransaction.timezones[0].start);
+          const datefinish = new Date(itemTransaction.timezones[0].finish);
+
+          const hours = date.getHours();
+          const minutes = date.getMinutes();
+          const seconds = date.getSeconds();
+
+          const hoursfinish = datefinish.getHours() - date.getHours();
+          const minutesfinish = datefinish.getMinutes() - date.getMinutes();
+          const secondsfinish = datefinish.getSeconds() - date.getSeconds();
+          const extractedDate = date.toISOString();
+
+          record.push({
+            nombre: item.nombre,
+            total_charge: item.total_charge,
+            last_connection: `${item.last_connection.getDate()}/${
+              item.last_connection.getMonth() + 1
+            }/${item.last_connection.getFullYear()}`,
+            maximum_power: item.maximum_power,
+            serial_number: item.serial_number,
+            address: item.address,
+            municipality: item.municipality,
+            fecha: extractedDate,
+            timeinicial: `${hours}:${minutes}:${seconds}`,
+            time: `${hoursfinish}:${minutesfinish}:${secondsfinish}`,
+            potencia: itemTransaction.timezones[0].deltaEnergy,
+          });
+        });
+      }
     });
 
     const csvStringifier = createObjectCsvStringifier({
@@ -595,13 +632,19 @@ export class ChargeService {
         { id: 'serial_number', title: 'Número de serie' },
         { id: 'address', title: 'Dirección' },
         { id: 'municipality', title: 'Municipio' },
+        { id: 'fecha', title: 'Fecha' },
+        { id: 'timeinicial', title: 'Hora inicio' },
+        { id: 'time', title: 'Tiempo de carga' },
+        { id: 'potencia', title: 'Potencia de carga' },
       ],
       fieldDelimiter: ';',
+      alwaysQuote: true,
     });
 
     const csvString =
       csvStringifier.getHeaderString() +
       csvStringifier.stringifyRecords(record);
+    res.set('Accept-Encoding', 'UTF-8');
     res.set('Content-Type', 'text/csv');
     res.set('Content-Disposition', 'attachment; filename=charge.csv');
     res.send(csvString);
