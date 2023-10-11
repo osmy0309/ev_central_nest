@@ -591,7 +591,7 @@ export class ChargeService {
         { id: 'nombre', title: 'Nombre' },
         { id: 'total_charge', title: 'Carga total' },
         { id: 'last_connection', title: 'Ultima conexión' },
-        { id: 'maximum_power', title: 'Poder máximo' },
+        { id: 'maximum_power', title: 'Potencia Máxima' },
         { id: 'serial_number', title: 'Número de serie' },
         { id: 'address', title: 'Dirección' },
         { id: 'municipality', title: 'Municipio' },
