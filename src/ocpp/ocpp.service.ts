@@ -42,7 +42,9 @@ export class OcppService {
           sessionId: handshake.identity,
         });
       } else {
-        reject(new Error('Autenticación fallida'));
+        accept({
+          error: 'No se pudo autenticar la conexión',
+        });
       }
     });
 

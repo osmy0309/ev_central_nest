@@ -65,7 +65,23 @@ export class ChargeService {
     const change = await this.chargeRepository
       .createQueryBuilder('charge')
       .leftJoinAndSelect('charge.client', 'company')
-      .select(['charge', 'company.id'])
+      .leftJoinAndSelect('charge.transaction', 'transaction')
+      .leftJoinAndSelect('transaction.card', 'card')
+      .leftJoinAndSelect('card.user', 'user')
+      .leftJoinAndSelect('transaction.timezones', 'timezone')
+      .select([
+        'charge',
+        'company.id',
+        'transaction',
+        'card',
+        'user.id',
+        'user.username',
+        'user.email',
+        'user.firstName',
+        'user.lastName',
+        'user.id',
+        'timezone',
+      ])
       .where('charge.id = :id', { id })
       .getOne();
 
@@ -74,10 +90,10 @@ export class ChargeService {
       return {} as Charge;
     }
 
-    if (change.client.id != id_company) {
+    /*  if (change.client.id != id_company) {
       //throw new HttpException('CHANGE_NOT_EXIST_IN_THIS_COMPANY', 400);
       return {} as Charge;
-    }
+    }*/
 
     return change;
   }

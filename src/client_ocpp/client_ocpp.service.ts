@@ -146,8 +146,9 @@ export class ClientOcppService {
       };
       try {
         await this.cli.call('ChangeAvailability', payload);
+        return { success: true };
       } catch (error) {
-        console.log('ERROR catch', error);
+        return error;
       }
     }
   }
@@ -160,9 +161,11 @@ export class ClientOcppService {
         type: 'Operative',
       };
       try {
-        await this.cli.call('ChangeAvailability', payload);
+        const response = await this.cli.call('ChangeAvailability', payload);
+        console.log('RESPONSE', response);
+        return { success: true };
       } catch (error) {
-        console.log('ERROR catch', error);
+        return error;
       }
     }
   }
