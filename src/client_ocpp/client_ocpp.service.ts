@@ -10,7 +10,7 @@ export class ClientOcppService {
   constructor() {}
   async connect(newConnection: connectDto): Promise<any> {
     this.cli = new RPCClient({
-      endpoint: 'ws://localhost:3100', // the OCPP endpoint URL
+      endpoint: 'wss://evr-back-int.simon-cloud.com/ocpp', // the OCPP endpoint URL
       identity: newConnection.identity, // the OCPP identity
       protocols: ['ocpp1.6'], // client understands ocpp1.6 subprotocol
       strictMode: false, // enable strict validation of requests & responses
