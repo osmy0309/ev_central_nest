@@ -162,6 +162,10 @@ export class UserService {
       .where('user.id = :id', { id })
       .getOne();
 
+    const charges = await this.chargeService.getChargeAllAdmin(
+      user.client.id,
+      user.roles,
+    );
     if (!user) return {} as User;
     const companies_son = await this.clientService.getMyClientsTree(
       usercompany.company,
@@ -209,7 +213,18 @@ export class UserService {
         .andWhere('user.id = :id', { id })
         .getOne();
       if (!users) continue;
-      else return users;
+      else {
+        let response: any = users;
+        for (const char of charges) {
+          if (char.transaction.length > 0)
+            for (const transaction of char.transaction) {
+              if (users.id == transaction.card.user.id) {
+                response.charge_information = [char];
+              }
+            }
+        }
+        return response;
+      }
 
       /* for (const char of charges) {
         if (char.transaction.length > 0)
