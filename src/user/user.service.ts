@@ -113,7 +113,7 @@ export class UserService {
         for (const char of charges) {
           if (char.transaction.length > 0) {
             for (const transaction of char.transaction) {
-              if (user.id == transaction.card.user.id) {
+              if (user?.id == transaction.card?.user?.id) {
                 allUsers[allUsers.length - 1].charge_information = [char];
               }
             }
@@ -219,7 +219,7 @@ export class UserService {
         for (const char of charges) {
           if (char.transaction.length > 0) {
             for (const transaction of char.transaction) {
-              if (users.id == transaction.card.user.id) {
+              if (user?.id == transaction.card?.user?.id) {
                 response.charge_information = [char];
               }
             }
