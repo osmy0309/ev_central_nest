@@ -162,11 +162,11 @@ export class UserService {
       .where('user.id = :id', { id })
       .getOne();
 
-    const charges = await this.chargeService.getChargeAllAdmin(
-      user.client.id,
-      user.roles,
-    );
     if (!user) return {} as User;
+    const charges = await this.chargeService.getChargeAllAdmin(
+      usercompany.company,
+      usercompany.roles,
+    );
     const companies_son = await this.clientService.getMyClientsTree(
       usercompany.company,
       usercompany.roles,
