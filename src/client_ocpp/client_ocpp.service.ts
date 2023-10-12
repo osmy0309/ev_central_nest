@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions';
+import { ChargeService } from 'src/charge/charge.service';
 const { RPCClient } = require('ocpp-rpc');
 import { connectDto } from './dto/client_ocpp.dto';
 @Injectable()
@@ -7,7 +8,7 @@ export class ClientOcppService {
   private cli: any;
   private autTransaction: boolean = false;
 
-  constructor() {}
+  constructor(private chargeService: ChargeService) {}
   async connect(newConnection: connectDto): Promise<any> {
     this.cli = new RPCClient({
       endpoint: 'wss://evr-back-int.simon-cloud.com/ocpp', // the OCPP endpoint URL
@@ -137,6 +138,10 @@ export class ClientOcppService {
   }
 
   async disabledCharge(newConnection: connectDto) {
+    const charge = await this.chargeService.getChargeBySerial(
+      newConnection.identity,
+    );
+    await this.chargeService.updateStateChargeGeneral(charge.id, 4);
     console.log(newConnection);
     await this.connect(newConnection);
     if (this.cli) {
@@ -154,6 +159,10 @@ export class ClientOcppService {
   }
 
   async enabledCharge(newConnection: connectDto) {
+    const charge = await this.chargeService.getChargeBySerial(
+      newConnection.identity,
+    );
+    await this.chargeService.updateStateChargeGeneral(charge.id, 3);
     await this.connect(newConnection);
     if (this.cli) {
       const payload = {
