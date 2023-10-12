@@ -111,12 +111,13 @@ export class UserService {
       for (const user of users) {
         allUsers.push(user);
         for (const char of charges) {
-          if (char.transaction.length > 0)
+          if (char.transaction.length > 0) {
             for (const transaction of char.transaction) {
               if (user.id == transaction.card.user.id) {
                 allUsers[allUsers.length - 1].charge_information = [char];
               }
             }
+          }
         }
       }
     }
@@ -216,12 +217,13 @@ export class UserService {
       else {
         let response: any = users;
         for (const char of charges) {
-          if (char.transaction.length > 0)
+          if (char.transaction.length > 0) {
             for (const transaction of char.transaction) {
               if (users.id == transaction.card.user.id) {
                 response.charge_information = [char];
               }
             }
+          }
         }
         return response;
       }
