@@ -137,10 +137,14 @@ export class UserService {
     return user;
   }
 
-  async getUserById(id: number, usercompany: number): Promise<User> {
+  async getUserById(id: number, usercompany: any): Promise<User> {
+    let arrayallcompany = [];
+    let myCompany = [];
+
     const user = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.client', 'company')
+      .leftJoinAndSelect('user.client', 'client')
+      //   .leftJoinAndSelect('transaction.charge', 'charge_information')
       .select([
         'user.id',
         'user.firstName',
@@ -151,15 +155,74 @@ export class UserService {
         'user.direction',
         'user.dni',
         'user.roles',
-        'company.id',
+        'user.client',
+        'client.id',
+        //   'charge_information',
       ])
-      .where('user.clientId = :idcompany', { idcompany: usercompany })
-      .andWhere('user.id = :id', { id })
+      .where('user.id = :id', { id })
       .getOne();
-    if (!user) {
-      throw new HttpException('USER_NOT_THIS_COMPANY', 400);
+
+    if (!user) return {} as User;
+    const companies_son = await this.clientService.getMyClientsTree(
+      usercompany.company,
+      usercompany.roles,
+    );
+    function addCompanies(companies) {
+      for (const company of companies) {
+        arrayallcompany.push({ ...company }); // Add the company as a charger
+
+        if (company.company_son) {
+          // Check if it has child companies
+          addCompanies(company.company_son); // Recursively add the child companies
+        }
+      }
     }
-    return user;
+
+    if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
+    myCompany.push({ id: usercompany.company, name: 'My Company' } as Company);
+    addCompanies(myCompany);
+    for (const companyarray of arrayallcompany) {
+      const users = await this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.client', 'company')
+        .leftJoinAndSelect('user.cards', 'card')
+        .leftJoinAndSelect('card.transaction', 'transaction')
+        .leftJoinAndSelect('transaction.timezones', 'timezones')
+        //   .leftJoinAndSelect('transaction.charge', 'charge_information')
+        .select([
+          'user.id',
+          'user.firstName',
+          'user.lastName',
+          'user.isActive',
+          'user.username',
+          'user.email',
+          'user.direction',
+          'user.dni',
+          'user.roles',
+          'company.id',
+          'card',
+          'transaction',
+          'timezones',
+          //   'charge_information',
+        ])
+        .where('user.clientId = :idbus', { idbus: companyarray.id })
+        .andWhere('user.id = :id', { id })
+        .getOne();
+      if (!users) continue;
+      else return users;
+
+      /* for (const char of charges) {
+        if (char.transaction.length > 0)
+          for (const transaction of char.transaction) {
+            if (user.id == transaction.card.user.id) {
+              allUsers[allUsers.length - 1].charge_information = [char];
+            }
+          }
+      }*/
+    }
+
+    //if (allUsers.length == 0) throw new HttpException('USER_NOT_FOUND', 400);
+    return {} as User;
   }
 
   async getUserByUserName(username: string): Promise<any> {

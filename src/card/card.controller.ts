@@ -67,6 +67,16 @@ export class CardController {
   async findAll(@GetPrincipal() user: userLoginDto) {
     return await this.cardService.getAllCards(user);
   }
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @Auth()
+  @Get(':id')
+  async getUserByID(
+    @Param('id', ParseIntPipe) id: number,
+    @GetPrincipal() user: any,
+  ): Promise<any> {
+    return await this.cardService.getAllCardsById(id, user);
+  }
 
   @Roles('ADMIN')
   @ApiBearerAuth()

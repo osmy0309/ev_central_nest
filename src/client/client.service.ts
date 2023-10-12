@@ -86,7 +86,7 @@ export class ClientService {
     async function getMyClientsTreeA(
       id_company: number,
       dataSource: any,
-    ): Promise<any> {
+    ): Promise<any[]> {
       const companies = await dataSource
         .createQueryBuilder()
         .select('company')
@@ -94,21 +94,19 @@ export class ClientService {
         .where('id_pather = :id', { id: id_company })
         .getMany();
 
-      const bool = rol.some((element) => ['ADMIN'].includes(element));
-      if (bool) {
-        for (const company of companies) {
-          const children = await getMyClientsTreeA(company.id, dataSource);
-          if (children.length) {
-            company.company_son = children;
-          }
-        }
+      const result: any[] = [];
+
+      for (const company of companies) {
+        const children = await getMyClientsTreeA(company.id, dataSource);
+        result.push(company, ...children);
       }
 
-      return companies;
+      return result;
     }
 
     const response = await getMyClientsTreeA(id_company, this.dataSource);
-    if (response.length == 0) {
+
+    if (response.length === 0) {
       return new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
     }
 

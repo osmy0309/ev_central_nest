@@ -88,7 +88,7 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
     @GetPrincipal() user: any,
   ): Promise<any> {
-    return await this.userService.getUserById(id, user.company);
+    return await this.userService.getUserById(id, user);
   }
   //SERVICIO PARA Modificar USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA
   @Roles('ADMIN')

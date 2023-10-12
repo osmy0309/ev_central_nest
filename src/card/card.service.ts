@@ -117,6 +117,53 @@ export class CardService {
     }
   }
 
+  async getAllCardsById(idcard: number, user: userLoginDto): Promise<Object> {
+    let myCompany = [];
+    let arrayallcompany = [];
+    let results = [];
+    function addCompanies(companies) {
+      for (const company of companies) {
+        arrayallcompany.push({ ...company }); // Add the company as a charger
+
+        if (company.company_son) {
+          // Check if it has child companies
+          addCompanies(company.company_son); // Recursively add the child companies
+        }
+      }
+    }
+    const companies_son = await this.clientService.getMyClientsTree(
+      user.company,
+      user.roles,
+    );
+
+    if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
+    myCompany.push({ id: user.company, name: 'My Company' } as Company);
+    addCompanies(myCompany);
+    for (const company of arrayallcompany) {
+      const cards = await this.cardRepository
+        .createQueryBuilder('card')
+        .leftJoinAndSelect('card.user', 'user')
+        .select([
+          'card',
+          'user.id',
+          'user.firstName',
+          'user.lastName',
+          'user.email',
+          'user.dni',
+          'user.username',
+        ])
+        .where('card.companyId = :id', { id: company.id })
+        .andWhere('card.id = :idbus', { idbus: idcard })
+        .getMany();
+      if (cards.length == 0) continue;
+
+      for (const card of cards) {
+        results.push(card);
+      }
+    }
+    return results;
+  }
+
   async getAllCards(user: userLoginDto): Promise<Object> {
     let myCompany = [];
     let arrayallcompany = [];
