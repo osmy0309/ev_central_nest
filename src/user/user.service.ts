@@ -261,75 +261,114 @@ export class UserService {
     return user;
   }
 
-  async deleteUser(id: number, id_company: number): Promise<any> {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.client', 'company')
-      .select([
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-        'user.isActive',
-        'user.username',
-        'user.email',
-        'user.direction',
-        'user.dni',
-        'user.roles',
-        'company.id',
-      ])
-      .where('user.clientId = :idcompany', { idcompany: id_company })
-      .andWhere('user.id = :id', { id })
-      .getOne();
-    if (!user) {
-      throw new HttpException('USER_NOT_THIS_COMPANY', 400);
+  async deleteUser(id: number, userParams: any): Promise<any> {
+    let myCompany = [];
+    let arrayallcompany = [];
+    const companies_son = await this.clientService.getMyClientsTree(
+      userParams.company,
+      userParams.roles,
+    );
+    function addCompanies(companies) {
+      for (const company of companies) {
+        arrayallcompany.push({ ...company }); // Add the company as a charger
+
+        if (company.company_son) {
+          // Check if it has child companies
+          addCompanies(company.company_son); // Recursively add the child companies
+        }
+      }
     }
 
-    const userdelete = await this.userRepository.delete({ id: user.id });
-    if (userdelete.affected === 0) {
-      throw new HttpException('USER_NOT_FOUND', 400);
+    if (!companies_son.status) myCompany = companies_son;
+    myCompany.push({ id: userParams.company, name: 'My Company' } as Company);
+    addCompanies(myCompany);
+    for (const company of arrayallcompany) {
+      const user = await this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.client', 'company')
+        .select([
+          'user.id',
+          'user.firstName',
+          'user.lastName',
+          'user.isActive',
+          'user.username',
+          'user.email',
+          'user.direction',
+          'user.dni',
+          'user.roles',
+          'company.id',
+        ])
+        .where('user.clientId = :idcompany', { idcompany: company.id })
+        .andWhere('user.id = :id', { id })
+        .getOne();
+      if (user) {
+        const userdelete = await this.userRepository.delete({ id: user.id });
+        if (userdelete.affected === 0) {
+          throw new HttpException('USER_NOT_FOUND', 400);
+        }
+        return user;
+      }
     }
-    return user;
+    return {} as User;
   }
 
   async updateUser(
     id: number,
     user: userUpdateDto,
-    id_company: number,
+    userParams: any,
   ): Promise<any> {
-    const usercompany = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.client', 'company')
-      .select(['user.id', 'company.id'])
-      .where('user.clientId = :idcompany', { idcompany: id_company })
-      .andWhere('user.id = :id', { id })
-      .getOne();
-    if (!usercompany) {
-      throw new HttpException('USER_NOT_THIS_COMPANY', 400);
+    let myCompany = [];
+    let arrayallcompany = [];
+    const companies_son = await this.clientService.getMyClientsTree(
+      userParams.company,
+      userParams.roles,
+    );
+    function addCompanies(companies) {
+      for (const company of companies) {
+        arrayallcompany.push({ ...company }); // Add the company as a charger
+
+        if (company.company_son) {
+          // Check if it has child companies
+          addCompanies(company.company_son); // Recursively add the child companies
+        }
+      }
     }
 
-    const response = await this.userRepository.update({ id }, user);
-    if (response.affected === 0) {
-      throw new HttpException('USER_NOT_FOUND', 400);
-    }
+    if (!companies_son.status) myCompany = companies_son;
+    myCompany.push({ id: userParams.company, name: 'My Company' } as Company);
+    addCompanies(myCompany);
+    for (const company of arrayallcompany) {
+      const usercompany = await this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.client', 'company')
+        .select(['user.id', 'company.id'])
+        .where('user.clientId = :idcompany', { idcompany: company.id })
+        .andWhere('user.id = :id', { id })
+        .getOne();
 
-    const userresponse = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.client', 'company')
-      .select([
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-        'user.isActive',
-        'user.username',
-        'user.email',
-        'user.direction',
-        'user.dni',
-        'user.roles',
-        'company.id',
-      ])
-      .where('user.id = :id', { id })
-      .getOne();
-    return userresponse;
+      if (usercompany) {
+        await this.userRepository.update({ id }, user);
+        const userresponse = await this.userRepository
+          .createQueryBuilder('user')
+          .leftJoinAndSelect('user.client', 'company')
+          .select([
+            'user.id',
+            'user.firstName',
+            'user.lastName',
+            'user.isActive',
+            'user.username',
+            'user.email',
+            'user.direction',
+            'user.dni',
+            'user.roles',
+            'company.id',
+          ])
+          .where('user.id = :id', { id })
+          .getOne();
+        return userresponse;
+      }
+    }
+    return {} as User;
   }
 
   //---------------------USUARIOS EN EL ARBOL DE COMPAñIAS ---------------------------------------

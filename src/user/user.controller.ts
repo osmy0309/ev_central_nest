@@ -100,11 +100,7 @@ export class UserController {
     @Body() userModify: userUpdateDto,
     @GetPrincipal() user: any,
   ) {
-    return await this.userService.updateUser(
-      my_users_id,
-      userModify,
-      user.company,
-    );
+    return await this.userService.updateUser(my_users_id, userModify, user);
   }
   //SERVICIO PARA ELIMINAR USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA
   @Roles('ADMIN')
@@ -115,7 +111,7 @@ export class UserController {
     @Param('my_user_id', ParseIntPipe) my_user_id: number,
     @GetPrincipal() user: any,
   ): Promise<any> {
-    return await this.userService.deleteUser(my_user_id, user.company);
+    return await this.userService.deleteUser(my_user_id, user);
   }
 
   @Roles('ADMIN')
