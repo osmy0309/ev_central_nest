@@ -154,14 +154,12 @@ export class CardService {
         ])
         .where('card.companyId = :id', { id: company.id })
         .andWhere('card.id = :idbus', { idbus: idcard })
-        .getMany();
-      if (cards.length == 0) continue;
+        .getOne();
+      if (!cards) continue;
 
-      for (const card of cards) {
-        results.push(card);
-      }
+      return cards;
     }
-    return results;
+    return {} as Card;
   }
 
   async getAllCards(user: userLoginDto): Promise<Object> {
