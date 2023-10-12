@@ -33,8 +33,8 @@ export class Charge {
   @Column()
   latitude: string;
 
-  @Column({ default: 1 })
-  state?: number; // 1- Libre, 2- Reservado, 3- Cargando, 4- Deshabilitado
+  @Column({ default: 3 })
+  state?: number; // 1- Libre, 2- cargando, 3- off, 4- Deshabilitado
 
   @Column()
   longitude: string;
