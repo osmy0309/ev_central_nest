@@ -234,11 +234,6 @@ export class ChargeService {
       .where('charge.id = :id', { id })
       .getOne();
 
-    if (change.client.id != id_company) {
-      //throw new HttpException('CHANGE_NOT_EXIST_IN_THIS_COMPANY', 400);
-      return {} as Charge;
-    }
-
     const charge = await this.chargeRepository.delete({ id });
     if (charge.affected === 0) {
       //throw new HttpException('CHARGE_NOT_FOUND', 400);
