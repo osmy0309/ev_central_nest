@@ -106,7 +106,7 @@ export class ClientService {
     const response = await getMyClientsTreeA(id_company, this.dataSource);
 
     if (response.length === 0) {
-      return {} as Company;
+      return [];
     }
 
     return response;
