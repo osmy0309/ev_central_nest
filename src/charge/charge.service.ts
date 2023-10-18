@@ -209,7 +209,6 @@ export class ChargeService {
 
     if (change.client.id != id_company) {
       return {} as Charge;
-      return {} as Charge;
     }
 
     const response = await this.chargeRepository.update({ id }, charge);
