@@ -22,7 +22,7 @@ export class ClientService {
       },
     });
     if (clientFind) {
-      throw new HttpException('CLIENT_EXIST', 400);
+      return {} as Company;
     }
     client.id_pather = id_company;
     const newClient = this.clientRepository.create(client);
@@ -42,7 +42,7 @@ export class ClientService {
       },
     });
     if (clientFind) {
-      throw new HttpException('CLIENT_EXIST', 400);
+      return {} as Company;
     }
     console.log(id_client_search);
 
@@ -63,7 +63,7 @@ export class ClientService {
       }
     } while (id_client_search != id_company && id_client_search != 0);
 
-    if (!flag) throw new HttpException('COMPANY_NOT_IS_SON', 400);
+    if (!flag) return {} as Company;
     client.id_pather = id_client_other;
     const newClient = this.clientRepository.create(client);
     return await this.clientRepository.save(newClient);
@@ -77,8 +77,7 @@ export class ClientService {
       .where('id_pather = :id', { id: id_company })
       .getMany();
 
-    if (clients.length == 0)
-      throw new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
+    if (clients.length == 0) return {} as Company[];
     return clients;
   }
 
@@ -107,7 +106,7 @@ export class ClientService {
     const response = await getMyClientsTreeA(id_company, this.dataSource);
 
     if (response.length === 0) {
-      return new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
+      return {} as Company;
     }
 
     return response;
@@ -120,7 +119,7 @@ export class ClientService {
       },
     });
     if (!client) {
-      throw new HttpException('CLIENT_NOT_FOUND', 400);
+      return {} as Company;
     }
     return client;
   }
@@ -132,7 +131,7 @@ export class ClientService {
       },
     });
     if (!client) {
-      throw new HttpException('USER_NOT_FOUND', 400);
+      return {} as Company;
     }
     return client;
   }
@@ -167,7 +166,7 @@ export class ClientService {
 
       const found = await idExistsInTree(treeClient, id);
 
-      if (!found) throw new HttpException('CLIENT_NOT_EXIST', 400);
+      if (!found) return { success: false };
     }
 
     async function deleteTree(data: any[], clientRepository) {
@@ -184,7 +183,7 @@ export class ClientService {
 
     const client = await this.clientRepository.delete({ id });
     if (client.affected === 0) {
-      throw new HttpException('CLIENT_NOT_FOUND', 400);
+      return { success: false };
     }
     return { success: true };
   }
@@ -246,12 +245,12 @@ export class ClientService {
 
       const found = await idExistsInTree(treeClient, id);
 
-      if (!found) throw new HttpException('CLIENT_NOT_RELATION', 400);
+      if (!found) return {} as Company;
     }
 
     const response = await this.clientRepository.update({ id }, client);
     if (response.affected === 0) {
-      throw new HttpException('CLIENT_NOT_UPDATE', 400);
+      return {} as Company;
     }
     const client_response = await this.getClientById(id);
     return client_response;
@@ -288,7 +287,7 @@ export class ClientService {
 
       const found = await idExistsInTree(treeClient, id);
 
-      if (!found) throw new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
+      if (!found) return { success: false };
     }
 
     async function deleteTree(data: any[], clientRepository) {
@@ -305,7 +304,7 @@ export class ClientService {
 
     const client = await this.clientRepository.delete({ id });
     if (client.affected === 0) {
-      throw new HttpException('CLIENT_NOT_FOUND', 400);
+      return { success: false };
     }
     return { success: true };
   }

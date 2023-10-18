@@ -44,7 +44,7 @@ export class ChargeService {
       },
     });
     if (!client) {
-      throw new HttpException('CLIENT_NOT_EXIST', 400);
+      return {} as Charge;
     }
 
     const chargeFind = await this.chargeRepository.findOne({
@@ -53,7 +53,7 @@ export class ChargeService {
       },
     });
     if (chargeFind) {
-      throw new HttpException('CHARGE_EXIST', 400);
+      return {} as Charge;
     }
     charge.client = client;
     await this.clientRepository.save(client);
@@ -208,13 +208,13 @@ export class ChargeService {
     }
 
     if (change.client.id != id_company) {
-      throw new HttpException('CHANGE_NOT_EXIST_IN_THIS_COMPANY', 400);
+      return {} as Charge;
       return {} as Charge;
     }
 
     const response = await this.chargeRepository.update({ id }, charge);
     if (response.affected === 0) {
-      throw new HttpException('CHARGE_NOT_MODIFY', 400);
+      return {} as Charge;
     }
 
     const updatedCharge = await this.chargeRepository.findOne({
@@ -226,21 +226,45 @@ export class ChargeService {
     return updatedCharge;
   }
 
-  async deleteCharge(id: number, id_company): Promise<Charge> {
-    const change = await this.chargeRepository
-      .createQueryBuilder('charge')
-      .leftJoinAndSelect('charge.client', 'company')
-      .select(['charge', 'company.id'])
-      .where('charge.id = :id', { id })
-      .getOne();
+  async deleteCharge(id: number, user: any): Promise<Charge> {
+    let arrayallcompany = [];
+    let myCompany = [];
+    const companies_son = await this.clientService.getMyClientsTree(
+      user.company,
+      user.roles,
+    );
+    function addCompanies(companies) {
+      for (const company of companies) {
+        arrayallcompany.push({ ...company }); // Add the company as a charger
 
-    const charge = await this.chargeRepository.delete({ id });
-    if (charge.affected === 0) {
-      //throw new HttpException('CHARGE_NOT_FOUND', 400);
-      return {} as Charge;
+        if (company.company_son) {
+          // Check if it has child companies
+          addCompanies(company.company_son); // Recursively add the child companies
+        }
+      }
     }
 
-    return change;
+    if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
+    myCompany.push({ id: user.company, name: 'My Company' } as Company);
+    addCompanies(myCompany);
+    for (const company of arrayallcompany) {
+      const change = await this.chargeRepository
+        .createQueryBuilder('charge')
+        .leftJoinAndSelect('charge.client', 'company')
+        .select(['charge', 'company.id'])
+        .where('charge.id = :id', { id })
+        .andWhere('charge.clientId = :idclient', { idclient: company.id })
+        .getOne();
+      if (!change) {
+        //throw new HttpException('CHARGE_NOT_FOUND', 400);
+        continue;
+      } else {
+        await this.chargeRepository.delete({ id });
+        return change;
+      }
+    }
+
+    return {} as Charge;
   }
 
   //ENPONTS PARA INTERACTUAR CON CARGADORES HIJOS
@@ -268,7 +292,6 @@ export class ChargeService {
 
     const treeClient = await getMyClientsTreeA(id_company, this.dataSource);
     if (treeClient.length == 0) {
-      // throw new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
       return {};
     }
 
@@ -307,7 +330,7 @@ export class ChargeService {
       },
     });
     if (!client) {
-      throw new HttpException('CLIENT_NOT_EXIST', 400);
+      return {} as Charge;
     }
     const chargeFind = await this.chargeRepository.findOne({
       where: {
@@ -315,11 +338,11 @@ export class ChargeService {
       },
     });
     if (chargeFind) {
-      throw new HttpException('CHARGE_EXIST', 400);
+      return {} as Charge;
     }
     if (id_client != id_son) {
       const flag = await this.companyIsMySon(id_client, id_son);
-      if (!flag) throw new HttpException('THIS_COMPANY_NOT_IS_SON', 400);
+      if (!flag) return {} as Charge;
     }
     charge.client = client;
     await this.clientRepository.save(client);
@@ -419,9 +442,6 @@ export class ChargeService {
     }
 
     await this.chargeRepository.update({ id }, charge);
-    /* if (response.affected === 0) {
-      throw new HttpException('CHARGE_NOT_FOUND', 400);
-    }*/
 
     const updatedCharge = await this.chargeRepository.findOne({
       where: {
@@ -441,17 +461,17 @@ export class ChargeService {
       .getOne();
 
     if (!change) {
-      throw new HttpException('CHANGE_NOT_FOUND', 400);
+      return {} as Charge;
     }
 
     if (change.client.id != id_company) {
       const flag = await this.companyIsMySon(id_company, change.client.id);
-      if (!flag) throw new HttpException('THIS_COMPANY_NOT_IS_SON', 400);
+      if (!flag) return {} as Charge;
     }
 
     const charge = await this.chargeRepository.delete({ id });
     if (charge.affected === 0) {
-      throw new HttpException('CHARGE_NOT_FOUND', 400);
+      return {} as Charge;
     }
 
     return change;
@@ -505,7 +525,7 @@ export class ChargeService {
       },
     });
     if (!relactionexist) {
-      throw new HttpException('RELATION_NOT_EXIST', 400);
+      return {} as Card_Charge;
     }
     relactionexist.estado = newCard_Charge.estado;
     return await this.card_chargeRepository.save(relactionexist);
@@ -521,13 +541,13 @@ export class ChargeService {
           chargeId: deleteCard_ChargerDto.chargeId,
         },
       });
-      if (!searchCardCharge) throw new HttpException('RELATION_NOT_EXIST', 400);
+      if (!searchCardCharge) return {} as Card_Charge;
       console.log(searchCardCharge.id);
       const charge = await this.card_chargeRepository.delete({
         id: searchCardCharge.id,
       });
       if (charge.affected === 0) {
-        throw new HttpException('CHARGE_NOT_FOUND', 400);
+        return {} as Card_Charge;
       }
       return { success: true };
     } else if (deleteCard_ChargerDto.cardId) {
@@ -536,8 +556,7 @@ export class ChargeService {
           cardId: deleteCard_ChargerDto.cardId,
         },
       });
-      if (searchCardCharge.length == 0)
-        throw new HttpException('CARD_NOT_RELATION', 400);
+      if (searchCardCharge.length == 0) return {};
       searchCardCharge.forEach(async (item) => {
         await this.card_chargeRepository.delete({
           id: item.id,
@@ -550,8 +569,7 @@ export class ChargeService {
           chargeId: deleteCard_ChargerDto.chargeId,
         },
       });
-      if (cardCharges.length == 0)
-        throw new HttpException('CHARGE_NOT_RELATION', 400);
+      if (cardCharges.length == 0) return {};
       console.log(cardCharges);
 
       cardCharges.forEach(async (item) => {
@@ -561,7 +579,7 @@ export class ChargeService {
       });
 
       return { success: true };
-    } else throw new HttpException('CHARGEID_OR_CARDID_IS_NECESARY', 400);
+    } else return { success: false };
   }
 
   async exportChargeCSV(res: Response, user: any): Promise<any> {

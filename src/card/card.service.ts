@@ -36,7 +36,7 @@ export class CardService {
       },
     });
     if (cardFind) {
-      throw new HttpException('CARD_EXIST', HttpStatus.CONFLICT);
+      return {} as Card;
     }
 
     const companyToAsing = await this.companyRepository.findOne({
@@ -60,8 +60,7 @@ export class CardService {
         .leftJoinAndSelect('card.user', 'user')
         .where('card.id = :id', { id: asing.id_card })
         .getMany();
-      if (cardrelation.length == 0)
-        throw new HttpException('CARD_NOT_EXIST', 400);
+      if (cardrelation.length == 0) return {} as Card;
       let cardModify = cardrelation[0];
       cardModify.user = null;
       const response = await this.cardRepository.update(
@@ -89,7 +88,7 @@ export class CardService {
       .getMany();
 
     if (!userFind) {
-      throw new HttpException('USER_NOT_EXIST', 400);
+      return {} as Card;
     } else {
       userFind[0].password = '';
       const cardFind = await this.cardRepository.findOne({
@@ -98,13 +97,13 @@ export class CardService {
         },
       });
       if (!cardFind) {
-        throw new HttpException('CARD_NOT_EXIST', HttpStatus.CONFLICT);
+        return {} as Card;
       }
 
       const companyFind = await this.companyRepository.find({
         where: { id: userFind[0].client.id },
       });
-      if (relation[0].user) throw new HttpException('CARD_IN_USED', 400);
+      if (relation[0].user) return {} as Card;
       cardFind.user = userFind[0];
       cardFind.company = companyFind[0];
 
@@ -236,7 +235,7 @@ export class CardService {
       .getOne(); // Cambiar de getMany() a getOne()
 
     if (!cardToUpdate) {
-      throw new HttpException('Card_not_found', 400);
+      return {} as Card;
     }
     if (midifyUser) {
       const user = await this.dataSource
@@ -247,7 +246,7 @@ export class CardService {
         .getOne(); // Cambiar de getMany() a getOne()
 
       if (!user) {
-        throw new HttpException('USER_NOT_FOUND', 400);
+        return {} as Card;
       }
       cardToUpdate.user = user;
     }
@@ -263,7 +262,6 @@ export class CardService {
   async deleteCard(id: number): Promise<{ success: boolean }> {
     const card = await this.cardRepository.delete({ id });
     if (card.affected === 0) {
-      // throw new HttpException('CARD_NOT_FOUND', 400);
       return { success: false };
     }
     return { success: true };

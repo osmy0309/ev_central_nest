@@ -108,14 +108,13 @@ export class TransactionService {
           chargeId: deleteTrasaction.chargeId,
         },
       });
-      if (!searchTransaction)
-        throw new HttpException('RELATION_NOT_EXIST', 400);
+      if (!searchTransaction) return {};
 
       const charge = await this.trasactionRepository.delete({
         id: searchTransaction.id,
       });
       if (charge.affected === 0) {
-        throw new HttpException('CHARGE_NOT_FOUND', 400);
+        return {};
       }
       return { success: true };
     } else if (deleteTrasaction.cardId) {
@@ -125,8 +124,7 @@ export class TransactionService {
         },
       });
 
-      if (searchTransaction.length == 0)
-        throw new HttpException('CARD_NOT_RELATION', 400);
+      if (searchTransaction.length == 0) return {};
       searchTransaction.forEach(async (item) => {
         await this.trasactionRepository.delete({
           id: item.id,
@@ -139,8 +137,7 @@ export class TransactionService {
           chargeId: deleteTrasaction.chargeId,
         },
       });
-      if (searchTransaction.length == 0)
-        throw new HttpException('CHARGE_NOT_RELATION', 400);
+      if (searchTransaction.length == 0) return {};
 
       searchTransaction.forEach(async (item) => {
         await this.trasactionRepository.delete({
@@ -149,6 +146,6 @@ export class TransactionService {
       });
 
       return { success: true };
-    } else throw new HttpException('CHARGEID_OR_CARDID_IS_NECESARY', 400);
+    } else return { success: false };
   }
 }

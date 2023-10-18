@@ -32,7 +32,8 @@ export class UserService {
       },
     });
     if (!client) {
-      throw new HttpException('CLIENT_NOT_EXIST', 400);
+      //throw new HttpException('CLIENT_NOT_EXIST', 400);
+      return {} as User;
     }
 
     const userFind = await this.userRepository.findOne({
@@ -42,7 +43,8 @@ export class UserService {
       },
     });
     if (userFind) {
-      throw new HttpException('USER_EXIST', HttpStatus.CONFLICT);
+      //throw new HttpException('USER_EXIST', HttpStatus.CONFLICT);
+      return {} as User;
     }
     if (!user.roles || user.roles.length == 0) {
       user.roles.push('AUTOR');
@@ -304,7 +306,8 @@ export class UserService {
       if (user) {
         const userdelete = await this.userRepository.delete({ id: user.id });
         if (userdelete.affected === 0) {
-          throw new HttpException('USER_NOT_FOUND', 400);
+          //throw new HttpException('USER_NOT_FOUND', 400);
+          return {} as User;
         }
         return user;
       }
@@ -398,7 +401,8 @@ export class UserService {
 
     const treeClient = await getMyClientsTreeA(id_company, this.dataSource);
     if (treeClient.length == 0) {
-      throw new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
+      //throw new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
+      return {} as User;
     }
 
     async function idExistsInTree(
@@ -436,7 +440,8 @@ export class UserService {
       },
     });
     if (!client) {
-      throw new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
+      //throw new HttpException('CLIENT_NOT_FOUND_THIS_COMPANY', 400);
+      return {} as User;
     }
 
     const userFind = await this.userRepository.findOne({
@@ -446,11 +451,13 @@ export class UserService {
       },
     });
     if (userFind) {
-      throw new HttpException('USER_EXIST', HttpStatus.CONFLICT);
+      //throw new HttpException('USER_EXIST', HttpStatus.CONFLICT);
+      return {} as User;
     }
     if (id_client != id_client_son) {
       if (!(await this.companyIsMySon(id_client, id_client_son)))
-        throw new HttpException('THIS_COMPANY_NOT_RELATION', 400);
+        return {} as User;
+      // throw new HttpException('THIS_COMPANY_NOT_RELATION', 400);
     }
 
     user.password = await hash(user.password, 10);
@@ -482,17 +489,18 @@ export class UserService {
       .where('user.id = :id', { id })
       .getOne();
     if (!user) {
-      throw new HttpException('USER_NOT_THIS_COMPANY', 400);
+      return { success: false };
     }
 
     if (id_company != user.client.id) {
       if (!(await this.companyIsMySon(id_company, user.client.id)))
-        throw new HttpException('THIS_COMPANY_NOT_RELATION', 400);
+        //throw new HttpException('THIS_COMPANY_NOT_RELATION', 400);
+        return { success: false };
     }
 
     const userdelete = await this.userRepository.delete({ id: user.id });
     if (userdelete.affected === 0) {
-      throw new HttpException('USER_NOT_FOUND', 400);
+      return { success: false };
     }
     return { success: true };
   }
@@ -509,16 +517,16 @@ export class UserService {
       .where('user.id = :id', { id })
       .getOne();
     if (!usercompany) {
-      throw new HttpException('USER_NOT_THIS_COMPANY', 400);
+      return {} as User;
     }
     if (id_company != usercompany.client.id) {
       if (!(await this.companyIsMySon(id_company, usercompany.client.id)))
-        throw new HttpException('THIS_COMPANY_NOT_RELATION', 400);
+        return {} as User;
     }
 
     const response = await this.userRepository.update({ id }, user);
     if (response.affected === 0) {
-      throw new HttpException('USER_NOT_FOUND', 400);
+      return {} as User;
     }
 
     const userresponse = await this.userRepository

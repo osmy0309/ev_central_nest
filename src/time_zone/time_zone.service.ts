@@ -63,7 +63,7 @@ export class TimeZoneService {
       .getMany();
 
     if (results.length == 0) {
-      throw new HttpException('TIMEZONE_NOT_EXIST', 400);
+      return {} as Timezone;
     }
     return results[0];
   }

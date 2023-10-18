@@ -92,7 +92,7 @@ export class ChargeController {
     @Param('id', ParseIntPipe) id: number,
     @GetPrincipal() user: any,
   ) {
-    return await this.chargeService.deleteCharge(id, user.company);
+    return await this.chargeService.deleteCharge(id, user);
   }
   //SERVICIOS PARA INTERACTUAR CON LOS CARGADORES HIJOS
   @Roles('ADMIN')
