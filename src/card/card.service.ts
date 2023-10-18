@@ -135,7 +135,7 @@ export class CardService {
       user.roles,
     );
 
-    if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
+    //if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
     myCompany.push({ id: user.company, name: 'My Company' } as Company);
     addCompanies(myCompany);
     for (const company of arrayallcompany) {
@@ -180,7 +180,7 @@ export class CardService {
       user.roles,
     );
 
-    if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
+    //if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
     myCompany.push({ id: user.company, name: 'My Company' } as Company);
     addCompanies(myCompany);
     for (const company of arrayallcompany) {
