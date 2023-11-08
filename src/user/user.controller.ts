@@ -24,7 +24,7 @@ import { Response } from 'express';
 export class UserController {
   constructor(private readonly userService: UserService) {}
   //SERVICIO PARA ADICIONAR USUARIOS A LA COMPAÑIA DEL USUARIO LOGUEADO
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @Post()
@@ -32,7 +32,7 @@ export class UserController {
     return await this.userService.create(newUser, user.company);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @Post(':id_client_son')
@@ -80,7 +80,7 @@ export class UserController {
     return await this.userService.exportChargeCSV(res, user);
   }*/
   //SERVICIO PARA OBTENER USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @Get(':id')
@@ -91,7 +91,7 @@ export class UserController {
     return await this.userService.getUserById(id, user);
   }
   //SERVICIO PARA Modificar USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @Patch(':my_users_id')
@@ -103,7 +103,7 @@ export class UserController {
     return await this.userService.updateUser(my_users_id, userModify, user);
   }
   //SERVICIO PARA ELIMINAR USUARIO CON SU ID Y QUE PERTENEZCA A LA COMPAÑIA
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @Delete(':my_user_id')
@@ -114,7 +114,7 @@ export class UserController {
     return await this.userService.deleteUser(my_user_id, user);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @Delete('user_son/:user_id')
@@ -130,7 +130,7 @@ export class UserController {
       user.company,
     );
   }
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @Patch('user_son/:user_id')

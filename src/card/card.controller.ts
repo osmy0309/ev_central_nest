@@ -22,7 +22,7 @@ import { Response } from 'express';
 @Controller('card')
 export class CardController {
   constructor(private readonly cardService: CardService) {}
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @Post()
@@ -33,7 +33,7 @@ export class CardController {
     return await this.cardService.create(newCard, user);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @Post('asing_to_card')
@@ -60,14 +60,14 @@ export class CardController {
     return await this.cardService.getCardsByUserAutentication(user.userid);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @Get()
   async findAll(@GetPrincipal() user: userLoginDto) {
     return await this.cardService.getAllCards(user);
   }
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @Get(':id')
@@ -78,7 +78,7 @@ export class CardController {
     return await this.cardService.getAllCardsById(id, user);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @Patch(':id')
@@ -95,7 +95,7 @@ export class CardController {
     );
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'AUTOR')
   @Auth()
   @Delete(':id')
   async deleteUsers(@Param('id', ParseIntPipe) id: number): Promise<any> {
