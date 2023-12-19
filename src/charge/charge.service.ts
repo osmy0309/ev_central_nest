@@ -133,7 +133,7 @@ export class ChargeService {
         }
       }
     }
-
+    addCompanies(companies_son);
     //if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
     myCompany.push({ id: id_company, name: 'My Company' } as Company);
     addCompanies(myCompany);
@@ -608,14 +608,48 @@ export class ChargeService {
           const date = new Date(itemTransaction.timezones[0].start);
           const datefinish = new Date(itemTransaction.timezones[0].finish);
 
-          const hours = date.getHours();
-          const minutes = date.getMinutes();
-          const seconds = date.getSeconds();
+          const getDifferenceInMinutes = (
+            finishDate: Date,
+            startDate: Date,
+          ) => {
+            // Convert the difference to days, hours, minutes, and seconds
+            const differenceDates = finishDate.getTime() - startDate.getTime();
+            const differenceDays = Math.floor(
+              differenceDates / (1000 * 60 * 60 * 24),
+            );
+            const differenceHours = Math.floor(
+              (differenceDates % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+            );
+            const differenceMinutes = Math.floor(
+              (differenceDates % (1000 * 60 * 60)) / (1000 * 60),
+            );
+            const differenceSeconds = Math.floor(
+              (differenceDates % (1000 * 60)) / 1000,
+            );
 
-          const hoursfinish = datefinish.getHours() - date.getHours();
+            return {
+              differenceDays,
+              differenceHours,
+              differenceMinutes,
+              differenceSeconds,
+            };
+          };
+
+          const {
+            differenceDays,
+            differenceHours,
+            differenceMinutes,
+            differenceSeconds,
+          } = getDifferenceInMinutes(datefinish, date);
+
+          const hours = date.getHours().toString().padStart(2, '0');
+          const minutes = date.getMinutes().toString().padStart(2, '0');
+          const seconds = date.getSeconds().toString().padStart(2, '0');
+
+          /* const hoursfinish = datefinish.getHours() - date.getHours();
           const minutesfinish = datefinish.getMinutes() - date.getMinutes();
-          const secondsfinish = datefinish.getSeconds() - date.getSeconds();
-          const extractedDate = date.toISOString();
+          const secondsfinish = datefinish.getSeconds() - date.getSeconds();*/
+          const extractedDate = date.toISOString().slice(0, 10);
 
           record.push({
             nombre: item.nombre,
@@ -629,7 +663,7 @@ export class ChargeService {
             municipality: item.municipality,
             fecha: extractedDate,
             timeinicial: `${hours}:${minutes}:${seconds}`,
-            time: `${hoursfinish}:${minutesfinish}:${secondsfinish}`,
+            time: `${differenceHours}:${differenceMinutes}:${differenceSeconds}`,
             potencia: itemTransaction.timezones[0].deltaEnergy,
           });
         });
