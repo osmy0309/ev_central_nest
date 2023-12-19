@@ -82,6 +82,9 @@ export class createUserDto {
   roles: string[];
 
   @IsOptional()
+  clientSonId?: number;
+
+  @IsOptional()
   client?: Company;
 
   /* @IsEnum(RolName, { message: 'Los roles establecidos son user o admin' })

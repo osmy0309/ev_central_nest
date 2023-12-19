@@ -26,11 +26,27 @@ export class UserService {
   ) {}
 
   async create(user: createUserDto, id_client: number): Promise<User> {
+    let idclient = user.clientSonId ? user.clientSonId : id_client;
+
+    if (user.clientSonId) {
+      const companies_son = await this.clientService.getMyClientsTree(
+        id_client,
+        user.roles,
+      );
+      const index = companies_son.find((company) => company.id === idclient);
+
+      if (index !== undefined) {
+      } else {
+        idclient = id_client;
+      }
+    }
+
     const client = await this.clientRepository.findOne({
       where: {
-        id: id_client,
+        id: idclient,
       },
     });
+
     if (!client) {
       //throw new HttpException('CLIENT_NOT_EXIST', 400);
       return {} as User;
@@ -69,6 +85,7 @@ export class UserService {
       user.company,
       user.roles,
     );
+    addCompanies(companies_son);
     function addCompanies(companies) {
       for (const company of companies) {
         arrayallcompany.push({ ...company }); // Add the company as a charger
