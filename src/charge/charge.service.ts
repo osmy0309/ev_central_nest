@@ -53,7 +53,8 @@ export class ChargeService {
       },
     });
     if (chargeFind) {
-      return {} as Charge;
+      throw new HttpException('CHARGE_EXIST', 403);
+      //return {} as Charge;
     }
     charge.client = client;
     await this.clientRepository.save(client);
