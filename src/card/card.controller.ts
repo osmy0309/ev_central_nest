@@ -44,12 +44,23 @@ export class CardController {
   @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
-  @Get('exportCSV')
+  @Get('exportCSV/es')
   async exportCard(
     @Res() res: Response,
     @GetPrincipal() user: any,
   ): Promise<any> {
     return await this.cardService.exportCardCSV(res, user);
+  }
+
+  @Roles('ADMIN', 'AUTOR')
+  @ApiBearerAuth()
+  @Auth()
+  @Get('exportCSV/en')
+  async exportCardEn(
+    @Res() res: Response,
+    @GetPrincipal() user: any,
+  ): Promise<any> {
+    return await this.cardService.exportCardCSVEn(res, user);
   }
 
   @Roles('ADMIN', 'AUTOR')

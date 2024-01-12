@@ -60,12 +60,23 @@ export class UserController {
   @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
-  @Get('exportCSV')
+  @Get('exportCSV/es')
   async exportUser(
     @Res() res: Response,
     @GetPrincipal() user: any,
   ): Promise<void> {
     return await this.userService.exportUserCSV(res, user);
+  }
+
+  @Roles('ADMIN', 'AUTOR')
+  @ApiBearerAuth()
+  @Auth()
+  @Get('exportCSV/en')
+  async exportUserEn(
+    @Res() res: Response,
+    @GetPrincipal() user: any,
+  ): Promise<void> {
+    return await this.userService.exportUserCSVEn(res, user);
   }
 
   /*@Roles('ADMIN', 'AUTOR')

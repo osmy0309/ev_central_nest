@@ -601,4 +601,40 @@ export class UserService {
     res.set('Content-Disposition', 'attachment; filename=user.csv');
     res.send(csvString);
   }
+
+  async exportUserCSVEn(res: Response, user: any) {
+    const listUser = await this.getUser(user);
+    let record = [];
+
+    listUser.forEach((item) => {
+      record.push({
+        firstName: item.firstName,
+        lastName: item.lastName,
+        username: item.username,
+        email: item.email,
+        direction: item.direction,
+        dni: item.dni,
+      });
+    });
+
+    const csvStringifier = createObjectCsvStringifier({
+      header: [
+        { id: 'firstName', title: 'Name' },
+        { id: 'lastName', title: 'Surnames' },
+        { id: 'username', title: 'User' },
+        { id: 'email', title: 'Email' },
+        { id: 'direction', title: 'Address' },
+        { id: 'dni', title: 'DNI' },
+      ],
+      fieldDelimiter: ';',
+    });
+
+    const csvString =
+      csvStringifier.getHeaderString() +
+      csvStringifier.stringifyRecords(record);
+
+    res.set('Content-Type', 'text/csv');
+    res.set('Content-Disposition', 'attachment; filename=user.csv');
+    res.send(csvString);
+  }
 }

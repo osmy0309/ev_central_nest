@@ -302,6 +302,41 @@ export class CardService {
     res.set('Content-Disposition', 'attachment; filename=card.csv');
     res.send(csvString);
   }
+  async exportCardCSVEn(res: Response, user: any): Promise<any> {
+    const listCard = await this.getAllCards(user);
+    let record = [];
+
+    for (const key in listCard) {
+      record.push({
+        no_serie: listCard[key].no_serie,
+        credit: listCard[key].credit,
+        userfirstName: listCard[key].user ? listCard[key].user.firstName : '-',
+        userlastName: listCard[key].user ? listCard[key].user.lastName : '-',
+        email: listCard[key].user ? listCard[key].user.email : '-',
+        dni: listCard[key].user ? listCard[key].user.dni : '-',
+      });
+    }
+
+    const csvStringifier = createObjectCsvStringifier({
+      header: [
+        { id: 'no_serie', title: 'Serial number' },
+        { id: 'credit', title: 'Credit' },
+        { id: 'userfirstName', title: 'Owner Name' },
+        { id: 'userlastName', title: 'Owner Surnames' },
+        { id: 'email', title: 'Email' },
+        { id: 'dni', title: 'DNI' },
+      ],
+      fieldDelimiter: ';',
+    });
+
+    const csvString =
+      csvStringifier.getHeaderString() +
+      csvStringifier.stringifyRecords(record);
+
+    res.set('Content-Type', 'text/csv');
+    res.set('Content-Disposition', 'attachment; filename=card.csv');
+    res.send(csvString);
+  }
 
   async getChargeBySerial(id: string): Promise<Card> {
     const card = await this.cardRepository

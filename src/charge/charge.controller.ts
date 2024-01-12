@@ -29,12 +29,24 @@ export class ChargeController {
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
-  @Get('exportCSV')
+  @Get('exportCSV/es')
   async exportCharge(
     @Res() res: Response,
     @GetPrincipal() user: any,
   ): Promise<any> {
     return await this.chargeService.exportChargeCSV(res, user);
+  }
+
+  @Roles('ADMIN', 'AUTOR')
+  @ApiBearerAuth()
+  @Auth()
+  @ApiTags('Charges')
+  @Get('exportCSV/en')
+  async exportChargeEn(
+    @Res() res: Response,
+    @GetPrincipal() user: any,
+  ): Promise<any> {
+    return await this.chargeService.exportChargeCSVEn(res, user);
   }
 
   @Roles('ADMIN', 'AUTOR')
