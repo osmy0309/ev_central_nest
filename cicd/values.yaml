@@ -137,8 +137,8 @@ ingress:
     alb.ingress.kubernetes.io/healthcheck-path: /health-check
     #alb.ingress.kubernetes.io/success-codes: 200,404,301,302
     #alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=180
-    alb.ingress.kubernetes.io/healthcheck-interval-seconds: '60'
-    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '30'
+    #alb.ingress.kubernetes.io/healthcheck-interval-seconds: '60'
+    #alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '30'
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
     #alb.ingress.kubernetes.io/backend-protocol-version: HTTP2 #GRPC
     alb.ingress.kubernetes.io/certificate-arn: 'arn:aws:acm:eu-west-1:757841268213:certificate/0bfdee67-358a-4328-91f8-ef0875ac8cd2'
