@@ -15,6 +15,9 @@ export class Company {
   email: string;
 
   @Column()
+  contactName: string;
+
+  @Column()
   business_name: string;
 
   @Column({ default: () => 0 })

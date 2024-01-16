@@ -33,6 +33,14 @@ export class createClientDto {
   business_name: string;
 
   @IsOptional()
+  @IsString()
+  @ApiProperty({
+    example: 'contactName',
+    description: 'contactName',
+  })
+  contactName: string;
+
+  @IsOptional()
   @IsNumber()
   /* @ApiProperty({
     example: 0,
@@ -89,6 +97,14 @@ export class updateClientDto {
     description: 'id padre del arbol de cleintes',
   })*/
   id_pather?: number;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    example: 'contactName',
+    description: 'contactName',
+  })
+  contactName: string;
 
   @IsOptional()
   @IsString()
