@@ -78,13 +78,13 @@ image:
   symfony_env: dev
 imagePullSecrets: []
 nameOverride: ''
-fullnameOverride: 'evr-back-int'
+fullnameOverride: "evr-back"
 
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # Annotations to add to the service account
-  annotations: {'eks.amazonaws.com/role-arn': 'arn:aws:iam::757841268213:role/simon-develop-access-evr-back-int'}
+  annotations: {"eks.amazonaws.com/role-arn":"arn:aws:iam::757841268213:role/simon-develop-access-evr-back-int"}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: 'evr-back-int'
@@ -127,13 +127,13 @@ service:
 ingress:
   enabled: true
   groupOrder: 28-
-  className: 'alb'
+  className: "alb"
   annotations:
-    alb.ingress.kubernetes.io/group.name: 'develop-public' # Use same ALB for every ingress with current group name
-    alb.ingress.kubernetes.io/group.order: '28'
-    alb.ingress.kubernetes.io/target-type: 'ip'
-    alb.ingress.kubernetes.io/scheme: 'internet-facing' # internet-facing to use public subnets  internal
-    alb.ingress.kubernetes.io/target-group-attributes: 'stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60'
+    alb.ingress.kubernetes.io/group.name: "develop-public" # Use same ALB for every ingress with current group name
+    alb.ingress.kubernetes.io/group.order: "28"
+    alb.ingress.kubernetes.io/target-type: "ip"
+    alb.ingress.kubernetes.io/scheme: "internet-facing" # internet-facing to use public subnets  internal
+    alb.ingress.kubernetes.io/target-group-attributes: "stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60"
     alb.ingress.kubernetes.io/healthcheck-path: /health-check
     #alb.ingress.kubernetes.io/success-codes: 200,404,301,302
     #alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=180
@@ -141,11 +141,11 @@ ingress:
     #alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '30'
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
     #alb.ingress.kubernetes.io/backend-protocol-version: HTTP2 #GRPC
-    alb.ingress.kubernetes.io/certificate-arn: 'arn:aws:acm:eu-west-1:757841268213:certificate/0bfdee67-358a-4328-91f8-ef0875ac8cd2'
+    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-west-1:757841268213:certificate/0bfdee67-358a-4328-91f8-ef0875ac8cd2"
     #alb.ingress.kubernetes.io/ssl-redirect: '443'
-    alb.ingress.kubernetes.io/ssl-policy: 'ELBSecurityPolicy-TLS-1-1-2017-01'
-    alb.ingress.kubernetes.io/tags: 'Environment=develop'
-    alb.ingress.kubernetes.io/backend-protocol: 'HTTP'
+    alb.ingress.kubernetes.io/ssl-policy: "ELBSecurityPolicy-TLS-1-1-2017-01"
+    alb.ingress.kubernetes.io/tags: "Environment=develop"
+    alb.ingress.kubernetes.io/backend-protocol: "HTTP"
 
   hosts:
     - host: evr-back-int.k8s.simon-cloud.com
@@ -160,33 +160,20 @@ ingress:
     - hosts:
         - evr-back-int.simon-cloud.com
 
-ingressInternal:
+ingressAdditional:
   enabled: false
   groupOrder: 26-
-  className: 'alb'
-  annotations:
-    alb.ingress.kubernetes.io/group.name: 'develop-private' # Use same ALB for every ingress with current group name
-    alb.ingress.kubernetes.io/group.order: '26'
-    alb.ingress.kubernetes.io/target-type: 'ip'
-    alb.ingress.kubernetes.io/scheme: 'internal' # internet-facing to use public subnets  internal
-    alb.ingress.kubernetes.io/target-group-attributes: 'stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60'
-    #external-dns.alpha.kubernetes.io/hostname: int-api-auth2.k8s.simon-electric.com, int-api-auth2.simon-electric.com
-    #alb.ingress.kubernetes.io/healthcheck-path: /simon/manager/signin
-    #alb.ingress.kubernetes.io/success-codes: 200,404,301,302
-    #alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=180
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-    #alb.ingress.kubernetes.io/backend-protocol-version: HTTP2 #GRPC
-    #alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-west-1:757841268213:certificate/0bfdee67-358a-4328-91f8-ef0875ac8cd2"
-    #alb.ingress.kubernetes.io/ssl-redirect: '443'
-    #alb.ingress.kubernetes.io/ssl-policy: "ELBSecurityPolicy-TLS-1-1-2017-01"
-    alb.ingress.kubernetes.io/tags: 'Environment=develop'
-    alb.ingress.kubernetes.io/backend-protocol: 'HTTP'
-    #alb.ingress.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.bucket=my-access-log-bucket,access_logs.s3.prefix=steve01
-  hosts:
-    - host: evr-back-int.wk8s.simon-cloud.com
-      paths:
-        - path: /
-          pathType: Prefix
+  className: "alb"
+  annotations: {}
+  hosts: {}
+  tls: {}
+
+ingressInternal:
+  enabled: false
+  groupOrder: 28-
+  className: "alb"
+  annotations: {}
+  hosts: {}
   tls: {}
 
 resources:
@@ -225,7 +212,7 @@ serviceAccountCronJob:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  name: ''
 
 # Enable efs persistent data for integration environment
 int:
