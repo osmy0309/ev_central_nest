@@ -111,8 +111,8 @@ customProbe:
   readinessPath: /health-check
   #readinessPort: http
   initialDelaySeconds: 30
-  #periodSeconds: 60
-  #timeoutSeconds: 30
+  periodSeconds: 60
+  timeoutSeconds: 30
 
 service:
   type: ClusterIP
