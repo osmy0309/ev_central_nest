@@ -125,21 +125,21 @@ service:
   secondaryTargetPort: 3100
 
 ingress:
-  enabled: false
-  groupOrder: 1-
+  enabled: true
+  groupOrder: 26-
   className: "alb"
   annotations:
     alb.ingress.kubernetes.io/group.name: "k8s-develop-public" # Use same ALB for every ingress with current group name
     alb.ingress.kubernetes.io/load-balancer-name: "k8s-develop-public"
-    alb.ingress.kubernetes.io/group.order: "1"
+    alb.ingress.kubernetes.io/group.order: "26"
     alb.ingress.kubernetes.io/target-type: "ip"
     alb.ingress.kubernetes.io/scheme: "internet-facing" # internet-facing to use public subnets  internal
     alb.ingress.kubernetes.io/target-group-attributes: "stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60"
     alb.ingress.kubernetes.io/healthcheck-path: /health-check
     #alb.ingress.kubernetes.io/success-codes: 200,404,301,302
     #alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=180
-    #alb.ingress.kubernetes.io/healthcheck-interval-seconds: '60'
-    #alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '30'
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: '60'
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '30'
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
     #alb.ingress.kubernetes.io/backend-protocol-version: HTTP2 #GRPC
     alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-west-1:757841268213:certificate/0bfdee67-358a-4328-91f8-ef0875ac8cd2"
