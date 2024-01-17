@@ -41,6 +41,7 @@ secrets:
       objectType: ssmparameter
 
 migrateSecrets:
+  parameterSecrets: false
   all: {}
 
 replicaCount: 1
@@ -201,11 +202,13 @@ affinity: {}
 cronJob1:
   enabled: false
   schedule: '*/1 * * * *'
+  image: 219526371337.dkr.ecr.eu-west-1.amazonaws.com/tasker:v1.0.10
   command: {}
 
 cronJob2:
   enabled: false
   schedule: '*/1 * * * *'
+  image: 219526371337.dkr.ecr.eu-west-1.amazonaws.com/tasker:v1.0.10
   command: {}
 
 serviceAccountCronJob:
@@ -220,3 +223,4 @@ int:
   enabled: false
   fileSystemId: fs-040b7da2a
   storage: 5Gi
+
