@@ -126,11 +126,12 @@ service:
 
 ingress:
   enabled: true
-  groupOrder: 28-
+  groupOrder: 1-
   className: "alb"
   annotations:
-    alb.ingress.kubernetes.io/group.name: "develop-public" # Use same ALB for every ingress with current group name
-    alb.ingress.kubernetes.io/group.order: "28"
+    alb.ingress.kubernetes.io/group.name: "k8s-develop-public" # Use same ALB for every ingress with current group name
+    alb.ingress.kubernetes.io/load-balancer-name: "k8s-develop-public"
+    alb.ingress.kubernetes.io/group.order: "1"
     alb.ingress.kubernetes.io/target-type: "ip"
     alb.ingress.kubernetes.io/scheme: "internet-facing" # internet-facing to use public subnets  internal
     alb.ingress.kubernetes.io/target-group-attributes: "stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60"
