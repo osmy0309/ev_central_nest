@@ -125,7 +125,7 @@ service:
   secondaryTargetPort: 3100
 
 ingress:
-  enabled: true
+  enabled: false
   groupOrder: 1-
   className: "alb"
   annotations:
