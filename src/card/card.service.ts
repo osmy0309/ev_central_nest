@@ -319,7 +319,7 @@ export class CardService {
 
     const csvStringifier = createObjectCsvStringifier({
       header: [
-        { id: 'no_serie', title: 'Serial number' },
+        { id: 'no_serie', title: 'Box ID' },
         { id: 'credit', title: 'Credit' },
         { id: 'userfirstName', title: 'Owner Name' },
         { id: 'userlastName', title: 'Owner Surnames' },
