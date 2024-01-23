@@ -678,16 +678,16 @@ export class ChargeService {
     const csvStringifier = createObjectCsvStringifier({
       header: [
         { id: 'nombre', title: 'Nombre' },
-        { id: 'total_charge', title: 'Carga total' },
+        { id: 'total_charge', title: 'Carga total (kWh)' },
         { id: 'last_connection', title: 'Ultima conexión' },
-        { id: 'maximum_power', title: 'Potencia Máxima' },
+        { id: 'maximum_power', title: 'Potencia Máxima (kW)' },
         { id: 'serial_number', title: 'Número de serie' },
         { id: 'address', title: 'Dirección' },
         { id: 'municipality', title: 'Municipio' },
         { id: 'fecha', title: 'Fecha' },
         { id: 'timeinicial', title: 'Hora inicio' },
         { id: 'time', title: 'Tiempo de carga' },
-        { id: 'potencia', title: 'Potencia de carga' },
+        { id: 'potencia', title: 'Potencia de carga (kW)' },
         { id: 'card', title: 'Tarjeta' }
       ],
       fieldDelimiter: ';',
@@ -708,16 +708,16 @@ export class ChargeService {
     const csvStringifier = createObjectCsvStringifier({
       header: [
         { id: 'nombre', title: 'Name' },
-        { id: 'total_charge', title: 'Total load' },
+        { id: 'total_charge', title: 'Total load (kWh)' },
         { id: 'last_connection', title: 'Last connection' },
-        { id: 'maximum_power', title: 'Maximum Power' },
+        { id: 'maximum_power', title: 'Maximum Power (kW)' },
         { id: 'serial_number', title: 'Box ID' },
         { id: 'address', title: 'Address' },
         { id: 'municipality', title: 'Municipality' },
         { id: 'fecha', title: 'Date' },
         { id: 'timeinicial', title: 'Start time' },
         { id: 'time', title: 'Loading time' },
-        { id: 'potencia', title: 'Charging power' },
+        { id: 'potencia', title: 'Charging power (kW)' },
         { id: 'card', title: 'Card' }
       ],
       fieldDelimiter: ';',
