@@ -14,7 +14,7 @@ export class Company {
   @Column()
   email: string;
 
-  @Column()
+  @Column({default: 'Cambialo'})
   contactName: string;
 
   @Column()
