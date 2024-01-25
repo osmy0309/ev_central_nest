@@ -354,7 +354,7 @@ export class UserService {
       }
     }
 
-    //if (!companies_son.status) myCompany = companies_son;
+    if (!companies_son.status) myCompany = companies_son;
     myCompany.push({ id: userParams.company, name: 'My Company' } as Company);
     addCompanies(myCompany);
     for (const company of arrayallcompany) {
