@@ -582,7 +582,33 @@ export class ChargeService {
     } else return { success: false };
   }
 
-  async exportChargeCSV(res: Response, user: any): Promise<any> {
+  // METHODS TO GENERATE THE CSV
+
+  getDifferenceInMinutes = ( finishDate: Date, startDate: Date ) => {
+    // Convert the difference to days, hours, minutes, and seconds
+    const differenceDates = finishDate.getTime() - startDate.getTime();
+    const differenceDays = Math.floor(
+      differenceDates / (1000 * 60 * 60 * 24),
+    );
+    const differenceHours = Math.floor(
+      (differenceDates % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+    );
+    const differenceMinutes = Math.floor(
+      (differenceDates % (1000 * 60 * 60)) / (1000 * 60),
+    );
+    const differenceSeconds = Math.floor(
+      (differenceDates % (1000 * 60)) / 1000,
+    );
+
+    return {
+      differenceDays,
+      differenceHours,
+      differenceMinutes,
+      differenceSeconds,
+    };
+  }
+  
+  async getRecords(user: any){
     const listCharge = await this.getChargeAllAdmin(user.company, user.roles);
     console.log('HERE TRANS', listCharge[0].transaction[0]);
     let record = [];
@@ -602,45 +628,19 @@ export class ChargeService {
           timeinicial: '-',
           time: '-',
           potencia: '-',
+          card: '-'
         });
       } else {
         item.transaction.forEach((itemTransaction) => {
           const date = new Date(itemTransaction.timezones[0].start);
           const datefinish = new Date(itemTransaction.timezones[0].finish);
 
-          const getDifferenceInMinutes = (
-            finishDate: Date,
-            startDate: Date,
-          ) => {
-            // Convert the difference to days, hours, minutes, and seconds
-            const differenceDates = finishDate.getTime() - startDate.getTime();
-            const differenceDays = Math.floor(
-              differenceDates / (1000 * 60 * 60 * 24),
-            );
-            const differenceHours = Math.floor(
-              (differenceDates % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-            );
-            const differenceMinutes = Math.floor(
-              (differenceDates % (1000 * 60 * 60)) / (1000 * 60),
-            );
-            const differenceSeconds = Math.floor(
-              (differenceDates % (1000 * 60)) / 1000,
-            );
-
-            return {
-              differenceDays,
-              differenceHours,
-              differenceMinutes,
-              differenceSeconds,
-            };
-          };
-
           const {
             differenceDays,
             differenceHours,
             differenceMinutes,
             differenceSeconds,
-          } = getDifferenceInMinutes(datefinish, date);
+          } = this.getDifferenceInMinutes(datefinish, date);
 
           const hours = date.getHours().toString().padStart(2, '0');
           const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -650,7 +650,6 @@ export class ChargeService {
           const minutesfinish = datefinish.getMinutes() - date.getMinutes();
           const secondsfinish = datefinish.getSeconds() - date.getSeconds();*/
           const extractedDate = date.toISOString().slice(0, 10);
-
           record.push({
             nombre: item.nombre,
             total_charge: item.total_charge,
@@ -665,24 +664,31 @@ export class ChargeService {
             timeinicial: `${hours}:${minutes}:${seconds}`,
             time: `${differenceHours}:${differenceMinutes}:${differenceSeconds}`,
             potencia: itemTransaction.timezones[0].deltaEnergy,
+            card: itemTransaction.card.no_serie
           });
         });
       }
     });
+    console.log('RECORDS ', record);
+    return record;
+  }
 
+  async exportChargeCSV(res: Response, user: any): Promise<any> {
+    let records = await this.getRecords(user);
     const csvStringifier = createObjectCsvStringifier({
       header: [
         { id: 'nombre', title: 'Nombre' },
-        { id: 'total_charge', title: 'Carga total' },
+        { id: 'total_charge', title: 'Carga total (kWh)' },
         { id: 'last_connection', title: 'Ultima conexión' },
-        { id: 'maximum_power', title: 'Potencia Máxima' },
+        { id: 'maximum_power', title: 'Potencia Máxima (kW)' },
         { id: 'serial_number', title: 'Número de serie' },
         { id: 'address', title: 'Dirección' },
         { id: 'municipality', title: 'Municipio' },
         { id: 'fecha', title: 'Fecha' },
         { id: 'timeinicial', title: 'Hora inicio' },
         { id: 'time', title: 'Tiempo de carga' },
-        { id: 'potencia', title: 'Potencia de carga' },
+        { id: 'potencia', title: 'Potencia de carga (kW)' },
+        { id: 'card', title: 'Tarjeta' }
       ],
       fieldDelimiter: ';',
       alwaysQuote: true,
@@ -690,7 +696,7 @@ export class ChargeService {
 
     const csvString =
       csvStringifier.getHeaderString() +
-      csvStringifier.stringifyRecords(record);
+      csvStringifier.stringifyRecords(records);
     res.set('Accept-Encoding', 'UTF-8');
     res.set('Content-Type', 'text/csv');
     res.set('Content-Disposition', 'attachment; filename=charge.csv');
@@ -698,106 +704,21 @@ export class ChargeService {
   }
 
   async exportChargeCSVEn(res: Response, user: any): Promise<any> {
-    const listCharge = await this.getChargeAllAdmin(user.company, user.roles);
-    console.log('HERE TRANS', listCharge[0].transaction[0]);
-    let record = [];
-    listCharge.forEach((item) => {
-      if (item.transaction.length == 0) {
-        record.push({
-          nombre: item.nombre,
-          total_charge: item.total_charge,
-          last_connection: `${item.last_connection.getDate()}/${
-            item.last_connection.getMonth() + 1
-          }/${item.last_connection.getFullYear()}`,
-          maximum_power: item.maximum_power,
-          serial_number: item.serial_number,
-          address: item.address,
-          municipality: item.municipality,
-          fecha: '-',
-          timeinicial: '-',
-          time: '-',
-          potencia: '-',
-        });
-      } else {
-        item.transaction.forEach((itemTransaction) => {
-          const date = new Date(itemTransaction.timezones[0].start);
-          const datefinish = new Date(itemTransaction.timezones[0].finish);
-
-          const getDifferenceInMinutes = (
-            finishDate: Date,
-            startDate: Date,
-          ) => {
-            // Convert the difference to days, hours, minutes, and seconds
-            const differenceDates = finishDate.getTime() - startDate.getTime();
-            const differenceDays = Math.floor(
-              differenceDates / (1000 * 60 * 60 * 24),
-            );
-            const differenceHours = Math.floor(
-              (differenceDates % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-            );
-            const differenceMinutes = Math.floor(
-              (differenceDates % (1000 * 60 * 60)) / (1000 * 60),
-            );
-            const differenceSeconds = Math.floor(
-              (differenceDates % (1000 * 60)) / 1000,
-            );
-
-            return {
-              differenceDays,
-              differenceHours,
-              differenceMinutes,
-              differenceSeconds,
-            };
-          };
-
-          const {
-            differenceDays,
-            differenceHours,
-            differenceMinutes,
-            differenceSeconds,
-          } = getDifferenceInMinutes(datefinish, date);
-
-          const hours = date.getHours().toString().padStart(2, '0');
-          const minutes = date.getMinutes().toString().padStart(2, '0');
-          const seconds = date.getSeconds().toString().padStart(2, '0');
-
-          /* const hoursfinish = datefinish.getHours() - date.getHours();
-          const minutesfinish = datefinish.getMinutes() - date.getMinutes();
-          const secondsfinish = datefinish.getSeconds() - date.getSeconds();*/
-          const extractedDate = date.toISOString().slice(0, 10);
-
-          record.push({
-            nombre: item.nombre,
-            total_charge: item.total_charge,
-            last_connection: `${item.last_connection.getDate()}/${
-              item.last_connection.getMonth() + 1
-            }/${item.last_connection.getFullYear()}`,
-            maximum_power: item.maximum_power,
-            serial_number: item.serial_number,
-            address: item.address,
-            municipality: item.municipality,
-            fecha: extractedDate,
-            timeinicial: `${hours}:${minutes}:${seconds}`,
-            time: `${differenceHours}:${differenceMinutes}:${differenceSeconds}`,
-            potencia: itemTransaction.timezones[0].deltaEnergy,
-          });
-        });
-      }
-    });
-
+    let records = await this.getRecords(user);
     const csvStringifier = createObjectCsvStringifier({
       header: [
         { id: 'nombre', title: 'Name' },
-        { id: 'total_charge', title: 'Total load' },
+        { id: 'total_charge', title: 'Total load (kWh)' },
         { id: 'last_connection', title: 'Last connection' },
-        { id: 'maximum_power', title: 'Maximum Power' },
+        { id: 'maximum_power', title: 'Maximum Power (kW)' },
         { id: 'serial_number', title: 'Box ID' },
         { id: 'address', title: 'Address' },
         { id: 'municipality', title: 'Municipality' },
         { id: 'fecha', title: 'Date' },
         { id: 'timeinicial', title: 'Start time' },
         { id: 'time', title: 'Loading time' },
-        { id: 'potencia', title: 'Charging power' },
+        { id: 'potencia', title: 'Charging power (kW)' },
+        { id: 'card', title: 'Card' }
       ],
       fieldDelimiter: ';',
       alwaysQuote: true,
@@ -805,7 +726,7 @@ export class ChargeService {
 
     const csvString =
       csvStringifier.getHeaderString() +
-      csvStringifier.stringifyRecords(record);
+      csvStringifier.stringifyRecords(records);
     res.set('Accept-Encoding', 'UTF-8');
     res.set('Content-Type', 'text/csv');
     res.set('Content-Disposition', 'attachment; filename=charge.csv');

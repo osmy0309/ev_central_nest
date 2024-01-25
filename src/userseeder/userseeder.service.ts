@@ -24,6 +24,7 @@ export class UserSeederService implements OnModuleInit {
         (nuevoClient.email = 'prueba@gmail.com'),
         (nuevoClient.id_pather = 0),
         (nuevoClient.nif = 'provicional'),
+        (nuevoClient.contactName = 'Contact Name'),
         (nuevoClient.phone = 'provicional');
       nuevoClient.contactName = 'provicional';
       const newClient = this.clientRepository.create(nuevoClient);
