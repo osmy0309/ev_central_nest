@@ -25,6 +25,7 @@ export class UserSeederService implements OnModuleInit {
         (nuevoClient.id_pather = 0),
         (nuevoClient.nif = 'provicional'),
         (nuevoClient.phone = 'provicional');
+      nuevoClient.contactName = 'provicional';
       const newClient = this.clientRepository.create(nuevoClient);
       const cliente_response = await this.clientRepository.save(newClient);
       const usuarios = await this.userRepository.find();
