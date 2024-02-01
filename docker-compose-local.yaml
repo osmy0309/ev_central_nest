@@ -36,7 +36,7 @@ services:
       - simonevcentralbackend
     build:
       context: .
-      dockerfile: ././evr-front/Dockerfile
+      dockerfile: ./../evr-front/Dockerfile
     environment:
       - NODE_ENV=development
       - API_URL=http://simonevcentralbackend:3800

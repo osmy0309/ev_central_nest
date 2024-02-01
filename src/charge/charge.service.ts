@@ -652,19 +652,17 @@ export class ChargeService {
           const extractedDate = date.toISOString().slice(0, 10);
           record.push({
             nombre: item.nombre,
-            total_charge: item.total_charge,
-            last_connection: `${item.last_connection.getDate()}/${
-              item.last_connection.getMonth() + 1
-            }/${item.last_connection.getFullYear()}`,
-            maximum_power: item.maximum_power,
             serial_number: item.serial_number,
-            address: item.address,
-            municipality: item.municipality,
             fecha: extractedDate,
             timeinicial: `${hours}:${minutes}:${seconds}`,
             time: `${differenceHours}:${differenceMinutes}:${differenceSeconds}`,
-            potencia: itemTransaction.timezones[0].deltaEnergy,
-            card: itemTransaction.card.no_serie
+            energia: itemTransaction.timezones[0].energy,
+            card: itemTransaction.card.no_serie,
+            last_connection: `${item.last_connection.getDate()}/${
+              item.last_connection.getMonth() + 1
+            }/${item.last_connection.getFullYear()}`,
+            address: item.address,
+            municipality: item.municipality
           });
         });
       }
@@ -678,17 +676,16 @@ export class ChargeService {
     const csvStringifier = createObjectCsvStringifier({
       header: [
         { id: 'nombre', title: 'Nombre' },
-        { id: 'total_charge', title: 'Carga total (kWh)' },
-        { id: 'last_connection', title: 'Ultima conexión' },
-        { id: 'maximum_power', title: 'Potencia Máxima (kW)' },
         { id: 'serial_number', title: 'Número de serie' },
-        { id: 'address', title: 'Dirección' },
-        { id: 'municipality', title: 'Municipio' },
         { id: 'fecha', title: 'Fecha' },
         { id: 'timeinicial', title: 'Hora inicio' },
         { id: 'time', title: 'Tiempo de carga' },
-        { id: 'potencia', title: 'Potencia de carga (kW)' },
-        { id: 'card', title: 'Tarjeta' }
+        { id: 'energia', title: 'Consumo (Wh)' },
+        { id: 'card', title: 'Tarjeta' },
+        { id: 'last_connection', title: 'Ultima conexión' },
+        { id: 'address', title: 'Dirección' },
+        { id: 'municipality', title: 'Municipio' }
+        
       ],
       fieldDelimiter: ';',
       alwaysQuote: true,
@@ -708,17 +705,15 @@ export class ChargeService {
     const csvStringifier = createObjectCsvStringifier({
       header: [
         { id: 'nombre', title: 'Name' },
-        { id: 'total_charge', title: 'Total load (kWh)' },
-        { id: 'last_connection', title: 'Last connection' },
-        { id: 'maximum_power', title: 'Maximum Power (kW)' },
         { id: 'serial_number', title: 'Box ID' },
-        { id: 'address', title: 'Address' },
-        { id: 'municipality', title: 'Municipality' },
         { id: 'fecha', title: 'Date' },
         { id: 'timeinicial', title: 'Start time' },
         { id: 'time', title: 'Loading time' },
-        { id: 'potencia', title: 'Charging power (kW)' },
-        { id: 'card', title: 'Card' }
+        { id: 'energia', title: 'Consumption (Wh)' },
+        { id: 'card', title: 'Card' },
+        { id: 'last_connection', title: 'Last connection' },
+        { id: 'address', title: 'Address' },
+        { id: 'municipality', title: 'Municipality' }
       ],
       fieldDelimiter: ';',
       alwaysQuote: true,

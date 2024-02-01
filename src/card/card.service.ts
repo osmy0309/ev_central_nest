@@ -274,22 +274,18 @@ export class CardService {
     for (const key in listCard) {
       record.push({
         no_serie: listCard[key].no_serie,
-        credit: listCard[key].credit,
         userfirstName: listCard[key].user ? listCard[key].user.firstName : '-',
         userlastName: listCard[key].user ? listCard[key].user.lastName : '-',
         email: listCard[key].user ? listCard[key].user.email : '-',
-        dni: listCard[key].user ? listCard[key].user.dni : '-',
       });
     }
 
     const csvStringifier = createObjectCsvStringifier({
       header: [
         { id: 'no_serie', title: 'Número de serie' },
-        { id: 'credit', title: 'Crédito' },
         { id: 'userfirstName', title: 'Nombre Propietario' },
         { id: 'userlastName', title: 'Apellidos Propietario' },
-        { id: 'email', title: 'Correo Electrónico' },
-        { id: 'dni', title: 'DNI' },
+        { id: 'email', title: 'Correo Electrónico' }
       ],
       fieldDelimiter: ';',
     });
@@ -309,22 +305,18 @@ export class CardService {
     for (const key in listCard) {
       record.push({
         no_serie: listCard[key].no_serie,
-        credit: listCard[key].credit,
         userfirstName: listCard[key].user ? listCard[key].user.firstName : '-',
         userlastName: listCard[key].user ? listCard[key].user.lastName : '-',
-        email: listCard[key].user ? listCard[key].user.email : '-',
-        dni: listCard[key].user ? listCard[key].user.dni : '-',
+        email: listCard[key].user ? listCard[key].user.email : '-'
       });
     }
 
     const csvStringifier = createObjectCsvStringifier({
       header: [
-        { id: 'no_serie', title: 'Box ID' },
-        { id: 'credit', title: 'Credit' },
+        { id: 'no_serie', title: 'Serial Number' },
         { id: 'userfirstName', title: 'Owner Name' },
         { id: 'userlastName', title: 'Owner Surnames' },
         { id: 'email', title: 'Email' },
-        { id: 'dni', title: 'DNI' },
       ],
       fieldDelimiter: ';',
     });

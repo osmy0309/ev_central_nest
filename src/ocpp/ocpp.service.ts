@@ -441,6 +441,7 @@ export class OcppService {
           `Server got StopTransaction from ${client.identity}:`,
           params,
         );
+        console.log('>>>> STOP TRANSACTION <<<<');
         console.log(params);
         if (startTransactionStatus[clientconection] == false) {
           return {
@@ -462,6 +463,10 @@ export class OcppService {
           transaction.id,
         );
 
+        // [2,"2a1d0c75-d210-45a4-b40d-6d913fd78090",
+        // "StopTransaction",{"transactionId":2,"timestamp":"2024-01-31T05:40:31.829Z","meterStop":140}]
+        console.log(lineZone);
+        console.log(lineZone[0]);
         (lineZone[0].energy = params.meterStop),
           (lineZone[0].finish = dateFinish),
           await this.timeZoneService.modifyTimeZone(
