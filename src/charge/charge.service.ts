@@ -165,8 +165,6 @@ export class ChargeService {
         continue;
       }
 
-      console.log('TRANSACTION', change);
-
       updatedChange = updatedChange.concat(change);
     }
 

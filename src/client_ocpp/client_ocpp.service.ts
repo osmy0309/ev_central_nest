@@ -3,12 +3,14 @@ import { HttpException } from '@nestjs/common/exceptions';
 import { ChargeService } from 'src/charge/charge.service';
 const { RPCClient } = require('ocpp-rpc');
 import { connectDto } from './dto/client_ocpp.dto';
+import { OcppService } from 'src/ocpp/ocpp.service';
+
 @Injectable()
 export class ClientOcppService {
   private cli: any;
   private autTransaction: boolean = false;
 
-  constructor(private chargeService: ChargeService) {}
+  constructor(private chargeService: ChargeService, private ocppService: OcppService) {}
   async connect(newConnection: connectDto): Promise<any> {
     this.cli = new RPCClient({
       endpoint: 'wss://evr-back-int.simon-cloud.com/ocpp', // the OCPP endpoint URL
@@ -16,11 +18,11 @@ export class ClientOcppService {
       protocols: ['ocpp1.6'], // client understands ocpp1.6 subprotocol
       strictMode: false, // enable strict validation of requests & responses
     });
-
     // connect to the OCPP server
     await this.cli.connect({
       additionalParam: 'valor adicional',
     });
+
     if (this.cli) return { connect: 'on' };
   }
   //Service Call Heartbeat
@@ -142,15 +144,18 @@ export class ClientOcppService {
       newConnection.identity,
     );
     await this.chargeService.updateStateChargeGeneral(charge.id, 4);
-    console.log(newConnection);
-    await this.connect(newConnection);
-    if (this.cli) {
+
+    const client = this.ocppService.allClients.get(newConnection.identity);
+    if (!client) {
+        throw Error(" ----> Client not found");
+    }else{
       const payload = {
         connectorId: 0,
         type: 'Inoperative',
       };
       try {
-        await this.cli.call('ChangeAvailability', payload);
+        const response = await client.call('ChangeAvailability', payload);
+        console.log(response);
         return { success: true };
       } catch (error) {
         return error;
@@ -163,14 +168,17 @@ export class ClientOcppService {
       newConnection.identity,
     );
     await this.chargeService.updateStateChargeGeneral(charge.id, 3);
-    await this.connect(newConnection);
-    if (this.cli) {
+
+    const client = this.ocppService.allClients.get(newConnection.identity);
+    if (!client) {
+        throw Error(" ----> Client not found");
+    }else{
       const payload = {
         connectorId: 0,
         type: 'Operative',
       };
       try {
-        const response = await this.cli.call('ChangeAvailability', payload);
+        const response = await client.call('ChangeAvailability', payload);
         console.log('RESPONSE', response);
         return { success: true };
       } catch (error) {

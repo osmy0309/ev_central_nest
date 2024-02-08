@@ -12,14 +12,20 @@ import {
   updateTTimeZoneDTO,
 } from 'src/time_zone/dto/time_zone.dto';
 import { async } from 'rxjs';
+
 @Injectable()
 export class OcppService {
+  private instanceId: string
+
   constructor(
     private readonly chargeService: ChargeService,
     private readonly cardService: CardService,
     private readonly timeZoneService: TimeZoneService,
     private readonly transactionService: TransactionService,
-  ) {}
+  ) {
+  }
+
+  allClients = new Map();
 
   public async startServer() {
     console.log('Create Server OCPP...');
@@ -71,7 +77,7 @@ export class OcppService {
         console.log(`Llamada realizada: ${command.action}`);
       });
 
-      console.log(`${client.session.sessionId} connected!`);
+      this.allClients.set(client.identity, client); // store client reference
 
       client.on('disconnect', async () => {
         const chargedisconnect = await this.chargeService.getChargeBySerial(
@@ -441,8 +447,6 @@ export class OcppService {
           `Server got StopTransaction from ${client.identity}:`,
           params,
         );
-        console.log('>>>> STOP TRANSACTION <<<<');
-        console.log(params);
         if (startTransactionStatus[clientconection] == false) {
           return {
             transactionId: params.transactionId,

@@ -1,4 +1,25 @@
 # **Changelog**
+
+### v1.0.50
+
+##### Summary
+
+* CORREGIDA LA FUNCIÓN DE DESHABILITAR
+* Corregido numero de version en la vista web
+* Eliminados campos total\_charge y maximum\_power
+* Añadido campo "Consumption (Wh)" en la vista de sesiones de carga
+* Cambiado BoxId por Nombre en el listado de cargadores
+
+##### Jira Issues solved:
+
+* [https://simon-it.atlassian.net/browse/PDP-5560](https://simon-it.atlassian.net/browse/PDP-5560)
+* [https://simon-it.atlassian.net/browse/PDP-5785 \*\*](https://simon-it.atlassian.net/browse/PDP-5785)
+* [https://simon-it.atlassian.net/browse/PDP-5786](https://simon-it.atlassian.net/browse/PDP-5786)
+
+##### Known Issues
+
+* En un cargador con dos bocas, se inician dos sesiones de carga independientes. Al terminar una sesión aparece en el frontal web que han terminado las dos. El backend funciona correctamente y mantiene una sesion (la correcta) abierta y sigue almacenando correctamente los datos.
+
 <br>
 ### v1.0.48
 
