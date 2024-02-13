@@ -24,7 +24,7 @@ export class RolesGuard implements CanActivate {
       return bool;
     };
 
-    console.log('1', hasRole(), '2', user.roles);
+    //console.log('1', hasRole(), '2', user.roles);
     if (!user || !user.roles || !hasRole())
       throw new HttpException('ROL_NOT_AUTHORIZED', 400);
 

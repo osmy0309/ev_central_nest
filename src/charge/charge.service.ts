@@ -540,7 +540,7 @@ export class ChargeService {
         },
       });
       if (!searchCardCharge) return {} as Card_Charge;
-      console.log(searchCardCharge.id);
+      //console.log(searchCardCharge.id);
       const charge = await this.card_chargeRepository.delete({
         id: searchCardCharge.id,
       });
@@ -568,7 +568,7 @@ export class ChargeService {
         },
       });
       if (cardCharges.length == 0) return {};
-      console.log(cardCharges);
+      //console.log(cardCharges);
 
       cardCharges.forEach(async (item) => {
         await this.card_chargeRepository.delete({
@@ -608,7 +608,7 @@ export class ChargeService {
   
   async getRecords(user: any){
     const listCharge = await this.getChargeAllAdmin(user.company, user.roles);
-    console.log('HERE TRANS', listCharge[0].transaction[0]);
+    //console.log('HERE TRANS', listCharge[0].transaction[0]);
     let record = [];
     listCharge.forEach((item) => {
       if (item.transaction.length == 0) {
@@ -665,7 +665,7 @@ export class ChargeService {
         });
       }
     });
-    console.log('RECORDS ', record);
+    //console.log('RECORDS ', record);
     return record;
   }
 

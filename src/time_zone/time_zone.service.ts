@@ -72,7 +72,7 @@ export class TimeZoneService {
     idTransaction: number,
     newTransaction: updateTTimeZoneDTO,
   ): Promise<Timezone> {
-    console.log(idTransaction);
+    //console.log(idTransaction);
     const results = await this.timeRepository
       .createQueryBuilder('timezone')
       .leftJoinAndSelect('timezone.transaction', 'transaction')

@@ -108,7 +108,7 @@ export class ClientOcppService {
   }
 
   async stopTransaction(newConnection) {
-    console.log('here');
+    //console.log('here');
     if (this.cli) {
       const bootResponse = await this.cli.call('BootNotification', {
         chargePointVendor: 'ocpp-rpc',

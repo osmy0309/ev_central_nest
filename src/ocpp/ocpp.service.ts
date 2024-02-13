@@ -77,6 +77,7 @@ export class OcppService {
         console.log(`Llamada realizada: ${command.action}`);
       });
 
+      console.log(`${client.session.sessionId} connected!`);
       this.allClients.set(client.identity, client); // store client reference
 
       client.on('disconnect', async () => {
@@ -469,8 +470,8 @@ export class OcppService {
 
         // [2,"2a1d0c75-d210-45a4-b40d-6d913fd78090",
         // "StopTransaction",{"transactionId":2,"timestamp":"2024-01-31T05:40:31.829Z","meterStop":140}]
-        console.log(lineZone);
-        console.log(lineZone[0]);
+        //console.log(lineZone);
+        //console.log(lineZone[0]);
         (lineZone[0].energy = params.meterStop),
           (lineZone[0].finish = dateFinish),
           await this.timeZoneService.modifyTimeZone(
@@ -521,6 +522,7 @@ export class OcppService {
         if (params.status == 'Available') {
           console.log('Available', params);
         }
+        return {};
       });
 
       client.handle('DataTransfer', async (objet) => {
