@@ -168,13 +168,13 @@ export class OcppService {
 
           return {
             status: 'Accepted',
-            interval: 6000,
+            interval: 600,
             currentTime: new Date().toISOString(),
           };
         } else {
           return {
             status: 'Rejected',
-            interval: 6000,
+            interval: 600,
             currentTime: '',
           };
         }
@@ -320,12 +320,10 @@ export class OcppService {
             transaction.id,
             lineZone[0],
           );
-        // Procesar los valores del medidor recibidos y realizar las acciones necesarias
-        // ...
 
-        // Responder con una respuesta apropiada
+        // Teoricamente un "meter values" no tiene campos de respuesta
         return {
-          status: 'Accepted',
+          //status: 'Accepted',
         };
       });
 
