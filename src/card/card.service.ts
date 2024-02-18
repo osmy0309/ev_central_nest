@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, ConflictException } from '@nestjs/common';
 import { Repository, DataSource, In } from 'typeorm';
 import { Card } from './entities/card.entity';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
@@ -52,6 +52,7 @@ export class CardService {
   }
 
   async asingCard(asing: asingCardDto): Promise<Card> {
+    //console.log("-----> asingCard <----- ", asing)
     if (asing.id_user == 0) {
       const cardrelation = await this.dataSource
         .createQueryBuilder()
@@ -91,28 +92,42 @@ export class CardService {
       return {} as Card;
     } else {
       userFind[0].password = '';
-      const cardFind = await this.cardRepository.findOne({
-        where: {
-          id: asing.id_card,
-        },
-      });
-      if (!cardFind) {
-        return {} as Card;
+      const client_response = await this.clientService.getClientById(userFind[0].id);
+      const cardrelation = await this.dataSource
+        .createQueryBuilder()
+        .select('card')
+        .from(Card, 'card')
+        .innerJoinAndSelect('card.user', 'user')
+        .where('card.user.id = :id', { id: userFind[0].id })
+        .getMany();
+      //console.log("cardrelation: ", cardrelation);
+      //console.log("cardrelation.user: ", cardrelation.user)
+      if(cardrelation && cardrelation.length > 0){
+        throw new ConflictException('The user already has a card assigned.');
+      }else{
+        const cardFind = await this.cardRepository.findOne({
+          where: {
+            id: asing.id_card,
+          },
+        });
+        if (!cardFind) {
+          return {} as Card;
+        }
+  
+        const companyFind = await this.companyRepository.find({
+          where: { id: userFind[0].client.id },
+        });
+        if (relation[0].user) return {} as Card;
+        cardFind.user = userFind[0];
+        cardFind.company = companyFind[0];
+  
+        return await this.patchCards(
+          cardFind,
+          asing.id_card,
+          asing.id_user,
+          true,
+        );
       }
-
-      const companyFind = await this.companyRepository.find({
-        where: { id: userFind[0].client.id },
-      });
-      if (relation[0].user) return {} as Card;
-      cardFind.user = userFind[0];
-      cardFind.company = companyFind[0];
-
-      return await this.patchCards(
-        cardFind,
-        asing.id_card,
-        asing.id_user,
-        true,
-      );
     }
   }
 
