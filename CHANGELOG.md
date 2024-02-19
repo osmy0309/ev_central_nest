@@ -1,5 +1,24 @@
 # **Changelog**
 
+### v1.0.52
+
+##### Summary
+
+* Se ha eliminado un null de la respuesta del Authorize
+* Se han puesto fechas de caducidad de las tarjetas a muy al futuro
+* Se han corregido los formatos de las fechas para eliminar los milisegundos
+* Se ha eliminado el timestamp de "Start Transaction"
+* **Si se intenta asignar una tarjeta a un usuario que ya tiene otra devuelve un error y no permite hacerlo**
+
+##### Jira Issues solved:
+
+*
+
+##### Known Issues
+
+* En un cargador con dos bocas, se inician dos sesiones de carga independientes. Al terminar una sesión aparece en el frontal web que han terminado las dos. El backend funciona correctamente y mantiene una sesion (la correcta) abierta y sigue almacenando correctamente los datos.
+
+<br>
 ### v1.0.50
 
 ##### Summary

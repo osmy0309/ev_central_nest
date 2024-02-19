@@ -220,7 +220,7 @@ export class OcppService {
             return {
               idTagInfo: {
                 status: 'Accepted',
-                expiryDate: '2023-07-31T12:00:00.000Z',
+                expiryDate: '2032-03-02T12:00:00Z',
                 parentIdTag: '',
               },
             };
@@ -237,7 +237,7 @@ export class OcppService {
         return {
           idTagInfo: {
             status: 'Rejected',
-            expiryDate: null,
+            expiryDate: '',
             parentIdTag: '',
           },
         };
@@ -280,7 +280,7 @@ export class OcppService {
             transactionId: idTransaction,
             idTagInfo: {
               status: 'Accepted',
-              expiryDate: '2023-07-31T12:00:00.000Z',
+              expiryDate: '2032-03-02T12:00:00Z',
               parentIdTag: '',
             },
           };
@@ -393,10 +393,10 @@ export class OcppService {
             startTransactionStatus[clientconection] = true;
             return {
               transactionId: transactionSussess.id,
-              timeStampStart: objet.params.timestamp,
+              //timeStampStart: objet.params.timestamp.replace(/\.\d{3}Z$/, 'Z'),
               idTagInfo: {
                 status: 'Accepted',
-                expiryDate: '2023-07-31T12:00:00.000Z',
+                expiryDate: '2032-03-02T12:00:00Z',
                 parentIdTag: '',
               },
             };
@@ -451,7 +451,7 @@ export class OcppService {
             transactionId: params.transactionId,
             idTagInfo: {
               status: 'Accepted',
-              expiryDate: '2023-07-31T12:00:00.000Z',
+              expiryDate: '2032-03-02T12:00:00Z',
             },
           };
         }
@@ -483,7 +483,7 @@ export class OcppService {
           transactionId: params.transactionId,
           idTagInfo: {
             status: 'Accepted',
-            expiryDate: '2023-07-31T12:00:00.000Z',
+            expiryDate: '2032-03-02T12:00:00Z',
           },
         };
       });
