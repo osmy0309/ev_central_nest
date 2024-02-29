@@ -168,13 +168,13 @@ export class OcppService {
 
           return {
             status: 'Accepted',
-            interval: 600,
+            interval: 300,
             currentTime: new Date().toISOString(),
           };
         } else {
           return {
             status: 'Rejected',
-            interval: 600,
+            interval: 300,
             currentTime: '',
           };
         }
