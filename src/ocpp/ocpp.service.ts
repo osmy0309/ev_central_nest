@@ -26,7 +26,8 @@ export class OcppService {
     const connectedClients = {};
     const server = new RPCServer({
       protocols: ['ocpp1.6'], // server accepts ocpp1.6 subprotocol
-      strictMode: false, // enable strict validation of requests & responses
+      strictMode: false,
+      pingIntervalMs: 5 * 60 * 1000, // callTimeoutMs: 3000000, // enable strict validation of requests & responses
     });
 
     server.auth(async (accept, reject, handshake) => {

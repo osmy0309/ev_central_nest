@@ -7,7 +7,7 @@ export class userLoginDto {
   @IsString()
   jti: string;
   @IsArray()
-  roles: [];
+  roles: Array<string>;
   @IsNumber()
   company: number;
   @IsNumber()

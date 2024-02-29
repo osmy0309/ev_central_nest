@@ -79,13 +79,13 @@ export class CardService {
       .where('user.id = :id', { id: asing.id_user })
       .getMany();
 
-    const relation = await this.dataSource
+    /*  const relation = await this.dataSource
       .createQueryBuilder()
       .select('card')
       .from(Card, 'card')
       .leftJoinAndSelect('card.user', 'user')
       .where('card.id = :id', { id: asing.id_card })
-      .getMany();
+      .getMany();*/
 
     if (!userFind) {
       return {} as Card;
@@ -103,7 +103,7 @@ export class CardService {
       const companyFind = await this.companyRepository.find({
         where: { id: userFind[0].client.id },
       });
-      if (relation[0].user) return {} as Card;
+      // if (relation[0].user) return {} as Card;
       cardFind.user = userFind[0];
       cardFind.company = companyFind[0];
 
@@ -135,7 +135,7 @@ export class CardService {
       user.roles,
     );
 
-    //if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
+    if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
     myCompany.push({ id: user.company, name: 'My Company' } as Company);
     addCompanies(myCompany);
     for (const company of arrayallcompany) {
@@ -179,8 +179,11 @@ export class CardService {
       user.company,
       user.roles,
     );
+    const bool = user.roles.some((element) => ['ADMIN'].includes(element));
+    if (bool) {
+      if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
+    }
 
-    if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
     myCompany.push({ id: user.company, name: 'My Company' } as Company);
     addCompanies(myCompany);
     for (const company of arrayallcompany) {

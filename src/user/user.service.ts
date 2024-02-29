@@ -53,10 +53,12 @@ export class UserService {
     }
 
     const userFind = await this.userRepository.findOne({
-      //BUSCAR PARA QUE NO EXISTAN USUARIOS REPETIDOS
-      where: {
-        username: user.username,
-      },
+      where: [
+        { username: user.username },
+        { email: user.email },
+        { dni: user.dni },
+        // Aquí puedes agregar cualquier otra condición necesaria
+      ],
     });
     if (userFind) {
       //throw new HttpException('USER_EXIST', HttpStatus.CONFLICT);
@@ -343,6 +345,7 @@ export class UserService {
       userParams.company,
       userParams.roles,
     );
+    if (user.password) user.password = await hash(user.password, 10);
     function addCompanies(companies) {
       for (const company of companies) {
         arrayallcompany.push({ ...company }); // Add the company as a charger
@@ -540,6 +543,7 @@ export class UserService {
       if (!(await this.companyIsMySon(id_company, usercompany.client.id)))
         return {} as User;
     }
+    if (user.password) user.password = await hash(user.password, 10);
 
     const response = await this.userRepository.update({ id }, user);
     if (response.affected === 0) {
