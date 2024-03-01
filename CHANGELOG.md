@@ -1,5 +1,60 @@
 # **Changelog**
+
+### v1.0.52
+
+##### Summary
+
+* Se ha eliminado un null de la respuesta del Authorize
+* Se han puesto fechas de caducidad de las tarjetas a muy al futuro
+* Se han corregido los formatos de las fechas para eliminar los milisegundos
+* Se ha eliminado el timestamp de "Start Transaction"
+* **Si se intenta asignar una tarjeta a un usuario que ya tiene otra devuelve un error y no permite hacerlo**
+
+##### Jira Issues solved:
+
+*
+
+##### Known Issues
+
+* En un cargador con dos bocas, se inician dos sesiones de carga independientes. Al terminar una sesión aparece en el frontal web que han terminado las dos. El backend funciona correctamente y mantiene una sesion (la correcta) abierta y sigue almacenando correctamente los datos.
+
 <br>
+### v1.0.50
+
+##### Summary
+
+* CORREGIDA LA FUNCIÓN DE DESHABILITAR
+* Corregido numero de version en la vista web
+* Eliminados campos total\_charge y maximum\_power
+* Añadido campo "Consumption (Wh)" en la vista de sesiones de carga
+* Cambiado BoxId por Nombre en el listado de cargadores
+
+##### Jira Issues solved:
+
+* [https://simon-it.atlassian.net/browse/PDP-5560](https://simon-it.atlassian.net/browse/PDP-5560)
+* [https://simon-it.atlassian.net/browse/PDP-5785 \*\*](https://simon-it.atlassian.net/browse/PDP-5785)
+* [https://simon-it.atlassian.net/browse/PDP-5786](https://simon-it.atlassian.net/browse/PDP-5786)
+
+##### Known Issues
+
+* En un cargador con dos bocas, se inician dos sesiones de carga independientes. Al terminar una sesión aparece en el frontal web que han terminado las dos. El backend funciona correctamente y mantiene una sesion (la correcta) abierta y sigue almacenando correctamente los datos.
+
+<br>
+### v1.0.48
+
+##### Summary
+
+* Fixed docker compose
+* Removed Credit and DNI from card export
+* Removed total charge, maximum power and renamed to "Consumption (Wh)" the fields in charge export
+* Removed Direction and DNI from user export
+
+##### Jira Issues solved:
+
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5560](https://simon-it.atlassian.net/browse/PDP-5572)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5786](https://simon-it.atlassian.net/browse/PDP-5571)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5550](https://simon-it.atlassian.net/browse/PDP-5570)</span>
+
 ### v1.0.44
 
 ##### Summary
@@ -17,25 +72,25 @@
 
 ##### Jira Issues solved:
 
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5572](https://simon-it.atlassian.net/browse/PDP-5572)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5571](https://simon-it.atlassian.net/browse/PDP-5571)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5570](https://simon-it.atlassian.net/browse/PDP-5570)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5569](https://simon-it.atlassian.net/browse/PDP-5569)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5568](https://simon-it.atlassian.net/browse/PDP-5568)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5550](https://simon-it.atlassian.net/browse/PDP-5550)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5549](https://simon-it.atlassian.net/browse/PDP-5549)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5476](https://simon-it.atlassian.net/browse/PDP-5476)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5561](https://simon-it.atlassian.net/browse/PDP-5561)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5564](https://simon-it.atlassian.net/browse/PDP-5564)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5562](https://simon-it.atlassian.net/browse/PDP-5562)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5556](https://simon-it.atlassian.net/browse/PDP-5556)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5535](https://simon-it.atlassian.net/browse/PDP-5535)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5531](https://simon-it.atlassian.net/browse/PDP-5531)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5524](https://simon-it.atlassian.net/browse/PDP-5524)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5523](https://simon-it.atlassian.net/browse/PDP-5523)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5477](https://simon-it.atlassian.net/browse/PDP-5477)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5473](https://simon-it.atlassian.net/browse/PDP-5473)</span>
-* <span class="colour" style="color: rgb(0, 0, 0);">[https://simon-it.atlassian.net/browse/PDP-5559](https://simon-it.atlassian.net/browse/PDP-5559)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5572](https://simon-it.atlassian.net/browse/PDP-5572)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5571](https://simon-it.atlassian.net/browse/PDP-5571)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5570](https://simon-it.atlassian.net/browse/PDP-5570)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5569](https://simon-it.atlassian.net/browse/PDP-5569)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5568](https://simon-it.atlassian.net/browse/PDP-5568)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5550](https://simon-it.atlassian.net/browse/PDP-5550)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5549](https://simon-it.atlassian.net/browse/PDP-5549)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5476](https://simon-it.atlassian.net/browse/PDP-5476)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5561](https://simon-it.atlassian.net/browse/PDP-5561)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5564](https://simon-it.atlassian.net/browse/PDP-5564)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5562](https://simon-it.atlassian.net/browse/PDP-5562)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5556](https://simon-it.atlassian.net/browse/PDP-5556)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5535](https://simon-it.atlassian.net/browse/PDP-5535)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5531](https://simon-it.atlassian.net/browse/PDP-5531)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5524](https://simon-it.atlassian.net/browse/PDP-5524)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5523](https://simon-it.atlassian.net/browse/PDP-5523)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5477](https://simon-it.atlassian.net/browse/PDP-5477)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5473](https://simon-it.atlassian.net/browse/PDP-5473)</span>
+* <span class="colour" style="color:rgb(0, 0, 0)">[https://simon-it.atlassian.net/browse/PDP-5559](https://simon-it.atlassian.net/browse/PDP-5559)</span>
 
 ### v1.0.32
 

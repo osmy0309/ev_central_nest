@@ -35,6 +35,9 @@ import { Card } from './entities/card.entity';
     ChargeService,
     TimeZoneService,
   ],
-  exports: [TypeOrmModule.forFeature([Card])],
+  exports: [
+    CardService,
+    TypeOrmModule.forFeature([Card])
+  ],
 })
 export class CardModule {}

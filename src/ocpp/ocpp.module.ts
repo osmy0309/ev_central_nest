@@ -1,5 +1,5 @@
 import { OcppService } from './ocpp.service';
-import { Module } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { ClientOcppService } from '../client_ocpp/client_ocpp.service';
 import { ChargeService } from 'src/charge/charge.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -16,6 +16,7 @@ import { CardService } from 'src/card/card.service';
 import { UserService } from 'src/user/user.service';
 import { TransactionService } from 'src/transaction/transaction.service';
 
+@Global()
 @Module({
   imports: [
     TypeOrmModule.forFeature([

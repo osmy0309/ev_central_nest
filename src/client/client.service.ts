@@ -44,12 +44,12 @@ export class ClientService {
     if (clientFind) {
       return {} as Company;
     }
-    console.log(id_client_search);
+    //console.log(id_client_search);
 
     do {
       const response = await this.getClientById(id_client_search);
-      console.log(id_company, 'idcompany');
-      console.log(response);
+      //console.log(id_company, 'idcompany');
+      //console.log(response);
       id_client_search = response.id_pather;
       if (response.id_pather == id_company) {
         flag = true;
@@ -261,7 +261,7 @@ export class ClientService {
     id_company: number,
     rol,
   ): Promise<{ success: boolean }> {
-    console.log('here');
+    //console.log('here');
     if (id != id_company) {
       const treeClient = await this.getMyClientsTree(id_company, rol);
       async function idExistsInTree(

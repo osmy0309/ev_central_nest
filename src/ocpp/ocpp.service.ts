@@ -12,14 +12,20 @@ import {
   updateTTimeZoneDTO,
 } from 'src/time_zone/dto/time_zone.dto';
 import { async } from 'rxjs';
+
 @Injectable()
 export class OcppService {
+  private instanceId: string
+
   constructor(
     private readonly chargeService: ChargeService,
     private readonly cardService: CardService,
     private readonly timeZoneService: TimeZoneService,
     private readonly transactionService: TransactionService,
-  ) {}
+  ) {
+  }
+
+  allClients = new Map();
 
   public async startServer() {
     console.log('Create Server OCPP...');
@@ -73,6 +79,7 @@ export class OcppService {
       });
 
       console.log(`${client.session.sessionId} connected!`);
+      this.allClients.set(client.identity, client); // store client reference
 
       client.on('disconnect', async () => {
         const chargedisconnect = await this.chargeService.getChargeBySerial(
@@ -162,13 +169,13 @@ export class OcppService {
 
           return {
             status: 'Accepted',
-            interval: 6000,
+            interval: 300,
             currentTime: new Date().toISOString(),
           };
         } else {
           return {
             status: 'Rejected',
-            interval: 6000,
+            interval: 300,
             currentTime: '',
           };
         }
@@ -214,7 +221,7 @@ export class OcppService {
             return {
               idTagInfo: {
                 status: 'Accepted',
-                expiryDate: '2023-07-31T12:00:00.000Z',
+                expiryDate: '2032-03-02T12:00:00Z',
                 parentIdTag: '',
               },
             };
@@ -231,7 +238,7 @@ export class OcppService {
         return {
           idTagInfo: {
             status: 'Rejected',
-            expiryDate: null,
+            expiryDate: '',
             parentIdTag: '',
           },
         };
@@ -274,7 +281,7 @@ export class OcppService {
             transactionId: idTransaction,
             idTagInfo: {
               status: 'Accepted',
-              expiryDate: '2023-07-31T12:00:00.000Z',
+              expiryDate: '2032-03-02T12:00:00Z',
               parentIdTag: '',
             },
           };
@@ -314,12 +321,10 @@ export class OcppService {
             transaction.id,
             lineZone[0],
           );
-        // Procesar los valores del medidor recibidos y realizar las acciones necesarias
-        // ...
 
-        // Responder con una respuesta apropiada
+        // Teoricamente un "meter values" no tiene campos de respuesta
         return {
-          status: 'Accepted',
+          //status: 'Accepted',
         };
       });
 
@@ -389,10 +394,10 @@ export class OcppService {
             startTransactionStatus[clientconection] = true;
             return {
               transactionId: transactionSussess.id,
-              timeStampStart: objet.params.timestamp,
+              //timeStampStart: objet.params.timestamp.replace(/\.\d{3}Z$/, 'Z'),
               idTagInfo: {
                 status: 'Accepted',
-                expiryDate: '2023-07-31T12:00:00.000Z',
+                expiryDate: '2032-03-02T12:00:00Z',
                 parentIdTag: '',
               },
             };
@@ -442,13 +447,12 @@ export class OcppService {
           `Server got StopTransaction from ${client.identity}:`,
           params,
         );
-        console.log(params);
         if (startTransactionStatus[clientconection] == false) {
           return {
             transactionId: params.transactionId,
             idTagInfo: {
               status: 'Accepted',
-              expiryDate: '2023-07-31T12:00:00.000Z',
+              expiryDate: '2032-03-02T12:00:00Z',
             },
           };
         }
@@ -463,6 +467,10 @@ export class OcppService {
           transaction.id,
         );
 
+        // [2,"2a1d0c75-d210-45a4-b40d-6d913fd78090",
+        // "StopTransaction",{"transactionId":2,"timestamp":"2024-01-31T05:40:31.829Z","meterStop":140}]
+        //console.log(lineZone);
+        //console.log(lineZone[0]);
         (lineZone[0].energy = params.meterStop),
           (lineZone[0].finish = dateFinish),
           await this.timeZoneService.modifyTimeZone(
@@ -476,7 +484,7 @@ export class OcppService {
           transactionId: params.transactionId,
           idTagInfo: {
             status: 'Accepted',
-            expiryDate: '2023-07-31T12:00:00.000Z',
+            expiryDate: '2032-03-02T12:00:00Z',
           },
         };
       });
@@ -513,6 +521,7 @@ export class OcppService {
         if (params.status == 'Available') {
           console.log('Available', params);
         }
+        return {};
       });
 
       client.handle('DataTransfer', async (objet) => {

@@ -579,9 +579,7 @@ export class UserService {
         firstName: item.firstName,
         lastName: item.lastName,
         username: item.username,
-        email: item.email,
-        direction: item.direction,
-        dni: item.dni,
+        email: item.email
       });
     });
 
@@ -590,9 +588,7 @@ export class UserService {
         { id: 'firstName', title: 'Nombre' },
         { id: 'lastName', title: 'Apellidos' },
         { id: 'username', title: 'Usuario' },
-        { id: 'email', title: 'Correo eléctronico' },
-        { id: 'direction', title: 'Dirección' },
-        { id: 'dni', title: 'dni' },
+        { id: 'email', title: 'Correo eléctronico' }
       ],
       fieldDelimiter: ';',
     });
@@ -615,9 +611,7 @@ export class UserService {
         firstName: item.firstName,
         lastName: item.lastName,
         username: item.username,
-        email: item.email,
-        direction: item.direction,
-        dni: item.dni,
+        email: item.email
       });
     });
 
@@ -626,9 +620,7 @@ export class UserService {
         { id: 'firstName', title: 'Name' },
         { id: 'lastName', title: 'Surnames' },
         { id: 'username', title: 'User' },
-        { id: 'email', title: 'Email' },
-        { id: 'direction', title: 'Address' },
-        { id: 'dni', title: 'DNI' },
+        { id: 'email', title: 'Email' }
       ],
       fieldDelimiter: ';',
     });

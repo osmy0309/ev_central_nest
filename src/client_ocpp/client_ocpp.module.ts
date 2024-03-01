@@ -11,12 +11,22 @@ import { Transaction } from 'src/transaction/entities/transaction.entity';
 import { User } from 'src/user/entities/user.entity';
 import { ClientOcppController } from './client_ocpp.controller';
 import { ClientOcppService } from './client_ocpp.service';
+import { CardModule } from 'src/card/card.module';
+import { TimeZoneModule } from 'src/time_zone/time_zone.module';
+import { TransactionModule } from 'src/transaction/transaction.module';
 
 @Module({
-  providers: [ClientOcppService, ChargeService, ClientService],
+  providers: [
+    ClientOcppService, 
+    ChargeService, 
+    ClientService, 
+  ],
   controllers: [ClientOcppController],
   exports: [ClientOcppService],
   imports: [
+    CardModule,
+    TimeZoneModule,
+    TransactionModule,
     TypeOrmModule.forFeature([
       Company,
       Transaction,

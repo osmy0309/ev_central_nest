@@ -75,7 +75,11 @@ image:
   repository: 219526371337.dkr.ecr.eu-west-1.amazonaws.com/evr_back
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
+<<<<<<< HEAD
   tag: 'v1.0.55'
+=======
+  tag: 'v1.0.53'
+>>>>>>> 016762d48185590828fff43e8195ba3cd850430f
   symfony_env: dev
 imagePullSecrets: []
 nameOverride: ''
@@ -183,10 +187,10 @@ ingressInternal:
 
 resources:
   limits:
-    cpu: 200m
+    #cpu: 200m
     memory: 256Mi
   requests:
-    cpu: 200m
+    #cpu: 200m
     memory: 256Mi
 
 autoscaling:

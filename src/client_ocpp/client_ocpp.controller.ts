@@ -7,7 +7,7 @@ import { connectDto } from './dto/client_ocpp.dto';
 export class ClientOcppController {
   constructor(private readonly clientOcppService: ClientOcppService) {}
   @Post('disableOCPPcharge')
-  async disble(@Body() newConnection: connectDto) {
+  async disable(@Body() newConnection: connectDto) {
     return await this.clientOcppService.disabledCharge(newConnection);
   }
   @Post('enableOCPPcharge')
