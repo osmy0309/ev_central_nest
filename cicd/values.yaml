@@ -75,7 +75,7 @@ image:
   repository: 219526371337.dkr.ecr.eu-west-1.amazonaws.com/evr_back
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: 'v1.0.47'
+  tag: 'v1.0.55'
   symfony_env: dev
 imagePullSecrets: []
 nameOverride: ''
