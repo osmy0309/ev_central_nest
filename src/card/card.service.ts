@@ -36,7 +36,7 @@ export class CardService {
       },
     });
     if (cardFind) {
-      return {} as Card;
+      throw new HttpException('CARD_EXIST', 403);
     }
 
     const companyToAsing = await this.companyRepository.findOne({

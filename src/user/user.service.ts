@@ -62,7 +62,11 @@ export class UserService {
     });
     if (userFind) {
       //throw new HttpException('USER_EXIST', HttpStatus.CONFLICT);
-      return {} as User;
+      if (userFind.email == user.email)
+        throw new HttpException('EMAIL_EXIST', 403);
+      if (userFind.username == user.username)
+        throw new HttpException('USER_NAME_EXIST', 403);
+      if (userFind.dni == user.dni) throw new HttpException('CIF_EXIST', 403);
     }
     if (!user.roles || user.roles.length == 0) {
       user.roles.push('AUTOR');
@@ -465,14 +469,20 @@ export class UserService {
     }
 
     const userFind = await this.userRepository.findOne({
-      //BUSCAR PARA QUE NO EXISTAN USUARIOS REPETIDOS
-      where: {
-        username: user.username,
-      },
+      where: [
+        { username: user.username },
+        { email: user.email },
+        { dni: user.dni },
+        // Aquí puedes agregar cualquier otra condición necesaria
+      ],
     });
     if (userFind) {
       //throw new HttpException('USER_EXIST', HttpStatus.CONFLICT);
-      return {} as User;
+      if (userFind.email == user.email)
+        throw new HttpException('EMAIL_EXIST', 403);
+      if (userFind.username == user.username)
+        throw new HttpException('USER_NAME_EXIST', 403);
+      if (userFind.dni == user.dni) throw new HttpException('CIF_EXIST', 403);
     }
     if (id_client != id_client_son) {
       if (!(await this.companyIsMySon(id_client, id_client_son)))
@@ -579,7 +589,7 @@ export class UserService {
         firstName: item.firstName,
         lastName: item.lastName,
         username: item.username,
-        email: item.email
+        email: item.email,
       });
     });
 
@@ -588,7 +598,7 @@ export class UserService {
         { id: 'firstName', title: 'Nombre' },
         { id: 'lastName', title: 'Apellidos' },
         { id: 'username', title: 'Usuario' },
-        { id: 'email', title: 'Correo eléctronico' }
+        { id: 'email', title: 'Correo eléctronico' },
       ],
       fieldDelimiter: ';',
     });
@@ -611,7 +621,7 @@ export class UserService {
         firstName: item.firstName,
         lastName: item.lastName,
         username: item.username,
-        email: item.email
+        email: item.email,
       });
     });
 
@@ -620,7 +630,7 @@ export class UserService {
         { id: 'firstName', title: 'Name' },
         { id: 'lastName', title: 'Surnames' },
         { id: 'username', title: 'User' },
-        { id: 'email', title: 'Email' }
+        { id: 'email', title: 'Email' },
       ],
       fieldDelimiter: ';',
     });
