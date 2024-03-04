@@ -16,13 +16,17 @@ export class ClientService {
 
   async create(client: createClientDto, id_company: number): Promise<Company> {
     const clientFind = await this.clientRepository.findOne({
-      //BUSCAR PARA QUE NO EXISTAN USUARIOS REPETIDOS
-      where: {
-        email: client.email,
-      },
+      where: [
+        { nif: client.nif },
+        { email: client.email },
+        // Aquí puedes agregar cualquier otra condición necesaria
+      ],
     });
     if (clientFind) {
-      return {} as Company;
+      if (clientFind.email == client.email)
+        throw new HttpException('EMAIL_EXIST', 403);
+      if (clientFind.nif == client.nif)
+        throw new HttpException('NIF_EXIST', 403);
     }
     client.id_pather = id_company;
     const newClient = this.clientRepository.create(client);
@@ -37,12 +41,17 @@ export class ClientService {
     let id_client_search = id_client_other;
     let flag = false;
     const clientFind = await this.clientRepository.findOne({
-      where: {
-        email: client.email,
-      },
+      where: [
+        { nif: client.nif },
+        { email: client.email },
+        // Aquí puedes agregar cualquier otra condición necesaria
+      ],
     });
     if (clientFind) {
-      return {} as Company;
+      if (clientFind.email == client.email)
+        throw new HttpException('EMAIL_EXIST', 403);
+      if (clientFind.nif == client.nif)
+        throw new HttpException('NIF_EXIST', 403);
     }
     //console.log(id_client_search);
 
@@ -220,6 +229,19 @@ export class ClientService {
     id_company: number,
     rol,
   ): Promise<Company> {
+    const clientFind = await this.clientRepository.findOne({
+      where: [
+        { nif: client.nif || '' },
+        { email: client.email || '' },
+        // Aquí puedes agregar cualquier otra condición necesaria
+      ],
+    });
+    if (clientFind) {
+      if (clientFind.email == client.email)
+        throw new HttpException('EMAIL_EXIST', 403);
+      if (clientFind.nif == client.nif)
+        throw new HttpException('NIF_EXIST', 403);
+    }
     if (id != id_company) {
       const treeClient = await this.getMyClientsTree(id_company, rol);
       async function idExistsInTree(

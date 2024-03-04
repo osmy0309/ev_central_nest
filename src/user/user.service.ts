@@ -345,6 +345,24 @@ export class UserService {
   ): Promise<any> {
     let myCompany = [];
     let arrayallcompany = [];
+
+    const userFind = await this.userRepository.findOne({
+      where: [
+        { username: user.username || '' },
+        { email: user.email || '' },
+        { dni: user.dni || '' },
+        // Aquí puedes agregar cualquier otra condición necesaria
+      ],
+    });
+
+    if (userFind) {
+      if (user.email && userFind.email === user.email)
+        throw new HttpException('EMAIL_EXIST', 403);
+      if (user.username && userFind.username === user.username)
+        throw new HttpException('USER_NAME_EXIST', 403);
+      if (user.dni && userFind.dni === user.dni)
+        throw new HttpException('CIF_EXIST', 403);
+    }
     const companies_son = await this.clientService.getMyClientsTree(
       userParams.company,
       userParams.roles,
@@ -540,6 +558,23 @@ export class UserService {
     user: userUpdateDto,
     id_company: number,
   ): Promise<any> {
+    const userFind = await this.userRepository.findOne({
+      where: [
+        { username: user.username || '' },
+        { email: user.email || '' },
+        { dni: user.dni || '' },
+        // Aquí puedes agregar cualquier otra condición necesaria
+      ],
+    });
+
+    if (userFind) {
+      if (user.email && userFind.email === user.email)
+        throw new HttpException('EMAIL_EXIST', 403);
+      if (user.username && userFind.username === user.username)
+        throw new HttpException('USER_NAME_EXIST', 403);
+      if (user.dni && userFind.dni === user.dni)
+        throw new HttpException('CIF_EXIST', 403);
+    }
     const usercompany = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.client', 'company')
