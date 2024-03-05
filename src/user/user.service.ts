@@ -10,6 +10,7 @@ import { ChargeService } from 'src/charge/charge.service';
 import { Response } from 'express';
 import { createObjectCsvWriter, createObjectCsvStringifier } from 'csv-writer';
 import * as fs from 'fs';
+import { Not, Brackets } from 'typeorm';
 
 @Injectable()
 export class UserService {
@@ -346,14 +347,19 @@ export class UserService {
     let myCompany = [];
     let arrayallcompany = [];
 
-    const userFind = await this.userRepository.findOne({
-      where: [
-        { username: user.username || '' },
-        { email: user.email || '' },
-        { dni: user.dni || '' },
-        // Aquí puedes agregar cualquier otra condición necesaria
-      ],
-    });
+    const userFind = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.client', 'company')
+      .select(['user', 'company.id'])
+      .andWhere('user.id != :id', { id: id })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('user.username = :username', { username: user.username })
+            .orWhere('user.email = :email', { email: user.email })
+            .orWhere('user.dni = :dni', { dni: user.dni });
+        }),
+      )
+      .getOne();
 
     if (userFind) {
       if (user.email && userFind.email === user.email)
@@ -558,14 +564,19 @@ export class UserService {
     user: userUpdateDto,
     id_company: number,
   ): Promise<any> {
-    const userFind = await this.userRepository.findOne({
-      where: [
-        { username: user.username || '' },
-        { email: user.email || '' },
-        { dni: user.dni || '' },
-        // Aquí puedes agregar cualquier otra condición necesaria
-      ],
-    });
+    const userFind = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.client', 'company')
+      .select(['user', 'company.id'])
+      .andWhere('user.id != :id', { id: id })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('user.username = :username', { username: user.username })
+            .orWhere('user.email = :email', { email: user.email })
+            .orWhere('user.dni = :dni', { dni: user.dni });
+        }),
+      )
+      .getOne();
 
     if (userFind) {
       if (user.email && userFind.email === user.email)

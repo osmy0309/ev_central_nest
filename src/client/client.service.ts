@@ -1,6 +1,6 @@
 import { Injectable, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, Brackets } from 'typeorm';
 import { createClientDto, updateClientDto } from './dto/client.dto';
 import { Company } from './entities/client.entity';
 import { Response } from 'express';
@@ -229,7 +229,21 @@ export class ClientService {
     id_company: number,
     rol,
   ): Promise<Company> {
-    const clientFind = await this.clientRepository.findOne({
+    const clientFind = await this.clientRepository
+      .createQueryBuilder('client')
+      .select(['client'])
+      .andWhere('user.id != :id', { id: id })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('client.email = :email', { email: client.email }).orWhere(
+            'user.nif = :nif',
+            { nif: client.nif },
+          );
+        }),
+      )
+      .getOne();
+
+    await this.clientRepository.findOne({
       where: [
         { nif: client.nif || '' },
         { email: client.email || '' },
