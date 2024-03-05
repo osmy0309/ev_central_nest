@@ -354,9 +354,10 @@ export class UserService {
       .andWhere('user.id != :id', { id: id })
       .andWhere(
         new Brackets((qb) => {
-          qb.where('user.username = :username', { username: user.username })
-            .orWhere('user.email = :email', { email: user.email })
-            .orWhere('user.dni = :dni', { dni: user.dni });
+          qb.where('user.username = :username', {
+            username: user.username,
+          }).orWhere('user.email = :email', { email: user.email });
+          // .orWhere('user.dni = :dni', { dni: user.dni });
         }),
       )
       .getOne();
@@ -366,8 +367,8 @@ export class UserService {
         throw new HttpException('EMAIL_EXIST', 403);
       if (user.username && userFind.username === user.username)
         throw new HttpException('USER_NAME_EXIST', 403);
-      if (user.dni && userFind.dni === user.dni)
-        throw new HttpException('CIF_EXIST', 403);
+      /*if (user.dni && userFind.dni === user.dni)
+        throw new HttpException('CIF_EXIST', 403);*/
     }
     const companies_son = await this.clientService.getMyClientsTree(
       userParams.company,
@@ -571,9 +572,10 @@ export class UserService {
       .andWhere('user.id != :id', { id: id })
       .andWhere(
         new Brackets((qb) => {
-          qb.where('user.username = :username', { username: user.username })
-            .orWhere('user.email = :email', { email: user.email })
-            .orWhere('user.dni = :dni', { dni: user.dni });
+          qb.where('user.username = :username', {
+            username: user.username,
+          }).orWhere('user.email = :email', { email: user.email });
+          // .orWhere('user.dni = :dni', { dni: user.dni });
         }),
       )
       .getOne();
@@ -583,8 +585,8 @@ export class UserService {
         throw new HttpException('EMAIL_EXIST', 403);
       if (user.username && userFind.username === user.username)
         throw new HttpException('USER_NAME_EXIST', 403);
-      if (user.dni && userFind.dni === user.dni)
-        throw new HttpException('CIF_EXIST', 403);
+      /*if (user.dni && userFind.dni === user.dni)
+        throw new HttpException('CIF_EXIST', 403);*/
     }
     const usercompany = await this.userRepository
       .createQueryBuilder('user')
