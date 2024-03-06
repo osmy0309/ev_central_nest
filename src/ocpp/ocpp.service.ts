@@ -15,15 +15,14 @@ import { async } from 'rxjs';
 
 @Injectable()
 export class OcppService {
-  private instanceId: string
+  private instanceId: string;
 
   constructor(
     private readonly chargeService: ChargeService,
     private readonly cardService: CardService,
     private readonly timeZoneService: TimeZoneService,
     private readonly transactionService: TransactionService,
-  ) {
-  }
+  ) {}
 
   allClients = new Map();
 
@@ -193,46 +192,48 @@ export class OcppService {
         const card = await this.cardService.getChargeBySerial(
           params.params.idTag,
         );
-        if (
-          card &&
-          chargeidentity[client.identity].id &&
-          chargeidentity[client.identity].state != 4
-        ) {
-          if (
-            chargeidentity[client.identity].client.id != card.company.id &&
-            card
-          ) {
-            flagChangeSon = false;
-            const sonCharge = await this.chargeService.companyIsMySon(
-              card.company.id,
-              chargeidentity[client.identity].client.id,
-            );
-            if (sonCharge) flagChangeSon = true;
-          }
-
-          // Verify the idTag and respond with an appropriate response
+        if (chargeidentity[client.identity].client && card && card.company) {
           if (
             card &&
-            card.user &&
             chargeidentity[client.identity].id &&
-            flagChangeSon
+            chargeidentity[client.identity].state != 4
           ) {
-            //   await this.chargeService.updateStateChargeGeneral(charge.id, 5);
-            return {
-              idTagInfo: {
-                status: 'Accepted',
-                expiryDate: '2032-03-02T12:00:00Z',
-                parentIdTag: '',
-              },
-            };
-          } else {
-            return {
-              idTagInfo: {
-                status: 'Rejected',
-                expiryDate: null,
-                parentIdTag: '',
-              },
-            };
+            if (
+              chargeidentity[client.identity].client.id != card.company.id &&
+              card
+            ) {
+              flagChangeSon = false;
+              const sonCharge = await this.chargeService.companyIsMySon(
+                card.company.id,
+                chargeidentity[client.identity].client.id,
+              );
+              if (sonCharge) flagChangeSon = true;
+            }
+
+            // Verify the idTag and respond with an appropriate response
+            if (
+              card &&
+              card.user &&
+              chargeidentity[client.identity].id &&
+              flagChangeSon
+            ) {
+              //   await this.chargeService.updateStateChargeGeneral(charge.id, 5);
+              return {
+                idTagInfo: {
+                  status: 'Accepted',
+                  expiryDate: '2032-03-02T12:00:00Z',
+                  parentIdTag: '',
+                },
+              };
+            } else {
+              return {
+                idTagInfo: {
+                  status: 'Rejected',
+                  expiryDate: null,
+                  parentIdTag: '',
+                },
+              };
+            }
           }
         }
         return {

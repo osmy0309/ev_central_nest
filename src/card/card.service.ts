@@ -32,7 +32,7 @@ export class CardService {
   async create(card: createCardDto, user: userLoginDto): Promise<Card> {
     const cardFind = await this.cardRepository.findOne({
       where: {
-        no_serie: card.no_serie,
+        no_serie: card.no_serie.trim(),
       },
     });
     if (cardFind) {
@@ -228,8 +228,6 @@ export class CardService {
     id: number,
     midifyUser: boolean,
   ): Promise<Card> {
-    console.log('USERFIND', card);
-
     const cardToUpdate = await this.dataSource
       .createQueryBuilder()
       .select('card')
@@ -239,6 +237,15 @@ export class CardService {
 
     if (!cardToUpdate) {
       return {} as Card;
+    }
+
+    const cardFind = await this.cardRepository.findOne({
+      where: {
+        no_serie: card.no_serie.trim(),
+      },
+    });
+    if (cardFind && cardFind.id != idcard) {
+      throw new HttpException('CARD_EXIST', 403);
     }
     if (midifyUser) {
       const user = await this.dataSource
