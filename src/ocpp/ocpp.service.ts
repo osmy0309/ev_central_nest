@@ -228,7 +228,7 @@ export class OcppService {
             } else {
               return {
                 idTagInfo: {
-                  status: 'Rejected',
+                  status: 'Invalid',
                   expiryDate: null,
                   parentIdTag: '',
                 },
@@ -238,7 +238,7 @@ export class OcppService {
         }
         return {
           idTagInfo: {
-            status: 'Rejected',
+            status: 'Invalid',
             expiryDate: '',
             parentIdTag: '',
           },
