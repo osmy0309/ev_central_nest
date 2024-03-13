@@ -21,7 +21,7 @@ export class Transaction {
   @Column()
   public cardId: number;
 
-  @Column()
+  @Column({ default: null })
   public userId: number;
 
   @Column({ default: 1 })

@@ -17,7 +17,7 @@ export class createTrasactionDto {
   })
   cardId: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   @ApiProperty({
     example: 2,
