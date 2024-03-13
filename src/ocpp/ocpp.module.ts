@@ -15,6 +15,7 @@ import { TimeZoneService } from 'src/time_zone/time_zone.service';
 import { CardService } from 'src/card/card.service';
 import { UserService } from 'src/user/user.service';
 import { TransactionService } from 'src/transaction/transaction.service';
+import { Conector } from 'src/charge/entities/conector.entity';
 
 @Global()
 @Module({
@@ -27,6 +28,7 @@ import { TransactionService } from 'src/transaction/transaction.service';
       Transaction,
       User,
       Timezone,
+      Conector,
     ]),
   ],
   providers: [

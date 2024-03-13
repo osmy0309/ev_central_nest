@@ -10,6 +10,7 @@ import {
   deleteCard_ChargerDto,
 } from './dto/card_charge.dto';
 import { Card } from 'src/card/entities/card.entity';
+import { Conector } from './entities/conector.entity';
 import { Company } from 'src/client/entities/client.entity';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
 import { ClientService } from 'src/client/client.service';
@@ -17,6 +18,8 @@ import { TimeZoneService } from 'src/time_zone/time_zone.service';
 import { Response } from 'express';
 import { createObjectCsvStringifier, createObjectCsvWriter } from 'csv-writer';
 import * as fs from 'fs';
+import { createConectorDto } from './dto/conector.dto';
+import { last } from 'rxjs';
 
 @Injectable()
 export class ChargeService {
@@ -28,6 +31,8 @@ export class ChargeService {
     @InjectRepository(Card)
     private cardRepository: Repository<Card>,
     @InjectRepository(Company) private clientRepository: Repository<Company>,
+    @InjectRepository(Conector)
+    private connectorRepository: Repository<Conector>,
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
     private clientService: ClientService,
@@ -56,10 +61,24 @@ export class ChargeService {
       throw new HttpException('CHARGE_EXIST', 403);
       //return {} as Charge;
     }
+
     charge.client = client;
     await this.clientRepository.save(client);
     const newCHARGE = this.chargeRepository.create(charge);
-    return await this.chargeRepository.save(newCHARGE);
+    const createCharge = await this.chargeRepository.save(newCHARGE);
+    for (let index = 0; index < charge.conectors; index++) {
+      const newConnectorData: createConectorDto = {
+        name: (index + 1).toString(),
+        last_connection: new Date(),
+        state: 3,
+        charge: createCharge,
+      };
+      const newConnector = await this.connectorRepository.create(
+        newConnectorData,
+      );
+      await this.connectorRepository.save(newConnector);
+    }
+    return createCharge;
   }
 
   async getChargeById(id: number, id_company: number): Promise<Charge> {
@@ -68,6 +87,8 @@ export class ChargeService {
       .leftJoinAndSelect('charge.client', 'company')
       .leftJoinAndSelect('charge.transaction', 'transaction')
       .leftJoinAndSelect('transaction.card', 'card')
+      .leftJoinAndSelect('transaction.user', 'usertransaction')
+      .leftJoinAndSelect('charge.conector', 'conector')
       .leftJoinAndSelect('card.user', 'user')
       .leftJoinAndSelect('transaction.timezones', 'timezone')
       .select([
@@ -80,8 +101,13 @@ export class ChargeService {
         'user.email',
         'user.firstName',
         'user.lastName',
-        'user.id',
+        'usertransaction.id',
+        'usertransaction.username',
+        'usertransaction.email',
+        'usertransaction.firstName',
+        'usertransaction.lastName',
         'timezone',
+        'conector',
       ])
       .where('charge.id = :id', { id })
       .getOne();
@@ -103,7 +129,8 @@ export class ChargeService {
     const change = await this.chargeRepository
       .createQueryBuilder('charge')
       .leftJoinAndSelect('charge.client', 'client')
-      .select(['charge', 'client'])
+      .leftJoinAndSelect('charge.conector', 'conector')
+      .select(['charge', 'client', 'conector'])
       .where('charge.serial_number = :id', { id })
       .getOne();
 
@@ -142,13 +169,16 @@ export class ChargeService {
         .createQueryBuilder('charge')
         .leftJoinAndSelect('charge.client', 'company')
         .leftJoinAndSelect('charge.transaction', 'transaction')
+        .leftJoinAndSelect('charge.conector', 'conector')
         .leftJoinAndSelect('transaction.card', 'card')
         .leftJoinAndSelect('card.user', 'user')
+        .leftJoinAndSelect('transaction.user', 'userTrans')
         .leftJoinAndSelect('transaction.timezones', 'timezone')
         .select([
           'charge',
           'company.id',
           'transaction',
+          'conector',
           'card',
           'user.id',
           'user.username',
@@ -156,6 +186,12 @@ export class ChargeService {
           'user.firstName',
           'user.lastName',
           'user.id',
+          'user.id',
+          'userTrans.username',
+          'userTrans.email',
+          'userTrans.firstName',
+          'userTrans.lastName',
+          'userTrans.id',
           'timezone',
         ])
         .where('company.id = :id_company', { id_company: itemcompa.id })
@@ -187,6 +223,34 @@ export class ChargeService {
     await this.chargeRepository.update({ id }, change);
 
     return change;
+  }
+
+  async updateStateConector(
+    id: number,
+    numberConnector: string,
+    state: number,
+  ): Promise<Conector> {
+    const change = await this.chargeRepository
+      .createQueryBuilder('charge')
+      .leftJoinAndSelect('charge.client', 'company')
+      .leftJoinAndSelect('charge.conector', 'conector')
+      .select(['charge', 'company.id', 'conector'])
+      .where('charge.id = :id', { id })
+      .getOne();
+    if (!change) {
+      //throw new HttpException('CHANGE_NOT_FOUND', 400);
+      return {} as Conector;
+    }
+    let conectors = change.conector;
+    let desiredConector = conectors.find(
+      (conector) => conector.name === numberConnector,
+    );
+    desiredConector.state = state;
+    const idconnector: number = desiredConector.id;
+
+    await this.connectorRepository.update(idconnector, desiredConector);
+
+    return desiredConector;
   }
 
   async patchCharge(
@@ -345,7 +409,21 @@ export class ChargeService {
     charge.client = client;
     await this.clientRepository.save(client);
     const newCHARGE = this.chargeRepository.create(charge);
-    return await this.chargeRepository.save(newCHARGE);
+
+    const responseCharge = await this.chargeRepository.save(newCHARGE);
+    for (let index = 0; index < charge.conectors; index++) {
+      const newConnectorData: createConectorDto = {
+        name: (index + 1).toString(),
+        last_connection: new Date(),
+        state: 3,
+        charge: responseCharge,
+      };
+      const newConnector = await this.connectorRepository.create(
+        newConnectorData,
+      );
+      await this.connectorRepository.save(newConnector);
+    }
+    return responseCharge;
   }
 
   async getChargeByIdSon(id_company: number, id_son: number): Promise<Charge> {
@@ -372,6 +450,7 @@ export class ChargeService {
         const transaction = await this.transactionRepository
           .createQueryBuilder('transaction')
           .leftJoinAndSelect('transaction.card', 'card')
+          .leftJoinAndSelect('transaction.user', 'usertransaction')
           .leftJoinAndSelect('card.user', 'user')
           .leftJoinAndSelect('transaction.charge', 'charge')
           .select([
@@ -384,6 +463,11 @@ export class ChargeService {
             'user.lastName',
             'user.dni',
             'user.email',
+            'usertransaction.id',
+            'usertransaction.firstName',
+            'usertransaction.lastName',
+            'usertransaction.dni',
+            'usertransaction.email',
           ])
           .where('charge.id = :id', { id: item.id })
           .andWhere('transaction.estado NOT IN (:...estados)', {
@@ -582,12 +666,10 @@ export class ChargeService {
 
   // METHODS TO GENERATE THE CSV
 
-  getDifferenceInMinutes = ( finishDate: Date, startDate: Date ) => {
+  getDifferenceInMinutes = (finishDate: Date, startDate: Date) => {
     // Convert the difference to days, hours, minutes, and seconds
     const differenceDates = finishDate.getTime() - startDate.getTime();
-    const differenceDays = Math.floor(
-      differenceDates / (1000 * 60 * 60 * 24),
-    );
+    const differenceDays = Math.floor(differenceDates / (1000 * 60 * 60 * 24));
     const differenceHours = Math.floor(
       (differenceDates % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
     );
@@ -604,9 +686,9 @@ export class ChargeService {
       differenceMinutes,
       differenceSeconds,
     };
-  }
-  
-  async getRecords(user: any){
+  };
+
+  async getRecords(user: any) {
     const listCharge = await this.getChargeAllAdmin(user.company, user.roles);
     //console.log('HERE TRANS', listCharge[0].transaction[0]);
     let record = [];
@@ -626,7 +708,7 @@ export class ChargeService {
           timeinicial: '-',
           time: '-',
           potencia: '-',
-          card: '-'
+          card: '-',
         });
       } else {
         item.transaction.forEach((itemTransaction) => {
@@ -660,7 +742,7 @@ export class ChargeService {
               item.last_connection.getMonth() + 1
             }/${item.last_connection.getFullYear()}`,
             address: item.address,
-            municipality: item.municipality
+            municipality: item.municipality,
           });
         });
       }
@@ -682,8 +764,7 @@ export class ChargeService {
         { id: 'card', title: 'Tarjeta' },
         { id: 'last_connection', title: 'Ultima conexión' },
         { id: 'address', title: 'Dirección' },
-        { id: 'municipality', title: 'Municipio' }
-        
+        { id: 'municipality', title: 'Municipio' },
       ],
       fieldDelimiter: ';',
       alwaysQuote: true,
@@ -711,7 +792,7 @@ export class ChargeService {
         { id: 'card', title: 'Card' },
         { id: 'last_connection', title: 'Last connection' },
         { id: 'address', title: 'Address' },
-        { id: 'municipality', title: 'Municipality' }
+        { id: 'municipality', title: 'Municipality' },
       ],
       fieldDelimiter: ';',
       alwaysQuote: true,

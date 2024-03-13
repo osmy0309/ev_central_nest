@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChargeService } from 'src/charge/charge.service';
 import { Card_Charge } from 'src/charge/entities/card_charge.entity';
 import { Charge } from 'src/charge/entities/charge.entity';
+import { Conector } from 'src/charge/entities/conector.entity';
 import { ClientService } from 'src/client/client.service';
 import { Company } from 'src/client/entities/client.entity';
 import { Timezone } from 'src/time_zone/entities/time_zone.entity';
@@ -25,6 +26,7 @@ import { Card } from './entities/card.entity';
       Charge,
       Card_Charge,
       Timezone,
+      Conector,
     ]),
   ],
   controllers: [CardController],
@@ -35,9 +37,6 @@ import { Card } from './entities/card.entity';
     ChargeService,
     TimeZoneService,
   ],
-  exports: [
-    CardService,
-    TypeOrmModule.forFeature([Card])
-  ],
+  exports: [CardService, TypeOrmModule.forFeature([Card])],
 })
 export class CardModule {}

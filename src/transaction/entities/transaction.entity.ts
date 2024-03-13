@@ -1,5 +1,6 @@
 import { Card } from 'src/card/entities/card.entity';
 import { Timezone } from 'src/time_zone/entities/time_zone.entity';
+import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
   Column,
@@ -20,6 +21,9 @@ export class Transaction {
   @Column()
   public cardId: number;
 
+  @Column()
+  public userId: number;
+
   @Column({ default: 1 })
   public estado: number;
 
@@ -34,6 +38,12 @@ export class Transaction {
     nullable: false,
   })
   public card: Card;
+
+  @ManyToOne(() => User, (user) => user.transaction, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
+  public user: User;
 
   @OneToMany(() => Timezone, (timezone) => timezone.transaction, {
     cascade: true,

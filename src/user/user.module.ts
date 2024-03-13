@@ -13,6 +13,7 @@ import { Card_Charge } from 'src/charge/entities/card_charge.entity';
 import { ChargeService } from 'src/charge/charge.service';
 import { Timezone } from 'src/time_zone/entities/time_zone.entity';
 import { TimeZoneService } from 'src/time_zone/time_zone.service';
+import { Conector } from 'src/charge/entities/conector.entity';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TimeZoneService } from 'src/time_zone/time_zone.service';
       Card_Charge,
       User,
       Timezone,
+      Conector,
     ]),
   ],
   controllers: [UserController],

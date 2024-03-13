@@ -11,6 +11,7 @@ import { ChargeController } from './charge.controller';
 import { ChargeService } from './charge.service';
 import { Card_Charge } from './entities/card_charge.entity';
 import { Charge } from './entities/charge.entity';
+import { Conector } from './entities/conector.entity';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { Charge } from './entities/charge.entity';
       Transaction,
       User,
       Timezone,
+      Conector,
     ]),
   ],
   controllers: [ChargeController],

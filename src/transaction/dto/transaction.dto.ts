@@ -4,7 +4,7 @@ export class createTrasactionDto {
   @IsNotEmpty()
   @IsNumber()
   @ApiProperty({
-    example: 1,
+    example: 8,
     description: 'El usuario que va autenticarse',
   })
   chargeId: number;
@@ -18,6 +18,14 @@ export class createTrasactionDto {
   cardId: number;
 
   @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty({
+    example: 2,
+    description: 'El usuario que va autenticarse',
+  })
+  userId: number;
+
+  @IsOptional()
   @IsNumber()
   estado?: number;
 }

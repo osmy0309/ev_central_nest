@@ -1,4 +1,5 @@
 import { Card } from 'src/card/entities/card.entity';
+import { Conector } from './conector.entity';
 import { Company } from 'src/client/entities/client.entity';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
 import {
@@ -63,4 +64,9 @@ export class Charge {
     nullable: false,
   })
   client: Company;
+
+  @OneToMany(() => Conector, (conector) => conector.charge, {
+    cascade: true,
+  })
+  public conector: Conector[];
 }
