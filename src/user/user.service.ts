@@ -11,17 +11,21 @@ import { Response } from 'express';
 import { createObjectCsvWriter, createObjectCsvStringifier } from 'csv-writer';
 import * as fs from 'fs';
 import { Not, Brackets } from 'typeorm';
+import { Card } from 'src/card/entities/card.entity';
+import { CardService } from 'src/card/card.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Company) private clientRepository: Repository<Company>,
+    @InjectRepository(Card) private cardRepository: Repository<Card>,
     // @InjectRepository(Charge) private chargeRepository: Repository<Charge>,
     /*@InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,*/
 
     private chargeService: ChargeService,
+
     private clientService: ClientService,
     private dataSource: DataSource,
   ) {}
@@ -117,11 +121,13 @@ export class UserService {
         //   .leftJoinAndSelect('transaction.charge', 'charge_information')
         .select([
           'user.id',
+          'user.isActive',
           'user.firstName',
           'user.lastName',
           'user.isActive',
           'user.username',
           'user.email',
+          'user.direction',
           'user.direction',
           'user.dni',
           'user.roles',
@@ -132,6 +138,7 @@ export class UserService {
           //   'charge_information',
         ])
         .where('user.clientId = :id', { id: company.id })
+        .andWhere('user.isActive = :flag', { flag: true })
         .getMany();
       if (users.length == 0) continue;
       for (const user of users) {
@@ -187,6 +194,7 @@ export class UserService {
         //   'charge_information',
       ])
       .where('user.id = :id', { id })
+      .andWhere('user.isActive = :flag', { flag: true })
       .getOne();
 
     if (!user) return {} as User;
@@ -238,6 +246,7 @@ export class UserService {
         ])
         .where('user.clientId = :idbus', { idbus: companyarray.id })
         .andWhere('user.id = :id', { id })
+        .andWhere('user.isActive = :flag', { flag: true })
         .getOne();
       if (!users) continue;
       else {
@@ -305,7 +314,7 @@ export class UserService {
       }
     }
 
-    //if (!companies_son.status) myCompany = companies_son;
+    if (!companies_son.status) myCompany = companies_son;
     myCompany.push({ id: userParams.company, name: 'My Company' } as Company);
     addCompanies(myCompany);
     for (const company of arrayallcompany) {
@@ -328,11 +337,25 @@ export class UserService {
         .andWhere('user.id = :id', { id })
         .getOne();
       if (user) {
-        const userdelete = await this.userRepository.delete({ id: user.id });
+        const userId = user.id;
+        await this.cardRepository
+          .createQueryBuilder()
+          .update(Card)
+          .set({ userId: null })
+          .where('userId = :userId', { userId })
+          .execute();
+
+        await this.userRepository
+          .createQueryBuilder()
+          .update(User)
+          .set({ isActive: false })
+          .where('id = :userId', { userId })
+          .execute();
+        /* const userdelete = await this.userRepository.delete({ id: user.id });
         if (userdelete.affected === 0) {
           //throw new HttpException('USER_NOT_FOUND', 400);
           return {} as User;
-        }
+        }*/
         return user;
       }
     }
@@ -552,11 +575,25 @@ export class UserService {
         //throw new HttpException('THIS_COMPANY_NOT_RELATION', 400);
         return { success: false };
     }
+    const userId = user.id;
+    await this.cardRepository
+      .createQueryBuilder()
+      .update(Card)
+      .set({ userId: null })
+      .where('userId = :userId', { userId })
+      .execute();
 
-    const userdelete = await this.userRepository.delete({ id: user.id });
-    if (userdelete.affected === 0) {
+    await this.userRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({ isActive: false })
+      .where('id = :userId', { userId })
+      .execute();
+
+    // const userdelete = await this.userRepository.delete({ id: user.id });
+    /* if (userdelete.affected === 0) {
       return { success: false };
-    }
+    }*/
     return { success: true };
   }
 

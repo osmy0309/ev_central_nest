@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CardService } from 'src/card/card.service';
 import { Card } from 'src/card/entities/card.entity';
 import { ChargeService } from 'src/charge/charge.service';
 import { Card_Charge } from 'src/charge/entities/card_charge.entity';
@@ -33,6 +34,7 @@ import { UserSeederService } from './userseeder.service';
     ClientService,
     ChargeService,
     TimeZoneService,
+    CardService,
   ],
 })
 export class UserseederModule {}

@@ -48,7 +48,7 @@ export class User {
   roles: string[];
 
   @OneToMany(() => Card, (card) => card.user, {
-    cascade: true,
+    // cascade: true,
   })
   cards: Card[];
 
@@ -58,7 +58,7 @@ export class User {
   transaction: Transaction[];
 
   @ManyToOne(() => Company, (client) => client.users, {
-    onDelete: 'CASCADE',
+    // onDelete: 'CASCADE',
     nullable: false,
   })
   client: Company;

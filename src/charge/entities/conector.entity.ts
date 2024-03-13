@@ -22,10 +22,11 @@ export class Conector {
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   last_connection: Date;
 
-  /* @OneToMany(() => Transaction, (transaction) => transaction.charge, {
+  @OneToMany(() => Transaction, (trasaction) => trasaction.conector, {
     cascade: true,
   })
-  public transaction: Transaction[];*/
+  public trasaction: Transaction[];
+
   @ManyToOne(() => Charge, (charge) => charge.conector, {
     onDelete: 'CASCADE',
     nullable: false,

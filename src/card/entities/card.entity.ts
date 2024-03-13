@@ -22,11 +22,14 @@ export class Card {
   @Column({ default: 0 })
   idTarjetaPadre?: number;
 
+  @Column({ nullable: true })
+  userId: number | null;
+
   @Column({ type: 'float', default: () => 0 })
   credit: number;
 
   @ManyToOne(() => User, (user) => user.cards, {
-    onDelete: 'CASCADE',
+    // onDelete: 'CASCADE',
     nullable: true,
   })
   user: User;

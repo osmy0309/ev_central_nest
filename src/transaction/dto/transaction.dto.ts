@@ -27,6 +27,14 @@ export class createTrasactionDto {
 
   @IsOptional()
   @IsNumber()
+  @ApiProperty({
+    example: 2,
+    description: 'El usuario que va autenticarse',
+  })
+  conectorId: number;
+
+  @IsOptional()
+  @IsNumber()
   estado?: number;
 }
 
@@ -38,6 +46,14 @@ export class updateTrasactionDto {
     description: 'El usuario que va autenticarse',
   })
   chargeId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    example: 2,
+    description: 'El usuario que va autenticarse',
+  })
+  conectorId: number;
 
   @IsOptional()
   @IsNumber()
@@ -68,6 +84,14 @@ export class deleteTrasactionDto {
     description: 'El usuario que va autenticarse',
   })
   chargeId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    example: 2,
+    description: 'El usuario que va autenticarse',
+  })
+  conectorId: number;
 
   @IsOptional()
   @IsNumber()

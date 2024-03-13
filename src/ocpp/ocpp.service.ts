@@ -376,6 +376,7 @@ export class OcppService {
               chargeId: chargeidentity[client.identity].id,
               estado: 2,
               userId: card.user.id,
+              conectorId: null,
             };
             await this.chargeService.newCard_Charge(cardChangeRelations);
             const transactionSussess =

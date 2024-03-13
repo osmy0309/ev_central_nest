@@ -35,7 +35,7 @@ export class createCardDto {
   credit: number;
 
   @IsOptional()
-  user?: User;
+  user?: User | null;
 
   @IsOptional()
   company?: Company;
@@ -68,7 +68,7 @@ export class updateCardDto {
 
   @IsOptional()
   @ValidateNested()
-  user?: User;
+  user?: User | null;
 
   @IsOptional()
   company?: Company;
