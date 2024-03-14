@@ -19,6 +19,9 @@ export class Card {
   @Column()
   no_serie: string;
 
+  @Column({ default: true })
+  isActive: boolean;
+
   @Column({ default: 0 })
   idTarjetaPadre?: number;
 
@@ -35,18 +38,18 @@ export class Card {
   user: User;
 
   @ManyToOne(() => Company, (company) => company.cards, {
-    onDelete: 'CASCADE',
+    //onDelete: 'CASCADE',
     nullable: true,
   })
   company: Company;
 
   @OneToMany(() => Card_Charge, (card_charge) => card_charge.card, {
-    cascade: true,
+    //cascade: true,
   })
   public card_charge: Card_Charge[];
 
   @OneToMany(() => Transaction, (transaction) => transaction.card, {
-    cascade: true,
+    //cascade: true,
   })
   public transaction: Transaction[];
 }

@@ -7,24 +7,24 @@ export class Card_Charge {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @Column()
-  public chargeId: number;
+  @Column({ nullable: true })
+  public chargeId: number | null;
 
-  @Column()
-  public cardId: number;
+  @Column({ nullable: true })
+  public cardId: number | null;
 
   @Column()
   public estado: number;
 
   @ManyToOne(() => Charge, (charge) => charge.card_charge, {
-    onDelete: 'CASCADE',
-    nullable: false,
+    //onDelete: 'CASCADE',
+    nullable: true,
   })
   public charge: Charge;
 
   @ManyToOne(() => Card, (card) => card.card_charge, {
-    onDelete: 'CASCADE',
-    nullable: false,
+    //onDelete: 'CASCADE',
+    nullable: true,
   })
   public card: Card;
 }

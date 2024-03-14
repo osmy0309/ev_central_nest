@@ -35,7 +35,7 @@ export class OcppService {
       pingIntervalMs: 5 * 60 * 1000, // callTimeoutMs: 3000000, // enable strict validation of requests & responses
     });
 
-    server.auth(async (accept, reject, handshake) => {
+    server.auth(async (accept, reject, handshake, other) => {
       const charge = {};
       charge[handshake.identity] = await this.chargeService.getChargeBySerial(
         handshake.identity,
@@ -59,6 +59,7 @@ export class OcppService {
     });
 
     server.on('client', async (client) => {
+      // console.log('COSOLE TO CONECTOR ID ', client);
       const chargeidentity = {};
       chargeidentity[client.identity] =
         await this.chargeService.getChargeBySerial(client.identity);
@@ -105,6 +106,25 @@ export class OcppService {
           "DISCONNECT"
         );
       })*/
+
+      client.handle('ChangeAvailability', ({ params }) => {
+        console.log(
+          `Server got ChangeAvailability from ${client.identity}:`,
+          params,
+        );
+
+        const { connectorId, type } = params;
+
+        // Now you have the connectorId and the type of change, you can use them for further processing.
+        console.log(`Connector ID: ${connectorId}, Change Type: ${type}`);
+
+        // Here you can implement the logic to change the availability of the connector.
+
+        // respond with the appropriate response
+        return {
+          status: 'Accepted',
+        };
+      });
 
       client.handle('ChangeAvailability', async (clientparam, command) => {
         console.log(
@@ -154,10 +174,7 @@ export class OcppService {
             1,
           );
         }*/
-        console.log(
-          `Server got BootNotification from ${client.identity}:`,
-          params,
-        );
+        console.log(`Server got BootNotification from ${params}:`, params);
 
         // create a wildcard handler to handle any RPC method
         if (

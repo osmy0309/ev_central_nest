@@ -14,11 +14,14 @@ export class Company {
   @Column()
   email: string;
 
-  @Column({default: 'Cambialo'})
+  @Column({ default: 'Cambialo' })
   contactName: string;
 
   @Column()
   business_name: string;
+
+  @Column({ default: true })
+  isActive: boolean;
 
   @Column({ default: () => 0 })
   id_pather: number;
@@ -39,7 +42,7 @@ export class Company {
   charges: Charge[];
 
   @OneToMany(() => Card, (card) => card.user, {
-    cascade: true,
+    //cascade: true,
   })
   cards: Card[];
 }

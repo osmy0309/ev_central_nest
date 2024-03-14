@@ -53,7 +53,7 @@ export class User {
   cards: Card[];
 
   @OneToMany(() => Transaction, (transaction) => transaction.user, {
-    cascade: true,
+    //cascade: true,
   })
   transaction: Transaction[];
 

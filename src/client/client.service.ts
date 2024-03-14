@@ -84,6 +84,7 @@ export class ClientService {
       .select('company')
       .from(Company, 'company')
       .where('id_pather = :id', { id: id_company })
+      .andWhere('company.isActive = :flag', { flag: true })
       .getMany();
 
     if (clients.length == 0) return {} as Company[];
@@ -100,6 +101,7 @@ export class ClientService {
         .select('company')
         .from(Company, 'company')
         .where('id_pather = :id', { id: id_company })
+        .andWhere('company.isActive = :flag', { flag: true })
         .getMany();
 
       const result: any[] = [];
@@ -122,11 +124,13 @@ export class ClientService {
   }
 
   async getClientById(id: number): Promise<Company> {
-    const client = await this.clientRepository.findOne({
-      where: {
-        id,
-      },
-    });
+    const client = await this.dataSource
+      .createQueryBuilder()
+      .select('company')
+      .from(Company, 'company')
+      .where('id = :id', { id })
+      .andWhere('company.isActive = :flag', { flag: true })
+      .getOne();
     if (!client) {
       return {} as Company;
     }
@@ -134,11 +138,20 @@ export class ClientService {
   }
 
   async getClientByEmail(email: string): Promise<Company> {
-    const client = await this.clientRepository.findOne({
+    /* const client = await this.clientRepository.findOne({
       where: {
         email,
       },
-    });
+    });*/
+
+    const client = await this.dataSource
+      .createQueryBuilder()
+      .select('company')
+      .from(Company, 'company')
+      .where('email = :email', { email })
+      .andWhere('company.isActive = :flag', { flag: true })
+      .getOne();
+
     if (!client) {
       return {} as Company;
     }
@@ -183,17 +196,29 @@ export class ClientService {
         if (company.company_son) {
           await deleteTree(company.company_son, clientRepository);
         }
-        await clientRepository.delete({ id: company.id });
+        //await clientRepository.delete({ id: company.id });
+        await this.clientRepository
+          .createQueryBuilder()
+          .update(Company)
+          .set({ isActive: false })
+          .where('id = :id', { id })
+          .execute();
       });
 
       const clientsDelete = await this.getMyClientsTree(id);
       await deleteTree(clientsDelete, this.clientRepository);
     }
 
-    const client = await this.clientRepository.delete({ id });
-    if (client.affected === 0) {
+    // const client = await this.clientRepository.delete({ id });
+    await this.clientRepository
+      .createQueryBuilder()
+      .update(Company)
+      .set({ isActive: false })
+      .where('id = :id', { id })
+      .execute();
+    /* if (client.affected === 0) {
       return { success: false };
-    }
+    }*/
     return { success: true };
   }
 
@@ -331,17 +356,30 @@ export class ClientService {
         if (company.company_son) {
           await deleteTree(company.company_son, clientRepository);
         }
-        await clientRepository.delete({ id: company.id });
+        //await clientRepository.delete({ id: company.id });
+
+        await this.clientRepository
+          .createQueryBuilder()
+          .update(Company)
+          .set({ isActive: false })
+          .where('id = :id', { id })
+          .execute();
       });
 
       const clientsDelete = await this.getMyClientsTree(id);
       await deleteTree(clientsDelete, this.clientRepository);
     }
 
-    const client = await this.clientRepository.delete({ id });
-    if (client.affected === 0) {
+    //const client = await this.clientRepository.delete({ id });
+    await this.clientRepository
+      .createQueryBuilder()
+      .update(Company)
+      .set({ isActive: false })
+      .where('id = :id', { id })
+      .execute();
+    /*if (client.affected === 0) {
       return { success: false };
-    }
+    }*/
     return { success: true };
   }
 }

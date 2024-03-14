@@ -25,6 +25,9 @@ export class Charge {
   @Column({ type: 'float', default: () => 0 })
   total_charge: number;
 
+  @Column({ default: true })
+  isActive: boolean;
+
   @Column()
   maximum_power: number;
 
@@ -50,23 +53,23 @@ export class Charge {
   last_connection: Date;
 
   @OneToMany(() => Card_Charge, (card_charge) => card_charge.charge, {
-    cascade: true,
+    // cascade: true,
   })
   public card_charge: Card_Charge[];
 
   @OneToMany(() => Transaction, (transaction) => transaction.charge, {
-    cascade: true,
+    // cascade: true,
   })
   public transaction: Transaction[];
 
   @ManyToOne(() => Company, (client) => client.users, {
-    onDelete: 'CASCADE',
-    nullable: false,
+    // onDelete: 'CASCADE',
+    nullable: true,
   })
   client: Company;
 
   @OneToMany(() => Conector, (conector) => conector.charge, {
-    cascade: true,
+    // cascade: true,
   })
   public conector: Conector[];
 }

@@ -19,7 +19,7 @@ export class Timezone {
   deltaEnergy: number;
 
   @ManyToOne(() => Transaction, (transaction) => transaction.timezones, {
-    onDelete: 'CASCADE',
+    //onDelete: 'CASCADE',
     nullable: false,
   })
   transaction: Transaction;

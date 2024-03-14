@@ -12,6 +12,7 @@ import { ClientService } from 'src/client/client.service';
 import { Response } from 'express';
 import { createObjectCsvStringifier, createObjectCsvWriter } from 'csv-writer';
 import * as fs from 'fs';
+import { Card_Charge } from 'src/charge/entities/card_charge.entity';
 
 @Injectable()
 export class CardService {
@@ -24,6 +25,8 @@ export class CardService {
     @InjectRepository(Company)
     private companyRepository: Repository<Company>,
     private userService: UserService,
+    @InjectRepository(Card_Charge)
+    private card_chargeRepository: Repository<Card_Charge>,
     @InjectDataSource()
     private dataSource: DataSource,
     private clientService: ClientService,
@@ -154,6 +157,7 @@ export class CardService {
         ])
         .where('card.companyId = :id', { id: company.id })
         .andWhere('card.id = :idbus', { idbus: idcard })
+        .andWhere('card.isActive = :flag', { flag: true })
         .getOne();
       if (!cards) continue;
 
@@ -202,6 +206,7 @@ export class CardService {
           'user.username',
         ])
         .where('card.companyId = :id', { id: company.id })
+        .andWhere('card.isActive = :flag', { flag: true })
         .getMany();
       if (cards.length == 0) continue;
 
@@ -272,10 +277,24 @@ export class CardService {
   }
 
   async deleteCard(id: number): Promise<{ success: boolean }> {
-    const card = await this.cardRepository.delete({ id });
+    /*const card = await this.cardRepository.delete({ id });
     if (card.affected === 0) {
       return { success: false };
-    }
+    }*/
+    await this.cardRepository
+      .createQueryBuilder()
+      .update(Card)
+      .set({ isActive: false, userId: null })
+
+      .where('id = :id', { id })
+      .execute();
+
+    await this.card_chargeRepository
+      .createQueryBuilder()
+      .update(Card_Charge)
+      .set({ cardId: null })
+      .where('cardId = :id', { id })
+      .execute();
     return { success: true };
   }
 
@@ -359,6 +378,7 @@ export class CardService {
       .leftJoinAndSelect('card.user', 'user')
       .select(['card', 'card_charge', 'transaction', 'company', 'user'])
       .where('card.no_serie = :id', { id })
+      .andWhere('card.isActive = :flag', { flag: true })
       .getOne();
     return card;
   }

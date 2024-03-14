@@ -8,7 +8,7 @@ export class createCard_ChargerDto {
     example: 1,
     description: 'El usuario que va autenticarse',
   })
-  chargeId: number;
+  chargeId: number | null;
 
   @IsNotEmpty()
   @IsNumber()
@@ -16,7 +16,7 @@ export class createCard_ChargerDto {
     example: 2,
     description: 'El usuario que va autenticarse',
   })
-  cardId: number;
+  cardId: number | null;
 
   @IsNotEmpty()
   @IsNumber()

@@ -23,13 +23,13 @@ export class Conector {
   last_connection: Date;
 
   @OneToMany(() => Transaction, (trasaction) => trasaction.conector, {
-    cascade: true,
+    //cascade: true,
   })
   public trasaction: Transaction[];
 
   @ManyToOne(() => Charge, (charge) => charge.conector, {
-    onDelete: 'CASCADE',
-    nullable: false,
+    // onDelete: 'CASCADE',
+    nullable: true,
   })
   charge: Charge;
 }

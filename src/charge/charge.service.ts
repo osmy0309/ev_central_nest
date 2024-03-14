@@ -110,6 +110,7 @@ export class ChargeService {
         'conector',
       ])
       .where('charge.id = :id', { id })
+      .andWhere('charge.isActive = :flag', { flag: true })
       .getOne();
 
     if (!change) {
@@ -132,6 +133,7 @@ export class ChargeService {
       .leftJoinAndSelect('charge.conector', 'conector')
       .select(['charge', 'client', 'conector'])
       .where('charge.serial_number = :id', { id })
+      .andWhere('charge.isActive = :flag', { flag: true })
       .getOne();
 
     if (!change) {
@@ -197,6 +199,7 @@ export class ChargeService {
           'timezone',
         ])
         .where('company.id = :id_company', { id_company: itemcompa.id })
+        .andWhere('charge.isActive = :flag', { flag: true })
         .getMany();
 
       if (change.length == 0) {
@@ -308,7 +311,7 @@ export class ChargeService {
       }
     }
 
-    // if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
+    if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
     myCompany.push({ id: user.company, name: 'My Company' } as Company);
     addCompanies(myCompany);
     for (const company of arrayallcompany) {
@@ -323,7 +326,20 @@ export class ChargeService {
         //throw new HttpException('CHARGE_NOT_FOUND', 400);
         continue;
       } else {
-        await this.chargeRepository.delete({ id });
+        // await this.chargeRepository.delete({ id });
+        await this.chargeRepository
+          .createQueryBuilder()
+          .update(Charge)
+          .set({ isActive: false })
+          .where('id = :id', { id })
+          .execute();
+
+        await this.card_chargeRepository
+          .createQueryBuilder()
+          .update(Card_Charge)
+          .set({ cardId: null, chargeId: null })
+          .where('chargeId = :id', { id })
+          .execute();
         return change;
       }
     }
@@ -552,11 +568,24 @@ export class ChargeService {
       const flag = await this.companyIsMySon(id_company, change.client.id);
       if (!flag) return {} as Charge;
     }
+    await this.chargeRepository
+      .createQueryBuilder()
+      .update(Charge)
+      .set({ isActive: false })
+      .where('id = :id', { id })
+      .execute();
 
-    const charge = await this.chargeRepository.delete({ id });
+    await this.card_chargeRepository
+      .createQueryBuilder()
+      .update(Card_Charge)
+      .set({ cardId: null, chargeId: null })
+      .where('chargeId = :id', { id })
+      .execute();
+
+    /* const charge = await this.chargeRepository.delete({ id });
     if (charge.affected === 0) {
       return {} as Charge;
-    }
+    }*/
 
     return change;
   }
