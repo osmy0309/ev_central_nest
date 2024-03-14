@@ -63,6 +63,7 @@ export class CardService {
         .from(Card, 'card')
         .leftJoinAndSelect('card.user', 'user')
         .where('card.id = :id', { id: asing.id_card })
+        .andWhere('card.isActive = :flag', { flag: true })
         .getMany();
       if (cardrelation.length == 0) return {} as Card;
       let cardModify = cardrelation[0];
@@ -81,6 +82,7 @@ export class CardService {
       .leftJoinAndSelect('user.client', 'client')
       .select(['user', 'client'])
       .where('user.id = :id', { id: asing.id_user })
+      .andWhere('user.isActive = :flag', { flag: true })
       .getMany();
 
     /*  const relation = await this.dataSource
