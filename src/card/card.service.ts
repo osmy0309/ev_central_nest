@@ -68,6 +68,7 @@ export class CardService {
       if (cardrelation.length == 0) return {} as Card;
       let cardModify = cardrelation[0];
       cardModify.user = null;
+      cardModify.userId = null;
       const response = await this.cardRepository.update(
         { id: asing.id_card },
         cardModify,
