@@ -19,13 +19,14 @@ export class ClientService {
       where: [
         { nif: client.nif },
         { email: client.email },
+        { isActive: true },
         // Aquí puedes agregar cualquier otra condición necesaria
       ],
     });
     if (clientFind) {
-      if (clientFind.email == client.email && client.isActive)
+      if (clientFind.email == client.email)
         throw new HttpException('EMAIL_EXIST', 403);
-      if (clientFind.nif == client.nif && client.isActive)
+      if (clientFind.nif == client.nif)
         throw new HttpException('NIF_EXIST', 403);
     }
     client.id_pather = id_company;
@@ -276,9 +277,9 @@ export class ClientService {
       ],
     });
     if (clientFind) {
-      if (clientFind.email == client.email && client.isActive)
+      if (clientFind.email == client.email && clientFind.isActive)
         throw new HttpException('EMAIL_EXIST', 403);
-      if (clientFind.nif == client.nif && client.isActive)
+      if (clientFind.nif == client.nif && clientFind.isActive)
         throw new HttpException('NIF_EXIST', 403);
     }
     if (id != id_company) {
