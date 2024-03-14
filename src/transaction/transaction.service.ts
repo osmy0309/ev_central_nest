@@ -104,6 +104,7 @@ export class TransactionService {
     let queryBuilder = this.trasactionRepository
       .createQueryBuilder('transaction')
       .leftJoinAndSelect('transaction.charge', 'charge')
+      .leftJoinAndSelect('transaction.timezones', 'timezone')
       .leftJoinAndSelect('transaction.card', 'card')
       .leftJoinAndSelect('transaction.user', 'user')
       .select([
@@ -115,6 +116,7 @@ export class TransactionService {
         'user.email',
         'user.firstName',
         'user.lastName',
+        'timezone',
       ]);
 
     if (newTransaction.chargeId) {
