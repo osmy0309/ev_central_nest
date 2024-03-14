@@ -389,7 +389,7 @@ export class UserService {
       // Puedes agregar cualquier otra condición necesaria aquí
       .getOne();
 
-    if (userFind) {
+    if (userFind && userFind.id != id) {
       if (user.email && userFind.email === user.email)
         throw new HttpException('EMAIL_EXIST', 403);
       if (user.username && userFind.username === user.username)
