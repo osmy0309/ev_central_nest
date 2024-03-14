@@ -61,11 +61,10 @@ export class UserService {
     const userFind = await this.userRepository
       .createQueryBuilder('user')
       .where(
-        'user.username = :username OR user.email = :email OR user.dni = :dni AND user.isActive = :isActive',
+        '(user.username = :username OR user.email = :email) AND user.isActive = :isActive',
         {
           username: user.username,
           email: user.email,
-          dni: user.dni,
           isActive: true,
         },
       )
@@ -380,11 +379,10 @@ export class UserService {
     const userFind = await this.userRepository
       .createQueryBuilder('user')
       .where(
-        'user.username = :username OR user.email = :email OR user.dni = :dni AND user.isActive = :isActive',
+        '(user.username = :username OR user.email = :email) AND user.isActive = :isActive',
         {
           username: user.username,
           email: user.email,
-          dni: user.dni,
           isActive: true,
         },
       )
@@ -522,14 +520,18 @@ export class UserService {
       return {} as User;
     }
 
-    const userFind = await this.userRepository.findOne({
-      where: [
-        { username: user.username },
-        { email: user.email },
-        { dni: user.dni },
-        // Aquí puedes agregar cualquier otra condición necesaria
-      ],
-    });
+    const userFind = await this.userRepository
+      .createQueryBuilder('user')
+      .where(
+        '(user.username = :username OR user.email = :email) AND user.isActive = :isActive',
+        {
+          username: user.username,
+          email: user.email,
+          isActive: true,
+        },
+      )
+      // Puedes agregar cualquier otra condición necesaria aquí
+      .getOne();
     if (userFind) {
       //throw new HttpException('USER_EXIST', HttpStatus.CONFLICT);
       if (userFind.email == user.email)
