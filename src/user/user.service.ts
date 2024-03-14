@@ -63,17 +63,18 @@ export class UserService {
         { username: user.username },
         { email: user.email },
         { dni: user.dni },
+        { isActive: true },
         // Aquí puedes agregar cualquier otra condición necesaria
       ],
     });
     if (userFind) {
       //throw new HttpException('USER_EXIST', HttpStatus.CONFLICT);
-      if (userFind.email == user.email && user.isActive)
+      if (userFind.email == user.email)
         throw new HttpException('EMAIL_EXIST', 403);
-      if (userFind.username == user.username && user.isActive)
+      if (userFind.username == user.username)
         throw new HttpException('USER_NAME_EXIST', 403);
-      if (userFind.dni == user.dni && user.isActive)
-        throw new HttpException('CIF_EXIST', 403);
+      /*if (userFind.dni == user.dni && userFind.isActive)
+        throw new HttpException('CIF_EXIST', 403);*/
     }
     if (!user.roles || user.roles.length == 0) {
       user.roles.push('AUTOR');
@@ -388,9 +389,13 @@ export class UserService {
       .getOne();
 
     if (userFind) {
-      if (user.email && userFind.email === user.email && user.isActive)
+      if (user.email && userFind.email === user.email && userFind.isActive)
         throw new HttpException('EMAIL_EXIST', 403);
-      if (user.username && userFind.username === user.username && user.isActive)
+      if (
+        user.username &&
+        userFind.username === user.username &&
+        userFind.isActive
+      )
         throw new HttpException('USER_NAME_EXIST', 403);
       /*if (user.dni && userFind.dni === user.dni)
         throw new HttpException('CIF_EXIST', 403);*/
