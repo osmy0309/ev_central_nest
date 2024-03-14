@@ -105,3 +105,29 @@ export class deleteTrasactionDto {
   @IsNumber()
   estado?: number;
 }
+
+export class filterTrasactionDto {
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    example: 2,
+    description: 'El usuario que va autenticarse',
+  })
+  userId: number;
+
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    example: 2,
+    description: 'El usuario que va autenticarse',
+  })
+  chargeId: number;
+
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    example: 2,
+    description: 'El usuario que va autenticarse',
+  })
+  cardId: number;
+}

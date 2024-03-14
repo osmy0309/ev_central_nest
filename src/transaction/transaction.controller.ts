@@ -10,6 +10,7 @@ import { Roles } from 'src/rol/decorator/rol.decorator';
 import {
   createTrasactionDto,
   deleteTrasactionDto,
+  filterTrasactionDto,
 } from './dto/transaction.dto';
 import { TransactionService } from './transaction.service';
 @ApiTags('Transaction')
@@ -36,6 +37,14 @@ export class TransactionController {
     return await this.transactionService.changeStatenewTransaction(
       newTrasaction,
     );
+  }
+
+  @Roles('ADMIN', 'AUTOR')
+  @ApiBearerAuth()
+  @Auth()
+  @Post('transaction_filter')
+  async filterTransaction(@Body() filterTrasaction: filterTrasactionDto) {
+    return await this.transactionService.filterTransaction(filterTrasaction);
   }
 
   @Roles('ADMIN', 'AUTOR')

@@ -5,6 +5,7 @@ import {
   createTrasactionDto,
   updateTrasactionDto,
   deleteTrasactionDto,
+  filterTrasactionDto,
 } from './dto/transaction.dto';
 import { Card } from 'src/card/entities/card.entity';
 import { Transaction } from './entities/transaction.entity';
@@ -95,6 +96,49 @@ export class TransactionService {
         id: relactionexist.id,
       },
     });
+    return transaction;
+  }
+  async filterTransaction(
+    newTransaction: filterTrasactionDto,
+  ): Promise<Transaction[]> {
+    let queryBuilder = this.trasactionRepository
+      .createQueryBuilder('transaction')
+      .leftJoinAndSelect('transaction.charge', 'charge')
+      .leftJoinAndSelect('transaction.card', 'card')
+      .leftJoinAndSelect('transaction.user', 'user')
+      .select([
+        'charge',
+        'transaction',
+        'card',
+        'user.id',
+        'user.username',
+        'user.email',
+        'user.firstName',
+        'user.lastName',
+      ]);
+
+    if (newTransaction.chargeId) {
+      queryBuilder = queryBuilder.where('transaction.chargeId = :chargeId', {
+        chargeId: newTransaction.chargeId,
+      });
+    } else if (newTransaction.cardId) {
+      queryBuilder = queryBuilder.where('transaction.cardId = :cardId', {
+        cardId: newTransaction.cardId,
+      });
+    } else if (newTransaction.userId) {
+      queryBuilder = queryBuilder.where('transaction.userId = :userId', {
+        userId: newTransaction.userId,
+      });
+    } else {
+      // Si ninguno de los campos está presente en newTransaction, puedes manejarlo según tus necesidades
+      // Por ejemplo, puedes lanzar una excepción o devolver un mensaje de error.
+      throw new Error('Ningún criterio de filtro proporcionado');
+    }
+
+    const transaction = await queryBuilder.getMany();
+
+    // Si necesitas manejar algún tipo de error si no se encuentra ninguna transacción, puedes hacerlo aquí
+
     return transaction;
   }
 
