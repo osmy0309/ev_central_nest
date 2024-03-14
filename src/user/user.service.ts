@@ -58,15 +58,19 @@ export class UserService {
       return {} as User;
     }
 
-    const userFind = await this.userRepository.findOne({
-      where: [
-        { username: user.username },
-        { email: user.email },
-        { dni: user.dni },
-        { isActive: true },
-        // Aquí puedes agregar cualquier otra condición necesaria
-      ],
-    });
+    const userFind = await this.userRepository
+      .createQueryBuilder('user')
+      .where(
+        'user.username = :username OR user.email = :email OR user.dni = :dni AND user.isActive = :isActive',
+        {
+          username: user.username,
+          email: user.email,
+          dni: user.dni,
+          isActive: true,
+        },
+      )
+      // Puedes agregar cualquier otra condición necesaria aquí
+      .getOne();
     if (userFind) {
       //throw new HttpException('USER_EXIST', HttpStatus.CONFLICT);
       if (userFind.email == user.email)
@@ -375,27 +379,22 @@ export class UserService {
 
     const userFind = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.client', 'company')
-      .select(['user', 'company.id'])
-      .andWhere('user.id != :id', { id: id })
-      .andWhere(
-        new Brackets((qb) => {
-          qb.where('user.username = :username', {
-            username: user.username,
-          }).orWhere('user.email = :email', { email: user.email });
-          // .orWhere('user.dni = :dni', { dni: user.dni });
-        }),
+      .where(
+        'user.username = :username OR user.email = :email OR user.dni = :dni AND user.isActive = :isActive',
+        {
+          username: user.username,
+          email: user.email,
+          dni: user.dni,
+          isActive: true,
+        },
       )
+      // Puedes agregar cualquier otra condición necesaria aquí
       .getOne();
 
     if (userFind) {
-      if (user.email && userFind.email === user.email && userFind.isActive)
+      if (user.email && userFind.email === user.email)
         throw new HttpException('EMAIL_EXIST', 403);
-      if (
-        user.username &&
-        userFind.username === user.username &&
-        userFind.isActive
-      )
+      if (user.username && userFind.username === user.username)
         throw new HttpException('USER_NAME_EXIST', 403);
       /*if (user.dni && userFind.dni === user.dni)
         throw new HttpException('CIF_EXIST', 403);*/
