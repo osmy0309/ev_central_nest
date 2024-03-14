@@ -49,6 +49,7 @@ export class UserService {
     const client = await this.clientRepository.findOne({
       where: {
         id: idclient,
+        isActive: true,
       },
     });
 
@@ -67,11 +68,12 @@ export class UserService {
     });
     if (userFind) {
       //throw new HttpException('USER_EXIST', HttpStatus.CONFLICT);
-      if (userFind.email == user.email)
+      if (userFind.email == user.email && user.isActive)
         throw new HttpException('EMAIL_EXIST', 403);
-      if (userFind.username == user.username)
+      if (userFind.username == user.username && user.isActive)
         throw new HttpException('USER_NAME_EXIST', 403);
-      if (userFind.dni == user.dni) throw new HttpException('CIF_EXIST', 403);
+      if (userFind.dni == user.dni && user.isActive)
+        throw new HttpException('CIF_EXIST', 403);
     }
     if (!user.roles || user.roles.length == 0) {
       user.roles.push('AUTOR');
@@ -386,9 +388,9 @@ export class UserService {
       .getOne();
 
     if (userFind) {
-      if (user.email && userFind.email === user.email)
+      if (user.email && userFind.email === user.email && user.isActive)
         throw new HttpException('EMAIL_EXIST', 403);
-      if (user.username && userFind.username === user.username)
+      if (user.username && userFind.username === user.username && user.isActive)
         throw new HttpException('USER_NAME_EXIST', 403);
       /*if (user.dni && userFind.dni === user.dni)
         throw new HttpException('CIF_EXIST', 403);*/

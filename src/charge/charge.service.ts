@@ -46,6 +46,7 @@ export class ChargeService {
     const client = await this.clientRepository.findOne({
       where: {
         id: id_client,
+        isActive: true,
       },
     });
     if (!client) {
@@ -55,6 +56,7 @@ export class ChargeService {
     const chargeFind = await this.chargeRepository.findOne({
       where: {
         serial_number: charge.serial_number,
+        isActive: true,
       },
     });
     if (chargeFind) {

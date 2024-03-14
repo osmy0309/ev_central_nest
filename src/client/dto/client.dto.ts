@@ -5,6 +5,7 @@ import {
   IsEmail,
   IsOptional,
   IsNumber,
+  IsBoolean,
 } from 'class-validator';
 
 export class createClientDto {
@@ -31,6 +32,14 @@ export class createClientDto {
     description: 'razon social del cliente',
   })
   business_name: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({
+    example: 'razon social',
+    description: 'razon social del cliente',
+  })
+  isActive: boolean;
 
   @IsOptional()
   @IsString()
@@ -81,6 +90,14 @@ export class updateClientDto {
     description: 'email del cliente',
   })
   email?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({
+    example: 'razon social',
+    description: 'razon social del cliente',
+  })
+  isActive: boolean;
 
   @IsOptional()
   @IsString()

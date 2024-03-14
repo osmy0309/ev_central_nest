@@ -22,6 +22,14 @@ export class createUserDto {
   })
   username: string;
 
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({
+    example: 'razon social',
+    description: 'razon social del cliente',
+  })
+  isActive: boolean;
+
   @IsNotEmpty()
   @ApiProperty({
     example: 'admin123',
@@ -99,6 +107,14 @@ export class userUpdateDto {
     description: 'usuario',
   })
   username?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({
+    example: 'razon social',
+    description: 'razon social del cliente',
+  })
+  isActive: boolean;
 
   @IsOptional()
   @IsString()

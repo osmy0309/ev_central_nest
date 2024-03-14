@@ -36,6 +36,7 @@ export class CardService {
     const cardFind = await this.cardRepository.findOne({
       where: {
         no_serie: card.no_serie.trim(),
+        isActive: true,
       },
     });
     if (cardFind) {
@@ -249,6 +250,7 @@ export class CardService {
     const cardFind = await this.cardRepository.findOne({
       where: {
         no_serie: card.no_serie.trim(),
+        isActive: true,
       },
     });
     if (cardFind && cardFind.id != idcard) {

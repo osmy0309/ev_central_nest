@@ -23,9 +23,9 @@ export class ClientService {
       ],
     });
     if (clientFind) {
-      if (clientFind.email == client.email)
+      if (clientFind.email == client.email && client.isActive)
         throw new HttpException('EMAIL_EXIST', 403);
-      if (clientFind.nif == client.nif)
+      if (clientFind.nif == client.nif && client.isActive)
         throw new HttpException('NIF_EXIST', 403);
     }
     client.id_pather = id_company;
@@ -48,9 +48,9 @@ export class ClientService {
       ],
     });
     if (clientFind) {
-      if (clientFind.email == client.email)
+      if (clientFind.email == client.email && client.isActive)
         throw new HttpException('EMAIL_EXIST', 403);
-      if (clientFind.nif == client.nif)
+      if (clientFind.nif == client.nif && client.isActive)
         throw new HttpException('NIF_EXIST', 403);
     }
     //console.log(id_client_search);
@@ -276,9 +276,9 @@ export class ClientService {
       ],
     });
     if (clientFind) {
-      if (clientFind.email == client.email)
+      if (clientFind.email == client.email && client.isActive)
         throw new HttpException('EMAIL_EXIST', 403);
-      if (clientFind.nif == client.nif)
+      if (clientFind.nif == client.nif && client.isActive)
         throw new HttpException('NIF_EXIST', 403);
     }
     if (id != id_company) {
