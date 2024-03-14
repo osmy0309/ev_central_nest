@@ -19,7 +19,7 @@ export class Charge {
   @Column()
   nombre: string;
 
-  @Column({ unique: true })
+  @Column({ unique: false })
   serial_number: string;
 
   @Column({ type: 'float', default: () => 0 })
