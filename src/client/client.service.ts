@@ -15,14 +15,19 @@ export class ClientService {
   ) {}
 
   async create(client: createClientDto, id_company: number): Promise<Company> {
-    const clientFind = await this.clientRepository.findOne({
-      where: [
-        { nif: client.nif },
-        { email: client.email },
-        { isActive: true },
-        // Aquí puedes agregar cualquier otra condición necesaria
-      ],
-    });
+    const clientFind = await this.clientRepository
+      .createQueryBuilder('client')
+      .where(
+        '(client.nif = :clientnif OR client.email = :email) AND client.isActive = :isActive',
+        {
+          clientnif: client.nif,
+          email: client.email,
+          isActive: true,
+        },
+      )
+      // Puedes agregar cualquier otra condición necesaria aquí
+      .getOne();
+
     if (clientFind) {
       if (clientFind.email == client.email)
         throw new HttpException('EMAIL_EXIST', 403);
@@ -41,13 +46,18 @@ export class ClientService {
   ): Promise<Company> {
     let id_client_search = id_client_other;
     let flag = false;
-    const clientFind = await this.clientRepository.findOne({
-      where: [
-        { nif: client.nif },
-        { email: client.email },
-        // Aquí puedes agregar cualquier otra condición necesaria
-      ],
-    });
+    const clientFind = await this.clientRepository
+      .createQueryBuilder('client')
+      .where(
+        '(client.nif = :clientnif OR client.email = :email) AND client.isActive = :isActive',
+        {
+          clientnif: client.nif,
+          email: client.email,
+          isActive: true,
+        },
+      )
+      // Puedes agregar cualquier otra condición necesaria aquí
+      .getOne();
     if (clientFind) {
       if (clientFind.email == client.email && client.isActive)
         throw new HttpException('EMAIL_EXIST', 403);
@@ -257,29 +267,20 @@ export class ClientService {
   ): Promise<Company> {
     const clientFind = await this.clientRepository
       .createQueryBuilder('client')
-      .select(['client'])
-      .andWhere('user.id != :id', { id: id })
-      .andWhere(
-        new Brackets((qb) => {
-          qb.where('client.email = :email', { email: client.email }).orWhere(
-            'user.nif = :nif',
-            { nif: client.nif },
-          );
-        }),
+      .where(
+        '(client.nif = :clientnif OR client.email = :email) AND client.isActive = :isActive',
+        {
+          clientnif: client.nif,
+          email: client.email,
+          isActive: true,
+        },
       )
+      // Puedes agregar cualquier otra condición necesaria aquí
       .getOne();
-
-    await this.clientRepository.findOne({
-      where: [
-        { nif: client.nif || '' },
-        { email: client.email || '' },
-        // Aquí puedes agregar cualquier otra condición necesaria
-      ],
-    });
     if (clientFind) {
-      if (clientFind.email == client.email && clientFind.isActive)
+      if (clientFind.email == client.email)
         throw new HttpException('EMAIL_EXIST', 403);
-      if (clientFind.nif == client.nif && clientFind.isActive)
+      if (clientFind.nif == client.nif)
         throw new HttpException('NIF_EXIST', 403);
     }
     if (id != id_company) {
