@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import {
   Delete,
+  Get,
   Post,
 } from '@nestjs/common/decorators/http/request-mapping.decorator';
 import { Body } from '@nestjs/common/decorators/http/route-params.decorator';
@@ -13,14 +14,15 @@ import {
   filterTrasactionDto,
 } from './dto/transaction.dto';
 import { TransactionService } from './transaction.service';
+
 @ApiTags('Transaction')
-@Roles('ADMIN', 'AUTOR')
-@ApiBearerAuth()
-@Auth()
 @Controller('transaction')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
-
+  @Get('changeBD')
+  async UpdateBD() {
+    return await this.transactionService.updateBD();
+  }
   @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()

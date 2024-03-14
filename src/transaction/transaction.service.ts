@@ -65,6 +65,13 @@ export class TransactionService {
     await this.trasactionRepository.save(newRelation);
     return transaction;
   }
+
+  async updateBD(): Promise<boolean> {
+    await this.trasactionRepository.query(
+      'UPDATE transaction t, card c SET t.userId = c.userId WHERE t.cardId = c.id AND t.userId IS NULL AND c.userId IS NOT NULL;',
+    );
+    return true;
+  }
   async getTransaction(id: number): Promise<Transaction> {
     const transaction = await this.trasactionRepository.findOne({
       where: {
