@@ -136,7 +136,7 @@ export class TransactionService {
       // Por ejemplo, puedes lanzar una excepción o devolver un mensaje de error.
       throw new Error('Ningún criterio de filtro proporcionado');
     }
-    queryBuilder = queryBuilder.orderBy('transaction.fecha', 'DESC');
+    queryBuilder = queryBuilder.orderBy('transaction.id', 'DESC');
     const transaction = await queryBuilder.getMany();
 
     // Si necesitas manejar algún tipo de error si no se encuentra ninguna transacción, puedes hacerlo aquí
