@@ -23,6 +23,12 @@ export class TransactionController {
   async UpdateBD() {
     return await this.transactionService.updateBD();
   }
+
+  @Get('removeConnectors')
+  async removeConnectors() {
+    return await this.transactionService.removeConnectors();
+  }
+
   @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()

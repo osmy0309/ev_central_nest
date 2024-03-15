@@ -72,6 +72,11 @@ export class TransactionService {
     );
     return true;
   }
+
+  async removeConnectors() {
+    await this.trasactionRepository.query('DELETE FROM conector;');
+    return true;
+  }
   async getTransaction(id: number): Promise<Transaction> {
     const transaction = await this.trasactionRepository.findOne({
       where: {
