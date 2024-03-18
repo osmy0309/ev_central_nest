@@ -745,8 +745,12 @@ export class ChargeService {
         });
       } else {
         item.transaction.forEach((itemTransaction) => {
-          const date = new Date(itemTransaction.timezones[0].start);
-          const datefinish = new Date(itemTransaction.timezones[0].finish);
+          const date = itemTransaction.timezones[0]
+            ? new Date(itemTransaction.timezones[0].start)
+            : new Date();
+          const datefinish = itemTransaction.timezones[0]
+            ? new Date(itemTransaction.timezones[0].finish)
+            : new Date();
 
           const {
             differenceDays,
@@ -769,8 +773,12 @@ export class ChargeService {
             fecha: extractedDate,
             timeinicial: `${hours}:${minutes}:${seconds}`,
             time: `${differenceHours}:${differenceMinutes}:${differenceSeconds}`,
-            energia: itemTransaction.timezones[0].energy,
-            card: itemTransaction.card.no_serie,
+            energia: itemTransaction.timezones[0]
+              ? itemTransaction.timezones[0].energy
+              : '-',
+            card: itemTransaction.timezones[0]
+              ? itemTransaction.card.no_serie
+              : '-',
             last_connection: `${item.last_connection.getDate()}/${
               item.last_connection.getMonth() + 1
             }/${item.last_connection.getFullYear()}`,
