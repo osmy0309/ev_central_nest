@@ -12,7 +12,7 @@ export class loginUserDto {
 
   @IsNotEmpty()
   @MinLength(4)
-  // @MaxLength(12)
+  @MaxLength(50)
   @IsString()
   @ApiProperty({
     example: '12345678',
