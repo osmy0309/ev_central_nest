@@ -310,22 +310,22 @@ export class CardService {
     for (const key in listCard) {
       record.push({
         no_serie: listCard[key].no_serie,
-        credit: listCard[key].credit,
+        // credit: listCard[key].credit,
         userfirstName: listCard[key].user ? listCard[key].user.firstName : '-',
         userlastName: listCard[key].user ? listCard[key].user.lastName : '-',
         email: listCard[key].user ? listCard[key].user.email : '-',
-        dni: listCard[key].user ? listCard[key].user.dni : '-',
+        // dni: listCard[key].user ? listCard[key].user.dni : '-',
       });
     }
 
     const csvStringifier = createObjectCsvStringifier({
       header: [
         { id: 'no_serie', title: 'Número de serie' },
-        { id: 'credit', title: 'Crédito' },
+        // { id: 'credit', title: 'Crédito' },
         { id: 'userfirstName', title: 'Nombre Propietario' },
         { id: 'userlastName', title: 'Apellidos Propietario' },
         { id: 'email', title: 'Correo Electrónico' },
-        { id: 'dni', title: 'DNI' },
+        // { id: 'dni', title: 'DNI' },
       ],
       fieldDelimiter: ';',
     });
