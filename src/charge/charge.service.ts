@@ -19,7 +19,7 @@ import { Response } from 'express';
 import { createObjectCsvStringifier, createObjectCsvWriter } from 'csv-writer';
 import * as fs from 'fs';
 import { createConectorDto } from './dto/conector.dto';
-import { last } from 'rxjs';
+import { async, last } from 'rxjs';
 
 @Injectable()
 export class ChargeService {
@@ -89,8 +89,9 @@ export class ChargeService {
       .leftJoinAndSelect('charge.client', 'company')
       .leftJoinAndSelect('charge.transaction', 'transaction')
       .leftJoinAndSelect('transaction.card', 'card')
+      .leftJoinAndSelect('transaction.conector', 'conector')
       .leftJoinAndSelect('transaction.user', 'usertransaction')
-      .leftJoinAndSelect('charge.conector', 'conector')
+      .leftJoinAndSelect('charge.conector', 'conectorcharge')
       .leftJoinAndSelect('card.user', 'user')
       .leftJoinAndSelect('transaction.timezones', 'timezone')
       .select([
@@ -110,6 +111,7 @@ export class ChargeService {
         'usertransaction.lastName',
         'timezone',
         'conector',
+        'conectorcharge',
       ])
       .where('charge.id = :id', { id })
       .andWhere('charge.isActive = :flag', { flag: true })
@@ -131,9 +133,33 @@ export class ChargeService {
   async getChargeBySerial(id: string): Promise<Charge> {
     const change = await this.chargeRepository
       .createQueryBuilder('charge')
-      .leftJoinAndSelect('charge.client', 'client')
-      .leftJoinAndSelect('charge.conector', 'conector')
-      .select(['charge', 'client', 'conector'])
+      .leftJoinAndSelect('charge.client', 'company')
+      .leftJoinAndSelect('charge.transaction', 'transaction')
+      .leftJoinAndSelect('transaction.card', 'card')
+      .leftJoinAndSelect('transaction.conector', 'conector')
+      .leftJoinAndSelect('transaction.user', 'usertransaction')
+      .leftJoinAndSelect('charge.conector', 'conectorcharge')
+      .leftJoinAndSelect('card.user', 'user')
+      .leftJoinAndSelect('transaction.timezones', 'timezone')
+      .select([
+        'charge',
+        'company.id',
+        'transaction',
+        'card',
+        'user.id',
+        'user.username',
+        'user.email',
+        'user.firstName',
+        'user.lastName',
+        'usertransaction.id',
+        'usertransaction.username',
+        'usertransaction.email',
+        'usertransaction.firstName',
+        'usertransaction.lastName',
+        'timezone',
+        'conector',
+        'conectorcharge',
+      ])
       .where('charge.serial_number = :id', { id })
       .andWhere('charge.isActive = :flag', { flag: true })
       .getOne();
@@ -173,32 +199,30 @@ export class ChargeService {
         .createQueryBuilder('charge')
         .leftJoinAndSelect('charge.client', 'company')
         .leftJoinAndSelect('charge.transaction', 'transaction')
-        .leftJoinAndSelect('charge.conector', 'conector')
         .leftJoinAndSelect('transaction.card', 'card')
+        .leftJoinAndSelect('transaction.conector', 'conector')
+        .leftJoinAndSelect('transaction.user', 'usertransaction')
+        .leftJoinAndSelect('charge.conector', 'conectorcharge')
         .leftJoinAndSelect('card.user', 'user')
-        .leftJoinAndSelect('transaction.user', 'userTrans')
         .leftJoinAndSelect('transaction.timezones', 'timezone')
         .select([
           'charge',
           'company.id',
           'transaction',
-          'conector',
           'card',
           'user.id',
           'user.username',
           'user.email',
-          'user.isActive',
           'user.firstName',
           'user.lastName',
-          'user.id',
-          'user.id',
-          'userTrans.username',
-          'userTrans.isActive',
-          'userTrans.email',
-          'userTrans.firstName',
-          'userTrans.lastName',
-          'userTrans.id',
+          'usertransaction.id',
+          'usertransaction.username',
+          'usertransaction.email',
+          'usertransaction.firstName',
+          'usertransaction.lastName',
           'timezone',
+          'conector',
+          'conectorcharge',
         ])
         .where('company.id = :id_company', { id_company: itemcompa.id })
         .andWhere('charge.isActive = :flag', { flag: true })
@@ -234,7 +258,7 @@ export class ChargeService {
 
   async updateStateConector(
     id: number,
-    numberConnector: string,
+    numberConnector: string | null,
     state: number,
   ): Promise<Conector> {
     const change = await this.chargeRepository
@@ -249,15 +273,24 @@ export class ChargeService {
       return {} as Conector;
     }
     let conectors = change.conector;
-    let desiredConector = conectors.find(
-      (conector) => conector.name === numberConnector,
-    );
-    desiredConector.state = state;
-    const idconnector: number = desiredConector.id;
+    if (conectors.length > 0) {
+      if (numberConnector) {
+        let desiredConector = conectors.find(
+          (conector) => conector.name === numberConnector,
+        );
+        desiredConector.state = state;
+        const idconnector: number = desiredConector.id;
 
-    await this.connectorRepository.update(idconnector, desiredConector);
+        await this.connectorRepository.update(idconnector, desiredConector);
 
-    return desiredConector;
+        return desiredConector;
+      }
+
+      conectors.map(async (conector: Conector) => {
+        conector.state = state;
+        await this.connectorRepository.update(conector.id, conector);
+      });
+    }
   }
 
   async patchCharge(

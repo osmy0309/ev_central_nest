@@ -47,6 +47,11 @@ export class OcppService {
           charge[handshake.identity].id,
           1,
         );
+        await this.chargeService.updateStateConector(
+          charge[handshake.identity].id,
+          null,
+          1,
+        );
         accept({
           // anything passed to accept() will be attached as a 'session' property of the client.
           sessionId: handshake.identity,
@@ -91,11 +96,22 @@ export class OcppService {
             chargedisconnect.id,
             3,
           );
-        } else if (chargedisconnect.state == 4)
+          await this.chargeService.updateStateConector(
+            chargedisconnect.id,
+            null,
+            3,
+          );
+        } else if (chargedisconnect.state == 4) {
           await this.chargeService.updateStateChargeGeneral(
             chargedisconnect.id,
             4,
           );
+          await this.chargeService.updateStateConector(
+            chargedisconnect.id,
+            null,
+            4,
+          );
+        }
 
         delete connectedClients[clientconection];
         // Aquí puedes agregar la lógica para manejar la desconexión del sistema central
@@ -520,6 +536,11 @@ export class OcppService {
         ) {
           await this.chargeService.updateStateChargeGeneral(
             chargeidentity[client.identity].id,
+            1,
+          );
+          await this.chargeService.updateStateConector(
+            chargeidentity[client.identity].id,
+            null,
             1,
           );
         }

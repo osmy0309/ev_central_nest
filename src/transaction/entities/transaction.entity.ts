@@ -48,7 +48,7 @@ export class Transaction {
     nullable: false,
   })
   public user: User;
-  @ManyToOne(() => Conector, (conector) => conector.trasaction, {
+  @ManyToOne(() => Conector, (conector) => conector.transaction, {
     onDelete: 'CASCADE',
     nullable: false,
   })
