@@ -361,10 +361,6 @@ export class OcppService {
           chargeidentity[client.identity].id &&
           chargeidentity[client.identity].state != 4
         ) {
-          await this.chargeService.updateStateChargeGeneral(
-            chargeidentity[client.identity].id,
-            2,
-          );
           if (chargeidentity[client.identity].client.id != card.company.id) {
             flagChangeSon = false;
             const sonCharge = await this.chargeService.companyIsMySon(
@@ -383,6 +379,10 @@ export class OcppService {
             chargeidentity[client.identity].id &&
             flagChangeSon
           ) {
+            await this.chargeService.updateStateChargeGeneral(
+              chargeidentity[client.identity].id,
+              2,
+            );
             const cardChangeRelations: createCard_ChargerDto = {
               cardId: card.id,
               chargeId: chargeidentity[client.identity].id,
