@@ -118,9 +118,11 @@ export class TransactionService {
       .leftJoinAndSelect('transaction.charge', 'charge')
       .leftJoinAndSelect('transaction.timezones', 'timezone')
       .leftJoinAndSelect('transaction.card', 'card')
+      .leftJoinAndSelect('transaction.conector', 'conector')
       .leftJoinAndSelect('transaction.user', 'user')
       .select([
         'charge',
+        'conector',
         'transaction',
         'card',
         'user.id',
