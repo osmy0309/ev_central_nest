@@ -368,6 +368,9 @@ export class OcppService {
           objet.params,
         );
         let flagChangeSon = true;
+        let conectorId = chargeidentity[client.identity].conector.find(
+          (conector) => conector.name === objet.params.connectorId,
+        );
         // create a wildcard handler to handle any RPC method
         const card = await this.cardService.getChargeBySerial(
           objet.params.idTag,
@@ -399,6 +402,12 @@ export class OcppService {
               chargeidentity[client.identity].id,
               2,
             );
+
+            await this.chargeService.updateStateConector(
+              chargeidentity[client.identity].id,
+              conectorId.name,
+              2,
+            );
             const cardChangeRelations: createCard_ChargerDto = {
               cardId: card.id,
               chargeId: chargeidentity[client.identity].id,
@@ -409,7 +418,7 @@ export class OcppService {
               chargeId: chargeidentity[client.identity].id,
               estado: 2,
               userId: card.user.id,
-              conectorId: null,
+              conectorId: conectorId.id,
             };
             await this.chargeService.newCard_Charge(cardChangeRelations);
             const transactionSussess =
@@ -430,7 +439,7 @@ export class OcppService {
             startTransactionStatus[clientconection] = true;
             return {
               transactionId: transactionSussess.id,
-              //timeStampStart: objet.params.timestamp.replace(/\.\d{3}Z$/, 'Z'),
+              conectorId: conectorId.id,
               idTagInfo: {
                 status: 'Accepted',
                 expiryDate: '2032-03-02T12:00:00Z',
@@ -474,8 +483,17 @@ export class OcppService {
       });
 
       client.handle('StopTransaction', async ({ params }) => {
+        const transaction = await this.transactionService.getTransaction(
+          params.transactionId,
+        );
         await this.chargeService.updateStateChargeGeneral(
           chargeidentity[client.identity].id,
+          1,
+        );
+
+        await this.chargeService.updateStateConector(
+          chargeidentity[client.identity].id,
+          transaction.conector.name,
           1,
         );
 
@@ -483,6 +501,7 @@ export class OcppService {
           `Server got StopTransaction from ${client.identity}:`,
           params,
         );
+
         if (startTransactionStatus[clientconection] == false) {
           return {
             transactionId: params.transactionId,
@@ -492,9 +511,7 @@ export class OcppService {
             },
           };
         }
-        const transaction = await this.transactionService.getTransaction(
-          params.transactionId,
-        );
+
         transaction.estado = 3;
         await this.transactionService.changeStatenewTransaction(transaction);
         const dateFinish = new Date(params.timestamp);

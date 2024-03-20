@@ -78,11 +78,21 @@ export class TransactionService {
     return true;
   }
   async getTransaction(id: number): Promise<Transaction> {
-    const transaction = await this.trasactionRepository.findOne({
+    let transaction = this.trasactionRepository
+      .createQueryBuilder('transaction')
+      .leftJoinAndSelect('transaction.charge', 'charge')
+      .leftJoinAndSelect('transaction.timezones', 'timezone')
+      .leftJoinAndSelect('transaction.card', 'card')
+      .leftJoinAndSelect('transaction.conector', 'conector')
+      .select(['charge', 'conector', 'transaction', 'card', 'timezone'])
+      .where('transaction.id = :id', { id: id })
+      .getOne();
+
+    /*const transaction = await this.trasactionRepository.findOne({
       where: {
         id,
       },
-    });
+    });*/
     return transaction;
   }
   // ENDPOINTS PARA LA TABLA RELACIONAL ENTRE TARJETA Y CARGADOR
