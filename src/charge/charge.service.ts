@@ -383,7 +383,7 @@ export class ChargeService {
   }
 
   //ENPONTS PARA INTERACTUAR CON CARGADORES HIJOS
-  async companyIsMySon(id_company: number, id_son: number): Promise<any> {
+  async companyIsMySon(id_company: number, id_son: number): Promise<boolean> {
     async function getMyClientsTreeA(
       id_company: number,
       dataSource: any,
@@ -407,7 +407,7 @@ export class ChargeService {
 
     const treeClient = await getMyClientsTreeA(id_company, this.dataSource);
     if (treeClient.length == 0) {
-      return {};
+      return false;
     }
 
     async function idExistsInTree(
