@@ -756,6 +756,7 @@ export class ChargeService {
 
   async getRecords(user: any) {
     const listCharge = await this.getChargeAllAdmin(user.company, user.roles);
+    console.log('listCharge', listCharge);
     //console.log('HERE TRANS', listCharge[0].transaction[0]);
     let record = [];
     listCharge.forEach((item) => {
@@ -775,6 +776,7 @@ export class ChargeService {
           time: '-',
           potencia: '-',
           card: '-',
+          conector: '-',
         });
       } else {
         item.transaction.forEach((itemTransaction) => {
@@ -817,6 +819,7 @@ export class ChargeService {
             }/${item.last_connection.getFullYear()}`,
             address: item.address,
             municipality: item.municipality,
+            conector: itemTransaction.conector.name,
           });
         });
       }
@@ -830,6 +833,7 @@ export class ChargeService {
     const csvStringifier = createObjectCsvStringifier({
       header: [
         { id: 'nombre', title: 'Nombre' },
+        { id: 'conector', title: 'Conector' },
         { id: 'serial_number', title: 'Número de serie' },
         { id: 'fecha', title: 'Fecha' },
         { id: 'timeinicial', title: 'Hora inicio' },
@@ -858,6 +862,7 @@ export class ChargeService {
     const csvStringifier = createObjectCsvStringifier({
       header: [
         { id: 'nombre', title: 'Name' },
+        { id: 'conector', title: 'Conector' },
         { id: 'serial_number', title: 'Box ID' },
         { id: 'fecha', title: 'Date' },
         { id: 'timeinicial', title: 'Start time' },

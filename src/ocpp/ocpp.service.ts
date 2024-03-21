@@ -39,14 +39,15 @@ export class OcppService {
       const charge = {};
       charge[handshake.identity] = await this.chargeService.getChargeBySerial(
         handshake.identity,
-      );
+      ); // OBTENER DATOS DEL CARGADOR CONECTADO EN LA BD
 
-      // accept the incoming client
+      // CAMBIAR ESTADO A CONECTADO DEL CARGADOR
       if (charge[handshake.identity].id /*&& charge.state != 4*/) {
         await this.chargeService.updateStateChargeGeneral(
           charge[handshake.identity].id,
           1,
         );
+        //CAMBIAR ESTADO A CONECTADO DE LOS CONECTORES
         await this.chargeService.updateStateConector(
           charge[handshake.identity].id,
           null,
@@ -64,14 +65,9 @@ export class OcppService {
     });
 
     server.on('client', async (client) => {
-      // console.log('COSOLE TO CONECTOR ID ', client);
       const chargeidentity = {};
       chargeidentity[client.identity] =
         await this.chargeService.getChargeBySerial(client.identity);
-      /*const response = await this.chargeService.updateStateChargeGeneral(
-        charge.id,
-        1,
-      );*/
 
       let clientconection = client.session.sessionId;
       connectedClients[clientconection] = true;
@@ -91,21 +87,25 @@ export class OcppService {
           client.identity,
         );
         console.log(`${client.identity} disconnected!`);
+        //CAMBIAR ESTADO DEL CARGADOR A DESCONECTADO
         if (chargedisconnect.id && chargedisconnect.state != 4) {
           await this.chargeService.updateStateChargeGeneral(
             chargedisconnect.id,
             3,
           );
+          //CAMBIAR ESTADO DE LOS CONECTORES A DESCONECTADO
           await this.chargeService.updateStateConector(
             chargedisconnect.id,
             null,
             3,
           );
         } else if (chargedisconnect.state == 4) {
+          //CAMBIAR ESTADO DEL CARGADOR A DESHABILITADO
           await this.chargeService.updateStateChargeGeneral(
             chargedisconnect.id,
             4,
           );
+          //CAMBIAR ESTADO DE LOS CONECTORES A DESHABILITADO
           await this.chargeService.updateStateConector(
             chargedisconnect.id,
             null,
@@ -159,6 +159,12 @@ export class OcppService {
             chargeidentity[client.identity].id,
             3,
           );
+
+          await this.chargeService.updateStateConector(
+            chargeidentity[client.identity].id,
+            null,
+            3,
+          );
           await client.disconnect;
           // Lógica para habilitar el cargador con el ID de conector proporcionado
           // Por ejemplo, enviar una señal para habilitar el cargador o realizar cualquier otra acción necesaria
@@ -168,6 +174,12 @@ export class OcppService {
         ) {
           await this.chargeService.updateStateChargeGeneral(
             chargeidentity[client.identity].id,
+            4,
+          );
+
+          await this.chargeService.updateStateConector(
+            chargeidentity[client.identity].id,
+            null,
             4,
           );
           await client.disconnect;
