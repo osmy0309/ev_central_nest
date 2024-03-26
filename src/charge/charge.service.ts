@@ -242,7 +242,8 @@ export class ChargeService {
     const change = await this.chargeRepository
       .createQueryBuilder('charge')
       .leftJoinAndSelect('charge.client', 'company')
-      .select(['charge', 'company.id'])
+      .leftJoinAndSelect('charge.conector', 'conector')
+      .select(['charge', 'company.id', 'conector'])
       .where('charge.id = :id', { id })
       .getOne();
     if (!change) {
@@ -250,7 +251,11 @@ export class ChargeService {
       return {} as Charge;
     }
     change.state = state;
-
+    if (state == 4 && change.conector) {
+      change.conector.map(async (conect) => {
+        await this.updateStateConector(change.id, conect.id.toString(), 4);
+      });
+    }
     await this.chargeRepository.update({ id }, change);
 
     return change;
@@ -313,7 +318,15 @@ export class ChargeService {
     if (change.client.id != id_company) {
       return {} as Charge;
     }
-
+    if (change.conector && charge.state) {
+      change.conector.map(async (conect) => {
+        await this.updateStateConector(
+          change.id,
+          conect.id.toString(),
+          charge.state,
+        );
+      });
+    }
     const response = await this.chargeRepository.update({ id }, charge);
     if (response.affected === 0) {
       return {} as Charge;
@@ -560,7 +573,8 @@ export class ChargeService {
     const change = await this.chargeRepository
       .createQueryBuilder('charge')
       .leftJoinAndSelect('charge.client', 'company')
-      .select(['charge', 'company.id'])
+      .leftJoinAndSelect('charge.conector', 'conector')
+      .select(['charge', 'company.id', 'conector'])
       .where('charge.id = :id', { id })
       .getOne();
 
@@ -577,6 +591,16 @@ export class ChargeService {
     }
 
     await this.chargeRepository.update({ id }, charge);
+
+    if (change.conector && charge.state) {
+      change.conector.map(async (conect) => {
+        await this.updateStateConector(
+          change.id,
+          conect.id.toString(),
+          charge.state,
+        );
+      });
+    }
 
     const updatedCharge = await this.chargeRepository.findOne({
       where: {
