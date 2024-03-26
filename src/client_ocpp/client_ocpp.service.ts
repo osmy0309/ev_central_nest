@@ -10,7 +10,10 @@ export class ClientOcppService {
   private cli: any;
   private autTransaction: boolean = false;
 
-  constructor(private chargeService: ChargeService, private ocppService: OcppService) {}
+  constructor(
+    private chargeService: ChargeService,
+    private ocppService: OcppService,
+  ) {}
   async connect(newConnection: connectDto): Promise<any> {
     this.cli = new RPCClient({
       endpoint: 'wss://evr-back-int.simon-cloud.com/ocpp', // the OCPP endpoint URL
@@ -143,12 +146,23 @@ export class ClientOcppService {
     const charge = await this.chargeService.getChargeBySerial(
       newConnection.identity,
     );
+
+    if (charge.conector && charge.state) {
+      charge.conector.map(async (conect) => {
+        await this.chargeService.updateStateConector(
+          charge.id,
+          conect.id.toString(),
+          4,
+        );
+      });
+    }
+
     await this.chargeService.updateStateChargeGeneral(charge.id, 4);
 
     const client = this.ocppService.allClients.get(newConnection.identity);
     if (!client) {
-        throw Error(" ----> Client not found");
-    }else{
+      throw Error(' ----> Client not found');
+    } else {
       const payload = {
         connectorId: 0,
         type: 'Inoperative',
@@ -171,8 +185,8 @@ export class ClientOcppService {
 
     const client = this.ocppService.allClients.get(newConnection.identity);
     if (!client) {
-        throw Error(" ----> Client not found");
-    }else{
+      throw Error(' ----> Client not found');
+    } else {
       const payload = {
         connectorId: 0,
         type: 'Operative',

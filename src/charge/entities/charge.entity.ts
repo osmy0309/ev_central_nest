@@ -70,6 +70,7 @@ export class Charge {
 
   @OneToMany(() => Conector, (conector) => conector.charge, {
     // cascade: true,
+    nullable: true,
   })
-  public conector: Conector[];
+  public conector?: Conector[];
 }

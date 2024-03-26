@@ -256,6 +256,7 @@ export class ChargeService {
         await this.updateStateConector(change.id, conect.id.toString(), 4);
       });
     }
+    delete change.conector;
     await this.chargeRepository.update({ id }, change);
 
     return change;
