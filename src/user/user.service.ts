@@ -289,6 +289,7 @@ export class UserService {
       .leftJoinAndSelect('user.client', 'company')
       .select(['user', 'company.id'])
       .where('user.username = :username', { username })
+      .andWhere('user.isActive = :username', { username: true })
       .getOne();
     /*const user = await this.userRepository.findOne({
       where: {
