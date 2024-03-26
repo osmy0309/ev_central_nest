@@ -251,6 +251,11 @@ export class ChargeService {
       return {} as Charge;
     }
     change.state = state;
+    if (state == 3 && change.conector) {
+      change.conector.map(async (conect) => {
+        await this.updateStateConector(change.id, conect.id.toString(), 3);
+      });
+    }
     if (state == 4 && change.conector) {
       change.conector.map(async (conect) => {
         await this.updateStateConector(change.id, conect.id.toString(), 4);

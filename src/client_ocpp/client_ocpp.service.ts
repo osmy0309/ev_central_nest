@@ -158,7 +158,6 @@ export class ClientOcppService {
     }
 
     await this.chargeService.updateStateChargeGeneral(charge.id, 4);
-
     const client = this.ocppService.allClients.get(newConnection.identity);
     /*if (!client) {
       throw Error(' ----> Client not found');
