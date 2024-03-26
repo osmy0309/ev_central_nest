@@ -183,20 +183,20 @@ export class ClientOcppService {
     await this.chargeService.updateStateChargeGeneral(charge.id, 3);
 
     const client = this.ocppService.allClients.get(newConnection.identity);
-    if (!client) {
+    /* if (!client) {
       throw Error(' ----> Client not found');
-    } else {
-      const payload = {
-        connectorId: 0,
-        type: 'Operative',
-      };
-      try {
-        const response = await client.call('ChangeAvailability', payload);
-        console.log('RESPONSE', response);
-        return { success: true };
-      } catch (error) {
-        return error;
-      }
+    } else {*/
+    const payload = {
+      connectorId: 0,
+      type: 'Operative',
+    };
+    try {
+      const response = await client.call('ChangeAvailability', payload);
+      console.log('RESPONSE', response);
+      return { success: true };
+    } catch (error) {
+      return error;
     }
+    //}
   }
 }
