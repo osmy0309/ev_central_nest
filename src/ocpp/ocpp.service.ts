@@ -339,7 +339,7 @@ export class OcppService {
       client.handle('MeterValues', async (objet) => {
         console.log(
           `Server got MeterValues from ${client.identity}:`,
-          objet.params,
+          JSON.stringify(objet.params, null, 2),
         );
         console.log(
           'METERVALUES',

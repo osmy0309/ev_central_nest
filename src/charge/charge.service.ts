@@ -253,16 +253,17 @@ export class ChargeService {
     change.state = state;
     if (state == 3 && change.conector) {
       change.conector.map(async (conect) => {
-        await this.updateStateConector(change.id, conect.id.toString(), 3);
+        await this.updateStateConector(change.id, conect.name.toString(), 3);
       });
     }
     if (state == 4 && change.conector) {
       change.conector.map(async (conect) => {
-        await this.updateStateConector(change.id, conect.id.toString(), 4);
+        await this.updateStateConector(change.id, conect.name.toString(), 4);
       });
     }
     delete change.conector;
-    await this.chargeRepository.update({ id }, change);
+    const changess = { state: state };
+    await this.chargeRepository.update(change.id, changess);
 
     return change;
   }
