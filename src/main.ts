@@ -5,10 +5,13 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { OcppService } from './ocpp/ocpp.service';
 import * as dotenv from 'dotenv';
+import { LoggerService } from './services/logger/logger.service';
 
 async function bootstrap() {
   dotenv.config();
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: new LoggerService(),
+  });
 
   const config = new DocumentBuilder()
 

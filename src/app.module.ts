@@ -30,6 +30,7 @@ import { UserSeederService } from './userseeder/userseeder.service';
 import { ClientModule } from './client/client.module';
 import { ConfigModule } from '@nestjs/config';
 import { HealthCheckModule } from './health-check/health-check.module';
+import { LoggerService } from './services/logger/logger.service';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { HealthCheckModule } from './health-check/health-check.module';
     TimeZoneService,
     ChargeService,
     UserSeederService,
+    LoggerService,
   ],
 })
 export class AppModule {}
