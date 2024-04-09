@@ -379,91 +379,109 @@ export class OcppService {
           `Server got StartTransaction from ${client.identity}:`,
           objet.params,
         );
-        let flagChangeSon = true;
-        let conectorId = chargeidentity[client.identity].conector.find(
-          (conector) => conector.name === objet.params.connectorId,
-        );
-        // create a wildcard handler to handle any RPC method
-        const card = await this.cardService.getChargeBySerial(
-          objet.params.idTag,
-        );
-        if (
-          card &&
-          chargeidentity[client.identity].id &&
-          chargeidentity[client.identity].state != 4
-        ) {
-          if (chargeidentity[client.identity].client.id != card.company.id) {
-            flagChangeSon = false;
-            const sonCharge = await this.chargeService.companyIsMySon(
-              card.company.id,
-              chargeidentity[client.identity].client.id,
-            );
-            if (sonCharge) flagChangeSon = true;
-          }
-          // const idTransaction = v4();
-
-          // Verify the idTag and respond with an appropriate response
-
+        try {
+          let flagChangeSon = true;
+          let conectorId = chargeidentity[client.identity].conector.find(
+            (conector) => conector.name === objet.params.connectorId,
+          );
+          // create a wildcard handler to handle any RPC method
+          const card = await this.cardService.getChargeBySerial(
+            objet.params.idTag,
+          );
           if (
             card &&
-            card.user &&
             chargeidentity[client.identity].id &&
-            flagChangeSon
+            chargeidentity[client.identity].state != 4
           ) {
-            await this.chargeService.updateStateChargeGeneral(
-              chargeidentity[client.identity].id,
-              2,
-            );
+            if (chargeidentity[client.identity].client.id != card.company.id) {
+              flagChangeSon = false;
+              const sonCharge = await this.chargeService.companyIsMySon(
+                card.company.id,
+                chargeidentity[client.identity].client.id,
+              );
+              if (sonCharge) flagChangeSon = true;
+            }
+            // const idTransaction = v4();
 
-            await this.chargeService.updateStateConector(
-              chargeidentity[client.identity].id,
-              conectorId.name,
-              2,
-            );
-            const cardChangeRelations: createCard_ChargerDto = {
-              cardId: card.id,
-              chargeId: chargeidentity[client.identity].id,
-              estado: 1,
-            };
-            const transactionDTO: createTrasactionDto = {
-              cardId: card.id,
-              chargeId: chargeidentity[client.identity].id,
-              estado: 2,
-              userId: card.user.id,
-              conectorId: conectorId.id,
-            };
-            await this.chargeService.newCard_Charge(cardChangeRelations);
-            const transactionSussess =
-              await this.transactionService.newTransaction(transactionDTO);
+            // Verify the idTag and respond with an appropriate response
 
-            const lineZoneDTO: createTTimeZoneDTO = {
-              transaction: transactionSussess,
-              energy: 0,
-              deltaEnergy: 0,
-              finish: objet.params.timestamp,
-              start: objet.params.timestamp,
-            };
+            if (
+              card &&
+              card.user &&
+              chargeidentity[client.identity].id &&
+              flagChangeSon
+            ) {
+              await this.chargeService.updateStateChargeGeneral(
+                chargeidentity[client.identity].id,
+                2,
+              );
 
-            await this.timeZoneService.newTimeZone(
-              transactionSussess.id,
-              lineZoneDTO,
-            );
-            startTransactionStatus[clientconection] = true;
-            return {
-              transactionId: transactionSussess.id,
-              conectorId: conectorId.id,
-              idTagInfo: {
-                status: 'Accepted',
-                expiryDate: '2032-03-02T12:00:00Z',
-                parentIdTag: '',
-              },
-            };
-          } else {
-            /*const stopTransactionPayload2 = {
+              await this.chargeService.updateStateConector(
+                chargeidentity[client.identity].id,
+                conectorId.name,
+                2,
+              );
+              const cardChangeRelations: createCard_ChargerDto = {
+                cardId: card.id,
+                chargeId: chargeidentity[client.identity].id,
+                estado: 1,
+              };
+              const transactionDTO: createTrasactionDto = {
+                cardId: card.id,
+                chargeId: chargeidentity[client.identity].id,
+                estado: 2,
+                userId: card.user.id,
+                conectorId: conectorId.id,
+              };
+              await this.chargeService.newCard_Charge(cardChangeRelations);
+              const transactionSussess =
+                await this.transactionService.newTransaction(transactionDTO);
+
+              const lineZoneDTO: createTTimeZoneDTO = {
+                transaction: transactionSussess,
+                energy: 0,
+                deltaEnergy: 0,
+                finish: objet.params.timestamp,
+                start: objet.params.timestamp,
+              };
+
+              await this.timeZoneService.newTimeZone(
+                transactionSussess.id,
+                lineZoneDTO,
+              );
+              startTransactionStatus[clientconection] = true;
+              return {
+                transactionId: transactionSussess.id,
+                conectorId: conectorId.id,
+                idTagInfo: {
+                  status: 'Accepted',
+                  expiryDate: '2032-03-02T12:00:00Z',
+                  parentIdTag: '',
+                },
+              };
+            } else {
+              /*const stopTransactionPayload2 = {
               transactionId: objet.params.transactionId,
               reason: 'Some reason',
             };
             await client.send('StopTransaction', stopTransactionPayload2);*/
+              return {
+                idTagInfo: {
+                  status: 'Rejected',
+                  expiryDate: null,
+                  parentIdTag: '',
+                },
+                errorCode: 'AuthorizationFailed',
+                errorDescription: 'Invalid idTag',
+                preventMeterValue: true,
+              };
+            }
+          } else {
+            /*  const stopTransactionPayload2 = {
+            transactionId: objet.params.transactionId,
+            reason: 'Some reason',
+          };
+          await client.send('StopTransaction', stopTransactionPayload2);*/
             return {
               idTagInfo: {
                 status: 'Rejected',
@@ -475,22 +493,8 @@ export class OcppService {
               preventMeterValue: true,
             };
           }
-        } else {
-          /*  const stopTransactionPayload2 = {
-            transactionId: objet.params.transactionId,
-            reason: 'Some reason',
-          };
-          await client.send('StopTransaction', stopTransactionPayload2);*/
-          return {
-            idTagInfo: {
-              status: 'Rejected',
-              expiryDate: null,
-              parentIdTag: '',
-            },
-            errorCode: 'AuthorizationFailed',
-            errorDescription: 'Invalid idTag',
-            preventMeterValue: true,
-          };
+        } catch (error) {
+          console.error(error);
         }
       });
 
