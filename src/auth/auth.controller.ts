@@ -17,7 +17,10 @@ export class AuthController {
   registerUser(@Body() userObjet: registerUserDto) {
     return this.authService.register(userObjet);
   }*/
-
+  @Get('version')
+  version() {
+    return 'v1.0.81';
+  }
   @Post('login')
   loginUser(@Body() userLogin: loginUserDto) {
     return this.authService.login(userLogin);
