@@ -7,16 +7,14 @@ import { TransactionService } from '../transaction/transaction.service';
 import { v4 } from 'uuid';
 import { createCard_ChargerDto } from 'src/charge/dto/card_charge.dto';
 import { createTrasactionDto } from 'src/transaction/dto/transaction.dto';
-import {
-  createTTimeZoneDTO,
-  updateTTimeZoneDTO,
-} from 'src/time_zone/dto/time_zone.dto';
+import { createTTimeZoneDTO } from 'src/time_zone/dto/time_zone.dto';
 import { async } from 'rxjs';
 
 @Injectable()
 export class OcppService {
   private instanceId: string;
-
+  private charge = {};
+  private connections = {};
   constructor(
     private readonly chargeService: ChargeService,
     private readonly cardService: CardService,
@@ -36,30 +34,34 @@ export class OcppService {
     });
 
     server.auth(async (accept, reject, handshake, other) => {
-      const charge = {};
-      charge[handshake.identity] = await this.chargeService.getChargeBySerial(
-        handshake.identity,
-      ); // OBTENER DATOS DEL CARGADOR CONECTADO EN LA BD
+      //this.conections[handshake.identity]++;
+      if (!this.charge[handshake.identity]) {
+        this.connections[handshake.identity] = 1;
+        this.charge[handshake.identity] =
+          await this.chargeService.getChargeBySerial(handshake.identity); // OBTENER DATOS DEL CARGADOR CONECTADO EN LA BD
 
-      // CAMBIAR ESTADO A CONECTADO DEL CARGADOR
-      if (charge[handshake.identity].id /*&& charge.state != 4*/) {
-        await this.chargeService.updateStateChargeGeneral(
-          charge[handshake.identity].id,
-          1,
-        );
-        //CAMBIAR ESTADO A CONECTADO DE LOS CONECTORES
-        await this.chargeService.updateStateConector(
-          charge[handshake.identity].id,
-          null,
-          1,
-        );
+        // CAMBIAR ESTADO A CONECTADO DEL CARGADOR
+        if (this.charge[handshake.identity].id /*&& charge.state != 4*/) {
+          await this.chargeService.updateStateChargeGeneral(
+            this.charge[handshake.identity].id,
+            1,
+          );
+          //CAMBIAR ESTADO A CONECTADO DE LOS CONECTORES
+          await this.chargeService.updateStateConector(
+            this.charge[handshake.identity].id,
+            null,
+            1,
+          );
+        }
         accept({
           // anything passed to accept() will be attached as a 'session' property of the client.
           sessionId: handshake.identity,
         });
       } else {
+        this.connections[handshake.identity]++;
         accept({
-          error: 'No se pudo autenticar la conexión',
+          sessionId: handshake.identity,
+          //error: 'No se pudo autenticar la conexión',
         });
       }
     });
@@ -82,24 +84,33 @@ export class OcppService {
       console.log(`${client.session.sessionId} connected!`);
       this.allClients.set(client.identity, client); // store client reference
 
-      client.on('disconnect', async () => {
+      client.on('disconnect', async (params) => {
         const chargedisconnect = await this.chargeService.getChargeBySerial(
           client.identity,
         );
+        if (this.connections[chargedisconnect.nombre] > 1) {
+          this.connections[chargedisconnect.nombre]--;
+        } else {
+          this.connections[chargedisconnect.nombre] = {};
+          if (chargedisconnect.id && chargedisconnect.state != 4) {
+            await this.chargeService.updateStateChargeGeneral(
+              chargedisconnect.id,
+              3,
+            );
+            //CAMBIAR ESTADO DE LOS CONECTORES A DESCONECTADO
+            await this.chargeService.updateStateConector(
+              chargedisconnect.id,
+              null,
+              3,
+            );
+            delete this.charge[chargedisconnect.nombre];
+          }
+        }
+
         console.log(`${client.identity} disconnected!`);
         //CAMBIAR ESTADO DEL CARGADOR A DESCONECTADO
-        if (chargedisconnect.id && chargedisconnect.state != 4) {
-          await this.chargeService.updateStateChargeGeneral(
-            chargedisconnect.id,
-            3,
-          );
-          //CAMBIAR ESTADO DE LOS CONECTORES A DESCONECTADO
-          await this.chargeService.updateStateConector(
-            chargedisconnect.id,
-            null,
-            3,
-          );
-        } else if (chargedisconnect.state == 4) {
+        if (chargedisconnect.state == 4) {
+          delete this.charge[chargedisconnect.nombre];
           //CAMBIAR ESTADO DEL CARGADOR A DESHABILITADO
           await this.chargeService.updateStateChargeGeneral(
             chargedisconnect.id,
