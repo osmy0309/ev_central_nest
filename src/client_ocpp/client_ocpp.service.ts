@@ -149,11 +149,7 @@ export class ClientOcppService {
 
     if (charge.conector && charge.state) {
       charge.conector.map(async (conect) => {
-        await this.chargeService.updateStateConector(
-          charge.id,
-          conect.id.toString(),
-          4,
-        );
+        await this.chargeService.updateStateConector(charge.id, conect.name, 4);
       });
     }
 
