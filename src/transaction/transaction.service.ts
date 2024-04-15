@@ -77,6 +77,10 @@ export class TransactionService {
     await this.trasactionRepository.query('DELETE FROM conector;');
     return true;
   }
+  async allTransactionState3() {
+    await this.trasactionRepository.query('UPDATE transaction SET estado = 3;');
+    return true;
+  }
   async getTransaction(id: number): Promise<Transaction> {
     let transaction = this.trasactionRepository
       .createQueryBuilder('transaction')

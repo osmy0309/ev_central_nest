@@ -29,6 +29,11 @@ export class TransactionController {
     return await this.transactionService.removeConnectors();
   }
 
+  @Get('allTransactionState3')
+  async allTransactionState3() {
+    return await this.transactionService.allTransactionState3();
+  }
+
   @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
