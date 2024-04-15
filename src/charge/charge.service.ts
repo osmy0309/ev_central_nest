@@ -860,7 +860,7 @@ export class ChargeService {
             timeinicial: this.formatDate(
               date,
               'time',
-              'short',
+              'medium',
               'Europe/Madrid',
               'es-ES',
             ), //`${hours}:${minutes}:${seconds}`,
@@ -945,5 +945,16 @@ export class ChargeService {
     res.set('Content-Type', 'text/csv');
     res.set('Content-Disposition', 'attachment; filename=charge.csv');
     res.send(csvString);
+  }
+  async removeConnectors() {
+    try {
+      await this.connectorRepository.query('DELETE FROM conector;');
+      const charges = await this.chargeRepository.find();
+
+      return true;
+    } catch (error) {
+      console.error('Error al obtener los cargadores:', error);
+      return null;
+    }
   }
 }

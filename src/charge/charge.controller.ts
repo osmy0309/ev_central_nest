@@ -25,6 +25,12 @@ import { Response } from 'express';
 @Controller('charge')
 export class ChargeController {
   constructor(private readonly chargeService: ChargeService) {}
+  @ApiTags('Charges')
+  @Get('removeConnectors')
+  async removeConnectors() {
+    return await this.chargeService.removeConnectors();
+  }
+
   @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
