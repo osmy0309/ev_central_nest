@@ -188,11 +188,11 @@ export class CardService {
       user.company,
       user.roles,
     );
-    const bool = user.roles.some((element) => ['ADMIN'].includes(element));
+    /* const bool = user.roles.some((element) => ['ADMIN'].includes(element));
     if (bool) {
       if (!companies_son.status) myCompany = companies_son; //----En caso de que no tenga comañias hijas
-    }
-
+    }*/
+    addCompanies(companies_son);
     myCompany.push({ id: user.company, name: 'My Company' } as Company);
     addCompanies(myCompany);
     for (const company of arrayallcompany) {
