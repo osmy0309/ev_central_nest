@@ -857,7 +857,13 @@ export class ChargeService {
               'es-ES',
             ),
 
-            timeinicial: `${hours}:${minutes}:${seconds}`,
+            timeinicial: this.formatDate(
+              date,
+              'time',
+              'short',
+              'Europe/Madrid',
+              'es-ES',
+            ), //`${hours}:${minutes}:${seconds}`,
             time: `${differenceHours}:${differenceMinutes}:${differenceSeconds}`,
             energia: itemTransaction.timezones[0]
               ? itemTransaction.timezones[0].energy
