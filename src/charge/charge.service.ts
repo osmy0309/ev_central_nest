@@ -784,6 +784,19 @@ export class ChargeService {
       differenceSeconds,
     };
   };
+  formatDate = (
+    date: Date,
+    type: 'time' | 'date',
+    style: 'short' | 'medium' | 'full',
+    timeZone: string = 'Europe/Madrid',
+    locale: string = 'es-ES',
+  ) => {
+    return new Intl.DateTimeFormat(locale, {
+      dateStyle: type === 'date' ? style : undefined,
+      timeStyle: type === 'time' ? style : undefined,
+      timeZone,
+    }).format(date);
+  };
 
   async getRecords(user: any) {
     const listCharge = await this.getChargeAllAdmin(user.company, user.roles);
@@ -836,7 +849,14 @@ export class ChargeService {
           record.push({
             nombre: item.nombre,
             serial_number: item.serial_number,
-            fecha: extractedDate,
+            fecha: this.formatDate(
+              date,
+              'date',
+              'short',
+              'Europe/Madrid',
+              'es-ES',
+            ),
+
             timeinicial: `${hours}:${minutes}:${seconds}`,
             time: `${differenceHours}:${differenceMinutes}:${differenceSeconds}`,
             energia: itemTransaction.timezones[0]
@@ -845,9 +865,13 @@ export class ChargeService {
             card: itemTransaction.timezones[0]
               ? itemTransaction.card.no_serie
               : '-',
-            last_connection: `${item.last_connection.getDate()}/${
-              item.last_connection.getMonth() + 1
-            }/${item.last_connection.getFullYear()}`,
+            last_connection: this.formatDate(
+              item.last_connection,
+              'date',
+              'short',
+              'Europe/Madrid',
+              'es-ES',
+            ),
             address: item.address,
             municipality: item.municipality,
             conector: itemTransaction.conector.name,
