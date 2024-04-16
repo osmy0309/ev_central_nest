@@ -1012,10 +1012,13 @@ export class ChargeService {
         for (const conector of conectors) {
           if (!transaction.conectorId) {
             if (conector.charge.id == transaction.chargeId) {
-              transaction.user = transaction.card.user;
               transaction.conector = conector;
               await this.transactionRepository.save(transaction);
             }
+          }
+          if (!transaction.userId) {
+            transaction.user = transaction.card.user;
+            await this.transactionRepository.save(transaction);
           }
         }
       }
