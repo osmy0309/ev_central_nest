@@ -950,7 +950,26 @@ export class ChargeService {
     try {
       await this.connectorRepository.query('DELETE FROM conector;');
       const charges = await this.chargeRepository.find();
-
+      for (const charge of charges) {
+        if (charge.conectors > 2) {
+          // Actualizar el cargador para poner los conectores a 2
+          charge.conectors = 2;
+          await this.chargeRepository.save(charge);
+        }
+        if (charge.conectors == 0) {
+          // Actualizar el cargador para poner los conectores a 1
+          charge.conectors = 1;
+          await this.chargeRepository.save(charge);
+        }
+        // Crear el conector en la base de datos
+        for (let i = 0; i < charge.conectors; i++) {
+          await this.connectorRepository.save({
+            charge: charge,
+            name: (i + 1).toString(),
+            state: 3,
+          });
+        }
+      }
       return true;
     } catch (error) {
       console.error('Error al obtener los cargadores:', error);
