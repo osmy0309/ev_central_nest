@@ -1001,11 +1001,18 @@ export class ChargeService {
         .leftJoinAndSelect('connector.charge', 'charge')
         .select(['charge', 'connector'])
         .getMany();
-      const transactions = await this.transactionRepository.find();
+      const transactions = await this.transactionRepository
+        .createQueryBuilder('transaction')
+        .leftJoinAndSelect('transaction.card', 'card')
+        .leftJoinAndSelect('card.user', 'user')
+        .select(['transaction', 'card', 'user'])
+        .getMany();
+      // const transactions = await this.transactionRepository.find();
       for (const transaction of transactions) {
         for (const conector of conectors) {
           if (!transaction.conectorId) {
             if (conector.charge.id == transaction.chargeId) {
+              transaction.user = transaction.card.user;
               transaction.conector = conector;
               await this.transactionRepository.save(transaction);
             }
