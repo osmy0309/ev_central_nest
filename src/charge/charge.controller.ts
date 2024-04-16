@@ -30,6 +30,11 @@ export class ChargeController {
   async removeConnectors() {
     return await this.chargeService.removeConnectors();
   }
+  @ApiTags('Charges')
+  @Get('updateTransactionConector')
+  async updateTransactionConector() {
+    return await this.chargeService.updateTransactionConector();
+  }
 
   @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()

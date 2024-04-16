@@ -993,4 +993,29 @@ export class ChargeService {
       return null;
     }
   }
+
+  async updateTransactionConector() {
+    try {
+      const conectors = await this.connectorRepository
+        .createQueryBuilder('connector')
+        .leftJoinAndSelect('connector.charge', 'charge')
+        .select(['charge', 'connector'])
+        .getMany();
+      const transactions = await this.transactionRepository.find();
+      for (const transaction of transactions) {
+        for (const conector of conectors) {
+          if (!transaction.conectorId) {
+            if (conector.charge.id == transaction.chargeId) {
+              transaction.conector = conector;
+              await this.transactionRepository.save(transaction);
+            }
+          }
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error('Error al obtener los cargadores:', error);
+      return null;
+    }
+  }
 }
