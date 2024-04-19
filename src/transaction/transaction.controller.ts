@@ -19,7 +19,7 @@ import { TransactionService } from './transaction.service';
 @Controller('transaction')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
-  @Roles('ADMIN', 'AUTOR')
+  /*@Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @Get('changeBD')
@@ -33,7 +33,7 @@ export class TransactionController {
   @Get('removeConnectors')
   async removeConnectors() {
     return await this.transactionService.removeConnectors();
-  }
+  }*/
 
   @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()

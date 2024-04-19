@@ -66,17 +66,17 @@ export class TransactionService {
     return transaction;
   }
 
-  async updateBD(): Promise<boolean> {
+  /*async updateBD(): Promise<boolean> {
     await this.trasactionRepository.query(
       'UPDATE transaction t, card c SET t.userId = c.userId WHERE t.cardId = c.id AND t.userId IS NULL AND c.userId IS NOT NULL;',
     );
     return true;
-  }
+  }*/
 
-  async removeConnectors() {
+  /* async removeConnectors() {
     await this.trasactionRepository.query('DELETE FROM conector;');
     return true;
-  }
+  }*/
   async allTransactionState3() {
     await this.trasactionRepository.query('UPDATE transaction SET estado = 3;');
     return true;
