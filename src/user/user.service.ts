@@ -149,11 +149,12 @@ export class UserService {
       if (users.length == 0) continue;
       for (const user of users) {
         allUsers.push(user);
+        allUsers[allUsers.length - 1].charge_information = [];
         for (const char of charges) {
           if (char.transaction.length > 0) {
             for (const transaction of char.transaction) {
-              if (user?.id == transaction.card?.user?.id) {
-                allUsers[allUsers.length - 1].charge_information = [char];
+              if (user?.id == transaction.user?.id && transaction.estado == 2) {
+                allUsers[allUsers.length - 1].charge_information.push(char);
               }
             }
           }
