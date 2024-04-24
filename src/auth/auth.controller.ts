@@ -19,7 +19,12 @@ export class AuthController {
   }*/
   @Get('version')
   version() {
-    return 'v1.0.91';
+    return {
+      version: 'v1.0.92',
+      database: process.env.DATABASE_NAME,
+      databaseDirection: process.env.DATABASE_HOST,
+      databasePort: process.env.DATABASE_PORT,
+    };
   }
   @Post('login')
   loginUser(@Body() userLogin: loginUserDto) {
