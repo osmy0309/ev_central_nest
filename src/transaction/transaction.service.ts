@@ -168,7 +168,7 @@ export class TransactionService {
     return transaction;
   }
 
-  async stopTransactionByIdCharge(id: number) {
+  /*async stopTransactionByIdCharge(id: number) {
     const transactions = await this.trasactionRepository
       .createQueryBuilder('transaction')
       .select(['transaction'])
@@ -181,7 +181,7 @@ export class TransactionService {
         await this.trasactionRepository.update(transaction.id, transaction);
       }
     });
-  }
+  }*/
 
   async deleteRelationTrasaction(
     deleteTrasaction: deleteTrasactionDto,
