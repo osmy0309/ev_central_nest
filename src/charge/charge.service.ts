@@ -261,9 +261,11 @@ export class ChargeService {
         await this.updateStateConector(change.id, conect.name.toString(), 4);
       });
     }
-    delete change.conector;
+
     const chargeState = change.conector.some((x) => x.state == 2) ? 2 : state;
+    delete change.conector;
     const changess = { state: chargeState };
+
     await this.chargeRepository.update(change.id, changess);
 
     return change;

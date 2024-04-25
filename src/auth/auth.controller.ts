@@ -19,7 +19,7 @@ export class AuthController {
   }*/
   @Get('version')
   version() {
-    return 'v1.0.97';
+    return 'v1.0.98';
   }
   @Post('login')
   loginUser(@Body() userLogin: loginUserDto) {
