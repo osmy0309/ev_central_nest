@@ -263,7 +263,7 @@ export class ChargeService {
     }
 
     let chargeState = state;
-    if (chargeState == 3)
+    if (chargeState == 3 || chargeState == 1)
       chargeState = change.conector.some((x) => x.state == 2) ? 2 : state;
     delete change.conector;
     const changess = { state: chargeState };

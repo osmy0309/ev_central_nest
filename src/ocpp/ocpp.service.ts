@@ -89,10 +89,11 @@ export class OcppService {
           client.identity,
         );
 
-        if (this.connections[chargedisconnect.nombre] > 1) {
-          this.connections[chargedisconnect.nombre]--;
+        if (this.connections[chargedisconnect.serial_number] > 1) {
+          this.connections[chargedisconnect.serial_number]--;
         } else {
           this.connections[chargedisconnect.nombre] = {};
+          this.connections[chargedisconnect.serial_number] = {};
           if (chargedisconnect.id && chargedisconnect.state != 4) {
             await this.chargeService.updateStateChargeGeneral(
               chargedisconnect.id,
