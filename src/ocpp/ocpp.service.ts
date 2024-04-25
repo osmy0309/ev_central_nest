@@ -105,8 +105,8 @@ export class OcppService {
               null,
               3,
             );
-            delete this.charge[chargedisconnect.nombre];
           }
+          delete this.charge[chargedisconnect.serial_number];
         }
 
         console.log(`${client.identity} disconnected!`);
