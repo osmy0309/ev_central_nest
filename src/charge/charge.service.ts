@@ -262,7 +262,9 @@ export class ChargeService {
       });
     }
 
-    const chargeState = change.conector.some((x) => x.state == 2) ? 2 : state;
+    let chargeState = state;
+    if (chargeState == 3)
+      chargeState = change.conector.some((x) => x.state == 2) ? 2 : state;
     delete change.conector;
     const changess = { state: chargeState };
 
