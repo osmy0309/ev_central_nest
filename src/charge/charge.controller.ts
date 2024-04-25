@@ -26,7 +26,7 @@ import { Response } from 'express';
 export class ChargeController {
   constructor(private readonly chargeService: ChargeService) {}
 
-  /* @Roles('ADMIN', 'AUTOR')
+  @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
@@ -41,7 +41,7 @@ export class ChargeController {
   @Get('updateTransactionConector')
   async updateTransactionConector() {
     return await this.chargeService.updateTransactionConector();
-  }*/
+  }
 
   @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()

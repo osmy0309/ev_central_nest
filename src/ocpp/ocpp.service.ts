@@ -88,6 +88,9 @@ export class OcppService {
         const chargedisconnect = await this.chargeService.getChargeBySerial(
           client.identity,
         );
+        await this.transactionService.stopTransactionByIdCharge(
+          chargedisconnect.id,
+        );
         if (this.connections[chargedisconnect.nombre] > 1) {
           this.connections[chargedisconnect.nombre]--;
         } else {

@@ -946,7 +946,7 @@ export class ChargeService {
     res.set('Content-Disposition', 'attachment; filename=charge.csv');
     res.send(csvString);
   }
-  /* async removeConnectors() {
+  async removeConnectors() {
     try {
       await this.connectorRepository.query('DELETE FROM conector;');
       const charges = await this.chargeRepository.find();
@@ -992,9 +992,9 @@ export class ChargeService {
       console.error('Error al obtener los cargadores:', error);
       return null;
     }
-  }*/
+  }
 
-  /* async updateTransactionConector() {
+  async updateTransactionConector() {
     try {
       const conectors = await this.connectorRepository
         .createQueryBuilder('connector')
@@ -1027,5 +1027,5 @@ export class ChargeService {
       console.error('Error al obtener los cargadores:', error);
       return null;
     }
-  }*/
+  }
 }

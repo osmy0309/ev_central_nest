@@ -10,6 +10,7 @@ import {
 import { Card } from 'src/card/entities/card.entity';
 import { Transaction } from './entities/transaction.entity';
 import { Charge } from 'src/charge/entities/charge.entity';
+import { async } from 'rxjs';
 
 @Injectable()
 export class TransactionService {
@@ -66,17 +67,17 @@ export class TransactionService {
     return transaction;
   }
 
-  /*async updateBD(): Promise<boolean> {
+  async updateBD(): Promise<boolean> {
     await this.trasactionRepository.query(
       'UPDATE transaction t, card c SET t.userId = c.userId WHERE t.cardId = c.id AND t.userId IS NULL AND c.userId IS NOT NULL;',
     );
     return true;
-  }*/
+  }
 
-  /* async removeConnectors() {
+  async removeConnectors() {
     await this.trasactionRepository.query('DELETE FROM conector;');
     return true;
-  }*/
+  }
   async allTransactionState3() {
     await this.trasactionRepository.query('UPDATE transaction SET estado = 3;');
     return true;
@@ -92,11 +93,6 @@ export class TransactionService {
       .where('transaction.id = :id', { id: id })
       .getOne();
 
-    /*const transaction = await this.trasactionRepository.findOne({
-      where: {
-        id,
-      },
-    });*/
     return transaction;
   }
   // ENDPOINTS PARA LA TABLA RELACIONAL ENTRE TARJETA Y CARGADOR
@@ -170,6 +166,21 @@ export class TransactionService {
     // Si necesitas manejar algún tipo de error si no se encuentra ninguna transacción, puedes hacerlo aquí
 
     return transaction;
+  }
+
+  async stopTransactionByIdCharge(id: number) {
+    const transactions = await this.trasactionRepository
+      .createQueryBuilder('transaction')
+      .select(['transaction'])
+      .where('chargeID = :id', { id })
+      .getMany();
+
+    transactions.forEach(async (transaction) => {
+      if (transaction.estado != 3) {
+        transaction.estado = 3;
+        await this.trasactionRepository.update(transaction.id, transaction);
+      }
+    });
   }
 
   async deleteRelationTrasaction(
