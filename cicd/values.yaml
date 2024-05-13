@@ -133,8 +133,7 @@ ingress:
   groupOrder: 26-
   className: 'alb'
   annotations:
-    alb.ingress.kubernetes.io/group.name: 'develop-public-k8s' # Use same ALB for every ingress with current group name
-    alb.ingress.kubernetes.io/load-balancer-name: 'k8s-develop-public'
+    alb.ingress.kubernetes.io/load-balancer-name: 'develop-public-k8s'
     alb.ingress.kubernetes.io/group.order: '26'
     alb.ingress.kubernetes.io/target-type: 'ip'
     alb.ingress.kubernetes.io/scheme: 'internet-facing' # internet-facing to use public subnets  internal
