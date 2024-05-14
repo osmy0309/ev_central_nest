@@ -395,10 +395,9 @@ export class OcppService {
         try {
           let flagChangeSon = true;
           let conectorId = chargeidentity[client.identity].conector.find(
-            (conector) =>
-              //conector.name.toString() === objet.params.connectorId.toString(),
-              JSON.stringify(conector.name) ===
-              JSON.stringify(objet.params.connectorId),
+            (conector) => conector.name == objet.params.connectorId,
+            //JSON.stringify(conector.name) ===
+            objet.params.connectorId,
           );
           // create a wildcard handler to handle any RPC method
           const card = await this.cardService.getChargeBySerial(
