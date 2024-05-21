@@ -26,15 +26,15 @@ import { Response } from 'express';
 export class ChargeController {
   constructor(private readonly chargeService: ChargeService) {}
 
-  @Roles('ADMIN', 'AUTOR')
+  /*@Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
   @Get('removeConnectorsandCreate')
   async removeConnectors() {
     return await this.chargeService.removeConnectors();
-  }
-  @Roles('ADMIN', 'AUTOR')
+  }*/
+  /*@Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
   @ApiTags('Charges')
@@ -42,7 +42,7 @@ export class ChargeController {
   async updateTransactionConector() {
     return await this.chargeService.updateTransactionConector();
   }
-
+*/
   @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
   @Auth()
