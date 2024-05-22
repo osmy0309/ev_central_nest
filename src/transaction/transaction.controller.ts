@@ -19,17 +19,19 @@ import { TransactionService } from './transaction.service';
 @Controller('transaction')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
-  @Roles('ADMIN', 'AUTOR')
+  /*@Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
-  @Auth()
+  @Auth()*/
+  @ApiTags('Transaction')
   @Get('changeBD')
   async UpdateBD() {
     return await this.transactionService.updateBD();
   }
 
-  @Roles('ADMIN', 'AUTOR')
+  /* @Roles('ADMIN', 'AUTOR')
   @ApiBearerAuth()
-  @Auth()
+  @Auth()*/
+  @ApiTags('Transaction')
   @Get('removeConnectors')
   async removeConnectors() {
     return await this.transactionService.removeConnectors();
