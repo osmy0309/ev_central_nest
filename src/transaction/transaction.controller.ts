@@ -17,6 +17,7 @@ import { TransactionService } from './transaction.service';
 
 @ApiTags('Transaction')
 @Controller('transaction')
+//Endpoints adicionales
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
   /*@Roles('ADMIN', 'AUTOR')
