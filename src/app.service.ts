@@ -9,6 +9,6 @@ export class AppService {
   }*/
   async getHello(): Promise<string> {
     // await this.ocppService.startClient();
-    return 'Hello World2!';
+    return 'status:ok';
   }
 }
