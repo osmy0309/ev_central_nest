@@ -10,7 +10,7 @@ FROM node:18-alpine AS production
 EXPOSE 3800
 EXPOSE 3100
 EXPOSE 3200
-RUN apk add --no-cache openrc nginx curl
+RUN apk add --no-cache openrc nginx curl net-tools iproute2
 COPY ./config/nginx.conf /etc/nginx/nginx.conf
 COPY ./config/boot.sh ./usr/src/boot.sh
 RUN chmod +x ./usr/src/boot.sh
