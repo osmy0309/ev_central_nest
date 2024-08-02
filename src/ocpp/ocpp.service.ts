@@ -154,6 +154,15 @@ export class OcppService {
           status: 'Accepted',
         };
       });
+      client.handle('FirmwareStatusNotification', ({ status }) => {
+        console.log(
+          `Firmware Status Notification from ${client.identity} ${status}`,
+        );
+
+        return {
+          status: 'Accepted',
+        };
+      });
 
       client.handle('ChangeAvailability', async (clientparam, command) => {
         console.log(
