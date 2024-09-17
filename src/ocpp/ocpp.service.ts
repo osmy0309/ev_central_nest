@@ -125,6 +125,24 @@ export class OcppService {
             4,
           );
         }
+        if (chargedisconnect.state == 2 || chargedisconnect.state == 1) {
+          delete this.charge[chargedisconnect.nombre];
+          //CAMBIAR ESTADO DEL CARGADOR A DESHABILITADO
+          await this.chargeService.updateStateChargeGeneral(
+            chargedisconnect.id,
+            3,
+          );
+          this.transactionService;
+          //CAMBIAR ESTADO DE LOS CONECTORES A DESHABILITADO
+          await this.chargeService.updateStateConector(
+            chargedisconnect.id,
+            null,
+            3,
+          );
+          await this.transactionService.changeStatenTransactionByCharge(
+            chargedisconnect.id,
+          );
+        }
 
         delete connectedClients[clientconection];
         // Aquí puedes agregar la lógica para manejar la desconexión del sistema central
@@ -154,6 +172,22 @@ export class OcppService {
           status: 'Accepted',
         };
       });
+
+      client.handle('UpdateFirmware', async ({ params }) => {
+        console.log(
+          `Server got UpdateFirmware from ${client.identity}:`,
+          params,
+        );
+
+        const { location, retrieveDate, retries, retryInterval } = params;
+
+        // Aquí puedes implementar la lógica para manejar la actualización de firmware,
+        // por ejemplo, iniciar el proceso de descarga e instalación del firmware.
+        return {
+          status: 'Accepted',
+        };
+      });
+
       client.handle('FirmwareStatusNotification', ({ status }) => {
         console.log(
           `Firmware Status Notification from ${client.identity} ${status}`,
@@ -638,6 +672,17 @@ export class OcppService {
             status: 'Rejected',
           };
         }
+      });
+      // Implementación del controlador por defecto
+      client.handle((command) => {
+        console.log(
+          `Received unknown command ${command.action} from ${client.identity}`,
+        );
+
+        // Responder con 'Accepted' por defecto
+        return {
+          status: 'Accepted',
+        };
       });
     });
     async function startServer() {

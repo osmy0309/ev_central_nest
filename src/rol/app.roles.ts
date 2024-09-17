@@ -3,6 +3,7 @@ import { RolesBuilder } from 'nest-access-control';
 export enum AppRoles {
   ADMIN = 'ADMIN',
   AUTOR = 'AUTOR',
+  USER = 'USER',
 }
 
 export enum AppRecources {

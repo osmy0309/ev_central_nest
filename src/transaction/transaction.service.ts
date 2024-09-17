@@ -120,6 +120,27 @@ export class TransactionService {
     });
     return transaction;
   }
+  async changeStatenTransactionByCharge(charge: any): Promise<boolean> {
+    /* const relactionexist = await this.trasactionRepository.find({
+      where: {
+        conectorId: conector,
+      },
+    });
+*/
+    const relactionexist = await this.trasactionRepository
+      .createQueryBuilder('transaction')
+      .select('transaction')
+      .leftJoinAndSelect('transaction.charge', 'charge')
+      .where('charge.id = :id', { id: charge })
+      .getMany();
+    relactionexist.forEach(async (elements) => {
+      elements.estado = 3;
+
+      await this.trasactionRepository.update({ id: elements.id }, elements);
+    });
+
+    return true;
+  }
   async filterTransaction(
     newTransaction: filterTrasactionDto,
   ): Promise<Transaction[]> {
