@@ -149,10 +149,7 @@ export class TransactionService {
     return transaction;
   }
 
-  async changeStatenTransactionByConnector(
-    conector: any,
-    idcard: any,
-  ): Promise<boolean> {
+  async changeStatenTransactionByConnector(conector: any): Promise<boolean> {
     const relactionexist = await this.trasactionRepository
       .createQueryBuilder('transaction')
       .select('transaction')
@@ -160,7 +157,6 @@ export class TransactionService {
       .leftJoinAndSelect('transaction.conector', 'conector')
       .where('conector.id = :id', { id: conector })
       .andWhere('transaction.estado = :estado', { estado: 2 })
-      .andWhere('card.id = :card', { card: idcard })
       .getMany();
     relactionexist.forEach(async (elements) => {
       elements.estado = 3;

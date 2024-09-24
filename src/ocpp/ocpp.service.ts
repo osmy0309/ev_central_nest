@@ -484,6 +484,11 @@ export class OcppService {
                 chargeId: chargeidentity[client.identity].id,
                 estado: 1,
               };
+
+              await this.transactionService.changeStatenTransactionByConnector(
+                conectorId.id,
+              );
+
               const transactionDTO: createTrasactionDto = {
                 cardId: card.id,
                 chargeId: chargeidentity[client.identity].id,
