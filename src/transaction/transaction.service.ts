@@ -1,6 +1,7 @@
 import { Injectable, HttpException } from '@nestjs/common';
 import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { RPCClient } from 'ocpp-rpc';
 import {
   createTrasactionDto,
   updateTrasactionDto,
@@ -14,6 +15,7 @@ import { async } from 'rxjs';
 
 @Injectable()
 export class TransactionService {
+  private cli: any;
   constructor(
     @InjectRepository(Charge)
     private chargeRepository: Repository<Charge>,
@@ -78,6 +80,31 @@ export class TransactionService {
     await this.trasactionRepository.query('DELETE FROM conector;');
     return true;
   }
+  async connectionRemote() {
+    const WebSocket = require('ws');
+    const url = 'ws://127.0.0.1:3100'; // Asegúrate de que esta URL sea correcta
+    this.cli = new RPCClient({
+      endpoint: url, // URL del servidor OCPP
+      identity: 'SMA00061', // Identidad OCPP
+      protocols: ['ocpp1.6'], // Protocolo OCPP
+      strictMode: false, // Modo estricto
+    });
+
+    try {
+      // Conectar al servidor OCPP
+      await this.cli.connect({
+        additionalParam: 'valor adicional',
+      });
+      const bootResponse = await this.cli.call('BootNotification', {
+        chargePointVendor: 'ocpp-rpc',
+        chargePointModel: 'ocpp-rpc',
+      });
+      return { connect: 'on' };
+    } catch (error) {
+      console.error('Error al conectar:', error);
+      return { connect: 'off', error: error.message };
+    }
+  }
   async allTransactionState3() {
     await this.trasactionRepository.query('UPDATE transaction SET estado = 3;');
     return true;
@@ -95,6 +122,7 @@ export class TransactionService {
 
     return transaction;
   }
+
   // ENDPOINTS PARA LA TABLA RELACIONAL ENTRE TARJETA Y CARGADOR
   async changeStatenewTransaction(
     newTransaction: updateTrasactionDto,
@@ -120,18 +148,35 @@ export class TransactionService {
     });
     return transaction;
   }
-  async changeStatenTransactionByCharge(charge: any): Promise<boolean> {
-    /* const relactionexist = await this.trasactionRepository.find({
-      where: {
-        conectorId: conector,
-      },
+
+  async changeStatenTransactionByConnector(
+    conector: any,
+    idcard: any,
+  ): Promise<boolean> {
+    const relactionexist = await this.trasactionRepository
+      .createQueryBuilder('transaction')
+      .select('transaction')
+      .leftJoinAndSelect('transaction.card', 'card')
+      .leftJoinAndSelect('transaction.conector', 'conector')
+      .where('conector.id = :id', { id: conector })
+      .andWhere('transaction.estado = :estado', { estado: 2 })
+      .andWhere('card.id = :card', { card: idcard })
+      .getMany();
+    relactionexist.forEach(async (elements) => {
+      elements.estado = 3;
+
+      await this.trasactionRepository.update({ id: elements.id }, elements);
     });
-*/
+
+    return true;
+  }
+  async changeStatenTransactionByCharge(charge: any): Promise<boolean> {
     const relactionexist = await this.trasactionRepository
       .createQueryBuilder('transaction')
       .select('transaction')
       .leftJoinAndSelect('transaction.charge', 'charge')
       .where('charge.id = :id', { id: charge })
+      .andWhere('transaction.estado = :estado', { estado: 2 })
       .getMany();
     relactionexist.forEach(async (elements) => {
       elements.estado = 3;
